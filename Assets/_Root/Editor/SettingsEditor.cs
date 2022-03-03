@@ -4,6 +4,7 @@ using System.IO;
 using Snorlax.Ads;
 using UnityEditor;
 using UnityEngine;
+using Network = Snorlax.Ads.Network;
 
 namespace Snorlax.AdsEditor
 {
@@ -54,15 +55,26 @@ namespace Snorlax.AdsEditor
 
         //Runtime auto initialization
         private SerializedProperty _autoInitializeProperty;
+        public static bool callFromEditorWindow = false;
+
+        private const float ACTION_FIELD_WIDTH = 60f;
+        private const float NETWORK_FIELD_MIN_WIDTH = 120f;
+        private const float VERSION_FIELD_MIN_WIDTH = 120f;
+        private static readonly GUILayoutOption NetworkWidthOption = GUILayout.Width(NETWORK_FIELD_MIN_WIDTH);
+        private static readonly GUILayoutOption VersionWidthOption = GUILayout.Width(VERSION_FIELD_MIN_WIDTH);
+        private static readonly GUILayoutOption FieldWidth = GUILayout.Width(ACTION_FIELD_WIDTH);
+        private GUIContent _warningIcon;
+        private GUIContent _iconMinus;
 
         #endregion
-
-        public static bool callFromEditorWindow = false;
 
         #region api
 
         private void Init()
         {
+            _warningIcon = IconContent("console.warnicon.sml", "Adapter not compatible, please update to the latest version.");
+            _iconMinus = IconContent("Toolbar Minus", "Uninstall entry");
+
             _autoInitializeProperty = serializedObject.FindProperty("runtimeAutoInitialize");
 
             AdProperties.main = serializedObject.FindProperty("adSettings");
@@ -136,6 +148,16 @@ namespace Snorlax.AdsEditor
                             EditorGUILayout.PropertyField(AdmobProperties.useAdaptiveBanner.property, AdmobProperties.useAdaptiveBanner.content);
                         }
 
+                        DrawUppercaseSection("ADMOB_MODULE_MEDIATION",
+                            "MEDIATION",
+                            () =>
+                            {
+                                foreach (var network in Settings.AdmobSettings.MediationNetworks)
+                                {
+                                    DrawNetworkDetailRow(network);
+                                }
+                            });
+
                         EditorGUILayout.Space();
                         EditorGUILayout.PropertyField(AdmobProperties.enableTestMode.property, AdmobProperties.enableTestMode.content);
                         if (Settings.AdmobSettings.EnableTestMode)
@@ -151,6 +173,96 @@ namespace Snorlax.AdsEditor
 
             EditorGUI.EndDisabledGroup();
             serializedObject.ApplyModifiedProperties();
+        }
+
+        private void DrawNetworkDetailRow(Network network)
+        {
+            string action;
+            string currentVersion = network.currentVersion;
+            string latestVersion = network.lastVersion;
+            bool isActionEnabled;
+            bool isInstalled;
+            if (string.IsNullOrEmpty(currentVersion))
+            {
+                action = "Install";
+                currentVersion = "Not Installed";
+                isActionEnabled = true;
+                isInstalled = false;
+            }
+            else
+            {
+                isInstalled = true;
+
+                var comparison = network.CurrentToLatestVersionComparisonResult;
+                // A newer version is available
+                if (comparison == EVersionComparisonResult.Lesser)
+                {
+                    action = "Upgrade";
+                    isActionEnabled = true;
+                }
+                // Current installed version is newer than latest version from DB (beta version)
+                else if (comparison == EVersionComparisonResult.Greater)
+                {
+                    action = "Installed";
+                    isActionEnabled = false;
+                }
+                // Already on the latest version
+                else
+                {
+                    action = "Installed";
+                    isActionEnabled = false;
+                }
+            }
+
+            GUILayout.Space(4);
+            using (new EditorGUILayout.HorizontalScope(GUILayout.ExpandHeight(false)))
+            {
+                GUILayout.Space(5);
+                EditorGUILayout.LabelField(new GUIContent(network.displayName), NetworkWidthOption);
+                EditorGUILayout.LabelField(new GUIContent(currentVersion), VersionWidthOption);
+                GUILayout.Space(3);
+                EditorGUILayout.LabelField(new GUIContent(latestVersion), VersionWidthOption);
+                GUILayout.Space(3);
+                GUILayout.FlexibleSpace();
+
+                if (network.requireUpdate)
+                {
+                    GUILayout.Label(_warningIcon);
+                }
+
+                GUI.enabled = isActionEnabled;
+                if (GUILayout.Button(new GUIContent(action), FieldWidth))
+                {
+                    // Download the plugin.
+                }
+
+                GUI.enabled = true;
+                GUILayout.Space(2);
+
+                GUI.enabled = isInstalled;
+                if (GUILayout.Button(_iconMinus))
+                {
+                    //EditorUtility.DisplayProgressBar("Integration Manager", "Deleting " + network.Name + "...", 0.5f);
+                    //var pluginRoot = AppLovinIntegrationManager.MediationSpecificPluginParentDirectory;
+                    //foreach (var pluginFilePath in network.PluginFilePaths)
+                    //{
+                    //    FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, pluginFilePath));
+                    //}
+
+                    //AppLovinIntegrationManager.UpdateCurrentVersions(network, pluginRoot);
+
+                    // Refresh UI
+                    AssetDatabase.Refresh();
+                    EditorUtility.ClearProgressBar();
+                }
+
+                GUI.enabled = true;
+                GUILayout.Space(5);
+            }
+
+            if (isInstalled)
+            {
+            }
         }
 
         #endregion
@@ -267,6 +379,12 @@ namespace Snorlax.AdsEditor
             if (foldout && drawer != null) drawer();
 
             EditorGUILayout.EndVertical();
+        }
+
+        private static GUIContent IconContent(string name, string tooltip)
+        {
+            var builtinIcon = EditorGUIUtility.IconContent(name);
+            return new GUIContent(builtinIcon.image, tooltip);
         }
 
         #endregion

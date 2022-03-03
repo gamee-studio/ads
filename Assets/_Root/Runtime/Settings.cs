@@ -26,7 +26,6 @@ namespace Snorlax.Ads
             }
         }
 
-
         #region member
 
         [SerializeField] private bool runtimeAutoInitialize = true;

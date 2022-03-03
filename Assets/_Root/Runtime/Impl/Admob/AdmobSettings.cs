@@ -15,6 +15,8 @@ namespace Snorlax.Ads
         [SerializeField] private AdmobRewardedInterstitialUnit rewardedInterstitialAdUnit;
         [SerializeField] private bool enableTestMode;
         [SerializeField] private bool useAdaptiveBanner;
+        
+        private List<Network> _mediationNetworks = new List<Network>();
 
         public bool Enable => enable;
         public List<string> DevicesTest => devicesTest;
@@ -26,5 +28,7 @@ namespace Snorlax.Ads
         public AdmobRewardedUnit RewardedAdUnit => rewardedAdUnit;
 
         public AdmobRewardedInterstitialUnit RewardedInterstitialAdUnit => rewardedInterstitialAdUnit;
+
+        public List<Network> MediationNetworks { get => _mediationNetworks; set => _mediationNetworks = value; }
     }
 }

@@ -1,7 +1,10 @@
-using System;
+using System.Collections.Generic;
+using System.Net;
+using Newtonsoft.Json;
 using Snorlax.Ads;
 using UnityEditor;
 using UnityEngine;
+using Network = Snorlax.Ads.Network;
 
 namespace Snorlax.AdsEditor
 {
@@ -48,6 +51,15 @@ namespace Snorlax.AdsEditor
             return window;
         }
 
+        private static void Load()
+        {
+            using var curl = new WebClient();
+            curl.Headers.Add(HttpRequestHeader.UserAgent, "request");
+            const string url = "https://gist.githubusercontent.com/yenmoc/d79936098344befbd8edfa882c17bf20/raw";
+            string json = curl.DownloadString(url);
+            Settings.AdmobSettings.MediationNetworks = JsonConvert.DeserializeObject<List<Network>>(json);
+        }
+
         public static void ShowWindow()
         {
             var window = GetWindow();
@@ -57,7 +69,11 @@ namespace Snorlax.AdsEditor
                 return;
             }
 
+            window.minSize = new Vector2(300, 0);
+
+            Load();
             window.Show();
+            
         }
     }
 }

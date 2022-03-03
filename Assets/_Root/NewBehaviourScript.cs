@@ -7,7 +7,6 @@ public class NewBehaviourScript : MonoBehaviour
     public GameObject fetchRewarded;
     public GameObject fetchRewardedInterstitial;
 
-
     private void Update()
     {
         fetchInterstitial.SetActive(!Advertising.IsInterstitialAdReady());
