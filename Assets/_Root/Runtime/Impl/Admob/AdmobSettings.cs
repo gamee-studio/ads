@@ -14,16 +14,17 @@ namespace Snorlax.Ads
         [SerializeField] private AdmobRewardedUnit rewardedAdUnit;
         [SerializeField] private AdmobRewardedInterstitialUnit rewardedInterstitialAdUnit;
         [SerializeField] private bool enableTestMode;
+        [SerializeField] private bool useAdaptiveBanner;
 
         public bool Enable => enable;
         public List<string> DevicesTest => devicesTest;
         public bool EnableTestMode => enableTestMode;
+        public bool UseAdaptiveBanner => useAdaptiveBanner;
         public AdmobBannerUnit BannerAdUnit => bannerAdUnit;
 
         public AdmobIntestitialUnit InterstitialAdUnit => interstitialAdUnit;
         public AdmobRewardedUnit RewardedAdUnit => rewardedAdUnit;
 
         public AdmobRewardedInterstitialUnit RewardedInterstitialAdUnit => rewardedInterstitialAdUnit;
-        
     }
 }
