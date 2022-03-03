@@ -1,0 +1,267 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using Snorlax.Ads;
+using UnityEditor;
+using UnityEngine;
+
+namespace Snorlax.AdsEditor
+{
+    [CustomEditor(typeof(Settings))]
+    internal class SettingsEditor : Editor
+    {
+        private class Property
+        {
+            public SerializedProperty property;
+            public GUIContent content;
+
+            public Property(SerializedProperty property, GUIContent content)
+            {
+                this.property = property;
+                this.content = content;
+            }
+
+            public Property(GUIContent content) { this.content = content; }
+        }
+
+        private static class AdProperties
+        {
+            public static SerializedProperty main;
+
+            public static Property autoInit = new Property(null, new GUIContent("Auto Init", "Whether the ads should automatically initialize itself"));
+            public static Property autoLoadAdsMode = new Property(null, new GUIContent("Auto Ad-Loading Mode"));
+            public static Property adCheckingInterval = new Property(null, new GUIContent("Ad Checking Interval", "Time (seconds) between 2 ad-availability checks"));
+
+            public static Property adLoadingInterval = new Property(null,
+                new GUIContent("Ad Loading Interval",
+                    "Minimum time (seconds) between two ad-loading requests, this is to restrict the number of requests sent to ad networks"));
+        }
+
+        private static class AdmobProperties
+        {
+            public static SerializedProperty main;
+            public static Property enable = new Property(null, new GUIContent("Enable", "Enable using admob ad"));
+            public static Property devicesTest = new Property(null, new GUIContent("Devices Test", "List devices show real ad but mark test user"));
+            public static Property bannerAdUnit = new Property(null, new GUIContent("Banner Ad"));
+            public static Property interstitialAdUnit = new Property(null, new GUIContent("Interstitial Ad"));
+            public static Property rewardedAdUnit = new Property(null, new GUIContent("Rewarded Ad"));
+            public static Property rewardedInterstitialAdUnit = new Property(null, new GUIContent("Rewarded Interstitial Ad"));
+            public static Property enableTestMode = new Property(null, new GUIContent("Enable Test Mode", "Enable true when want show test ad"));
+        }
+
+        #region properties
+
+        //Runtime auto initialization
+        private SerializedProperty _autoInitializeProperty;
+
+        #endregion
+
+        public static bool callFromEditorWindow = false;
+
+        #region api
+
+        private void Init()
+        {
+            _autoInitializeProperty = serializedObject.FindProperty("runtimeAutoInitialize");
+
+            AdProperties.main = serializedObject.FindProperty("adSettings");
+            AdProperties.autoInit.property = AdProperties.main.FindPropertyRelative("autoInit");
+            AdProperties.autoLoadAdsMode.property = AdProperties.main.FindPropertyRelative("autoLoadingAd");
+            AdProperties.adCheckingInterval.property = AdProperties.main.FindPropertyRelative("adCheckingInterval");
+            AdProperties.adLoadingInterval.property = AdProperties.main.FindPropertyRelative("adLoadingInterval");
+
+            AdmobProperties.main = serializedObject.FindProperty("admobSettings");
+            AdmobProperties.enable.property = AdmobProperties.main.FindPropertyRelative("enable");
+            AdmobProperties.devicesTest.property = AdmobProperties.main.FindPropertyRelative("devicesTest");
+            AdmobProperties.bannerAdUnit.property = AdmobProperties.main.FindPropertyRelative("bannerAdUnit");
+            AdmobProperties.interstitialAdUnit.property = AdmobProperties.main.FindPropertyRelative("interstitialAdUnit");
+            AdmobProperties.rewardedAdUnit.property = AdmobProperties.main.FindPropertyRelative("rewardedAdUnit");
+            AdmobProperties.rewardedInterstitialAdUnit.property = AdmobProperties.main.FindPropertyRelative("rewardedInterstitialAdUnit");
+            AdmobProperties.enableTestMode.property = AdmobProperties.main.FindPropertyRelative("enableTestMode");
+        }
+
+        public override void OnInspectorGUI()
+        {
+            serializedObject.Update();
+            Init();
+
+            if (!callFromEditorWindow)
+            {
+                EditorGUILayout.Space();
+                EditorGUILayout.HelpBox(
+                    "This ScriptableObject holds all the settings of Ads. Please go to menu Tools > Snorlax > Ads or click the button below to edit it.",
+                    MessageType.Info);
+                if (GUILayout.Button("Edit")) SettingsWindow.ShowWindow();
+                return;
+            }
+
+            EditorGUI.BeginDisabledGroup(EditorApplication.isCompiling);
+
+            #region draw
+
+            DrawUppercaseSection("AUTO_INITIALIZE_FOLDOUT_KEY",
+                "AUTO INITIALIZE",
+                () => { EditorGUILayout.PropertyField(AdProperties.autoInit.property, AdProperties.autoInit.content); });
+
+            EditorGUILayout.Space();
+            DrawUppercaseSection("AUTO_AD_LOADING_CONFIG_FOLDOUT_KEY",
+                "AUTO AD-LOADING",
+                () =>
+                {
+                    EditorGUILayout.PropertyField(AdProperties.autoLoadAdsMode.property, AdProperties.autoLoadAdsMode.content);
+                    if (Settings.AdSettings.AutoLoadingAd != EAutoLoadingAd.None)
+                    {
+                        EditorGUILayout.PropertyField(AdProperties.adCheckingInterval.property, AdProperties.adCheckingInterval.content);
+                        EditorGUILayout.PropertyField(AdProperties.adLoadingInterval.property, AdProperties.adLoadingInterval.content);
+                    }
+                });
+
+            EditorGUILayout.Space();
+            DrawUppercaseSection("ADMOB_MODULE",
+                "ADMOB",
+                () =>
+                {
+                    EditorGUILayout.PropertyField(AdmobProperties.enable.property, AdmobProperties.enable.content);
+                    if (Settings.AdmobSettings.Enable)
+                    {
+                        EditorGUILayout.PropertyField(AdmobProperties.bannerAdUnit.property, AdmobProperties.bannerAdUnit.content, true);
+                        EditorGUILayout.PropertyField(AdmobProperties.interstitialAdUnit.property, AdmobProperties.interstitialAdUnit.content, true);
+                        EditorGUILayout.PropertyField(AdmobProperties.rewardedAdUnit.property, AdmobProperties.rewardedAdUnit.content, true);
+                        EditorGUILayout.PropertyField(AdmobProperties.rewardedInterstitialAdUnit.property, AdmobProperties.rewardedInterstitialAdUnit.content, true);
+
+                        EditorGUILayout.Space();
+                        EditorGUILayout.PropertyField(AdmobProperties.enableTestMode.property, AdmobProperties.enableTestMode.content);
+                        if (Settings.AdmobSettings.EnableTestMode)
+                        {
+                            EditorGUI.indentLevel++;
+                            EditorGUILayout.PropertyField(AdmobProperties.devicesTest.property, AdmobProperties.devicesTest.content);
+                            EditorGUI.indentLevel--;
+                        }
+                    }
+                });
+
+            #endregion
+
+            EditorGUI.EndDisabledGroup();
+            serializedObject.ApplyModifiedProperties();
+        }
+
+        #endregion
+
+        #region gui
+
+        private readonly Dictionary<string, bool> _uppercaseSectionsFoldoutStates = new Dictionary<string, bool>();
+        private static readonly Dictionary<string, GUIStyle> CustomStyles = new Dictionary<string, GUIStyle>();
+        private static GUISkin skin;
+        private const string SKIN_PATH = "Assets/_Root/GUISkins/";
+        private const string UPM_SKIN_PATH = "Packages/com.snorlax.ads/GUISkins/";
+        private static GUIStyle uppercaseSectionHeaderExpand;
+        private static GUIStyle uppercaseSectionHeaderCollapse;
+        private static Texture2D chevronUp;
+        private static Texture2D chevronDown;
+        private const int CHEVRON_ICON_WIDTH = 10;
+        private const int CHEVRON_ICON_RIGHT_MARGIN = 5;
+
+        public static GUIStyle UppercaseSectionHeaderExpand { get { return uppercaseSectionHeaderExpand ??= GetCustomStyle("Uppercase Section Header"); } }
+
+        public static GUIStyle UppercaseSectionHeaderCollapse
+        {
+            get { return uppercaseSectionHeaderCollapse ??= new GUIStyle(GetCustomStyle("Uppercase Section Header")) { normal = new GUIStyleState() }; }
+        }
+
+        public static GUIStyle GetCustomStyle(string styleName)
+        {
+            if (CustomStyles.ContainsKey(styleName)) return CustomStyles[styleName];
+
+            if (Skin != null)
+            {
+                var style = Skin.FindStyle(styleName);
+
+                if (style == null) Debug.LogError("Couldn't find style " + styleName);
+                else CustomStyles.Add(styleName, style);
+
+                return style;
+            }
+
+            return null;
+        }
+
+        public static GUISkin Skin
+        {
+            get
+            {
+                if (skin != null) return skin;
+
+                const string upmPath = UPM_SKIN_PATH + "Dark.guiskin";
+                string path = !File.Exists(Path.GetFullPath(upmPath)) ? SKIN_PATH + "Dark.guiskin" : upmPath;
+                skin = AssetDatabase.LoadAssetAtPath(path, typeof(GUISkin)) as GUISkin;
+
+                if (skin == null) Debug.LogError("Couldn't load the GUISkin at " + path);
+
+                return skin;
+            }
+        }
+
+        public static Texture2D ChevronDown
+        {
+            get
+            {
+                if (chevronDown != null) return chevronDown;
+                const string upmPath = UPM_SKIN_PATH + "Icons/icon-chevron-down-dark.psd";
+                string path = !File.Exists(Path.GetFullPath(upmPath)) ? SKIN_PATH + "Icons/icon-chevron-down-dark.psd" : upmPath;
+                chevronDown = AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D;
+                return chevronDown;
+            }
+        }
+
+        public static Texture2D ChevronUp
+        {
+            get
+            {
+                if (chevronUp != null) return chevronUp;
+                const string upmPath = UPM_SKIN_PATH + "Icons/icon-chevron-up-dark.psd";
+                string path = !File.Exists(Path.GetFullPath(upmPath)) ? SKIN_PATH + "Icons/icon-chevron-up-dark.psd" : upmPath;
+                chevronUp = AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D;
+
+                return chevronUp;
+            }
+        }
+
+        private Texture2D GetChevronIcon(bool foldout) { return foldout ? ChevronUp : ChevronDown; }
+
+        private void DrawUppercaseSection(string key, string sectionName, Action drawer, Texture2D sectionIcon = null, bool defaultFoldout = true)
+        {
+            if (!_uppercaseSectionsFoldoutStates.ContainsKey(key))
+                _uppercaseSectionsFoldoutStates.Add(key, defaultFoldout);
+
+            bool foldout = _uppercaseSectionsFoldoutStates[key];
+
+            EditorGUILayout.BeginVertical(GetCustomStyle("Uppercase Section Box"), GUILayout.MinHeight(foldout ? 30 : 0));
+
+            EditorGUILayout.BeginHorizontal(foldout ? UppercaseSectionHeaderExpand : UppercaseSectionHeaderCollapse);
+
+            // Header label (and button).
+            if (GUILayout.Button(sectionName, GetCustomStyle("Uppercase Section Header Label")))
+                _uppercaseSectionsFoldoutStates[key] = !_uppercaseSectionsFoldoutStates[key];
+
+            // The expand/collapse icon.
+            var buttonRect = GUILayoutUtility.GetLastRect();
+            var iconRect = new Rect(buttonRect.x + buttonRect.width - CHEVRON_ICON_WIDTH - CHEVRON_ICON_RIGHT_MARGIN,
+                buttonRect.y,
+                CHEVRON_ICON_WIDTH,
+                buttonRect.height);
+            GUI.Label(iconRect, GetChevronIcon(foldout), GetCustomStyle("Uppercase Section Header Chevron"));
+
+            EditorGUILayout.EndHorizontal();
+
+            // Draw the section content.
+            if (foldout) GUILayout.Space(5);
+
+            if (foldout && drawer != null) drawer();
+
+            EditorGUILayout.EndVertical();
+        }
+
+        #endregion
+    }
+}

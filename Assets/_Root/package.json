@@ -1,0 +1,24 @@
+{
+  "name": "com.gamee.ads",
+  "displayName": "Monetization",
+  "description": "Advertising for unity3d",
+  "version": "1.0.0",
+  "unity": "2019.1",
+  "category": "gamee",
+  "author": {
+    "name": "Gamee",
+    "email": "phongsoyenmoc.diep@gmail.com",
+    "url": "https://github.com/yenmoc"
+  },
+  "license": "MIT",
+  "keywords": ["ads","iap" ],
+  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:gamee-studio/ads.git",
+    "directory": "com.gamee.ads"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/@gamee-studio"
+  }
+}

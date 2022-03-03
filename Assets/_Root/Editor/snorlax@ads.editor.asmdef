@@ -1,0 +1,18 @@
+{
+    "name": "snorlax@ads.editor",
+    "rootNamespace": "Snorlax.AdsEditor",
+    "references": [
+        "GUID:8f6ac78e86e04ef4aaab5df990e55dd6"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
