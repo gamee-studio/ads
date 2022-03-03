@@ -1,9 +1,12 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using ICSharpCode.SharpZipLib.Zip;
 using Snorlax.Ads;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Networking;
 using Network = Snorlax.Ads.Network;
 
 namespace Snorlax.AdsEditor
@@ -50,6 +53,20 @@ namespace Snorlax.AdsEditor
             public static Property enableTestMode = new Property(null, new GUIContent("Enable Test Mode", "Enable true when want show test ad"));
             public static Property useAdaptiveBanner = new Property(null, new GUIContent("Use Adaptive Banner", "Use adaptive banner ad when use smart banner"));
         }
+        
+        /// <summary>
+        /// Delegate to be called when downloading a plugin with the progress percentage. 
+        /// </summary>
+        /// <param name="pluginName">The name of the plugin being downloaded.</param>
+        /// <param name="progress">Percentage downloaded.</param>
+        /// <param name="done">Whether or not the download is complete.</param>
+        public delegate void DownloadPluginProgressCallback(string pluginName, float progress, bool done);
+
+        /// <summary>
+        /// Delegate to be called when a plugin package is imported.
+        /// </summary>
+        /// <param name="network">The network data for which the package is imported.</param>
+        public delegate void ImportPackageCompletedCallback(Network network);
 
         #region properties
 
@@ -64,7 +81,11 @@ namespace Snorlax.AdsEditor
         private static readonly GUILayoutOption VersionWidthOption = GUILayout.Width(VERSION_FIELD_MIN_WIDTH);
         private static readonly GUILayoutOption FieldWidth = GUILayout.Width(ACTION_FIELD_WIDTH);
         private GUIContent _warningIcon;
-        private GUIContent _iconMinus;
+        private GUIContent _iconUnintall;
+        public static UnityWebRequest webRequest;
+        private Network importingNetwork;
+        public static DownloadPluginProgressCallback downloadPluginProgressCallback;
+        public static ImportPackageCompletedCallback importPackageCompletedCallback;
 
         #endregion
 
@@ -73,7 +94,7 @@ namespace Snorlax.AdsEditor
         private void Init()
         {
             _warningIcon = IconContent("console.warnicon.sml", "Adapter not compatible, please update to the latest version.");
-            _iconMinus = IconContent("Toolbar Minus", "Uninstall entry");
+            _iconUnintall = IconContent("d_TreeEditor.Trash", "Uninstall entry");
 
             _autoInitializeProperty = serializedObject.FindProperty("runtimeAutoInitialize");
 
@@ -240,7 +261,7 @@ namespace Snorlax.AdsEditor
                 GUILayout.Space(2);
 
                 GUI.enabled = isInstalled;
-                if (GUILayout.Button(_iconMinus))
+                if (GUILayout.Button(_iconUnintall))
                 {
                     //EditorUtility.DisplayProgressBar("Integration Manager", "Deleting " + network.Name + "...", 0.5f);
                     //var pluginRoot = AppLovinIntegrationManager.MediationSpecificPluginParentDirectory;
@@ -262,6 +283,83 @@ namespace Snorlax.AdsEditor
 
             if (isInstalled)
             {
+            }
+        }
+
+        public IEnumerator DownloadPlugin(Network network)
+        {
+            string pathFile = Path.Combine(Application.temporaryCachePath, network.name.ToLowerInvariant() + "_" + network.lastVersion);
+            string urlDownload = string.Format(network.path, network.lastVersion);
+            var downloadHandler = new DownloadHandlerFile(pathFile);
+            webRequest = new UnityWebRequest(urlDownload) { method = UnityWebRequest.kHttpVerbGET, downloadHandler = downloadHandler };
+            var operation = webRequest.SendWebRequest();
+            
+            static void CallDownloadPluginProgressCallback(string pluginName, float progress, bool isDone)
+            {
+                if (downloadPluginProgressCallback == null) return;
+
+                downloadPluginProgressCallback(pluginName, progress, isDone);
+            }
+            
+            while (!operation.isDone)
+            {
+                yield return new WaitForSeconds(0.1f); // Just wait till webRequest is completed. Our coroutine is pretty rudimentary.
+                CallDownloadPluginProgressCallback(network.displayName, operation.progress, operation.isDone);
+            }
+            
+#if UNITY_2020_1_OR_NEWER
+            if (webRequest.result != UnityWebRequest.Result.Success)
+#elif UNITY_2017_2_OR_NEWER
+            if (webRequest.isNetworkError || webRequest.isHttpError)
+#else
+            if (webRequest.isError)
+#endif
+            {
+               Debug.LogError(webRequest.error);
+            }
+            else
+            {
+                importingNetwork = network;
+                
+                AssetDatabase.ImportPackage(pathFile, true);
+            }
+
+            webRequest = null;
+        }
+        
+        public IEnumerator ExtractZipFile(byte[] zipFileData, string targetDirectory, int bufferSize = 256 * 1024)
+        {
+            Directory.CreateDirectory(targetDirectory);
+
+            using (MemoryStream fileStream = new MemoryStream())
+            {
+                fileStream.Write(zipFileData, 0, zipFileData.Length);
+                fileStream.Flush();
+                fileStream.Seek(0, SeekOrigin.Begin);
+
+                ZipFile zipFile = new ZipFile(fileStream);
+
+                foreach (ZipEntry entry in zipFile)
+                {
+                    string targetFile = Path.Combine(targetDirectory, entry.Name);
+
+                    using (FileStream outputFile = File.Create(targetFile))
+                    {
+                        if (entry.Size > 0)
+                        {
+                            Stream zippedStream = zipFile.GetInputStream(entry);
+                            byte[] dataBuffer = new byte[bufferSize];
+
+                            int readBytes;
+                            while ((readBytes = zippedStream.Read(dataBuffer, 0, bufferSize)) > 0)
+                            {
+                                outputFile.Write(dataBuffer, 0, readBytes);
+                                outputFile.Flush();
+                                yield return null;
+                            }
+                        }
+                    }
+                }
             }
         }
 

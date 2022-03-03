@@ -17,7 +17,6 @@ namespace Snorlax.AdsEditor
         private const int TOP = 3;
         private const int BOTTOM = 3;
 
-
         private void OnGUI()
         {
             if (_editor == null) _editor = Editor.CreateEditor(Settings.Instance);
@@ -32,7 +31,7 @@ namespace Snorlax.AdsEditor
 
             _editor.DrawHeader();
             _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition);
-            EditorGUILayout.BeginVertical(new GUIStyle {padding = new RectOffset(LEFT, RIGHT, TOP, BOTTOM)});
+            EditorGUILayout.BeginVertical(new GUIStyle { padding = new RectOffset(LEFT, RIGHT, TOP, BOTTOM) });
             _editor.OnInspectorGUI();
             EditorGUILayout.EndVertical();
             EditorGUILayout.EndScrollView();
@@ -71,9 +70,34 @@ namespace Snorlax.AdsEditor
 
             window.minSize = new Vector2(300, 0);
 
+            SettingsEditor.downloadPluginProgressCallback = OnDownloadPluginProgress;
+            SettingsEditor.importPackageCompletedCallback = OnImportPackageCompleted;
+
             Load();
             window.Show();
-            
+        }
+
+        private static void OnImportPackageCompleted(Network network) { }
+
+        /// <summary>
+        /// Callback method that will be called with progress updates when the plugin is being downloaded.
+        /// </summary>
+        public static void OnDownloadPluginProgress(string pluginName, float progress, bool done)
+        {
+            // Download is complete. Clear progress bar.
+            if (done)
+            {
+                EditorUtility.ClearProgressBar();
+            }
+            // Download is in progress, update progress bar.
+            else
+            {
+                if (EditorUtility.DisplayCancelableProgressBar("Ads", string.Format("Downloading {0} plugin...", pluginName), progress))
+                {
+                    SettingsEditor.webRequest?.Abort();
+                    EditorUtility.ClearProgressBar();
+                }
+            }
         }
     }
 }
