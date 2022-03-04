@@ -50,7 +50,7 @@ namespace Snorlax.AdsEditor
             public static Property enableTestMode = new Property(null, new GUIContent("Enable Test Mode", "Enable true when want show test ad"));
             public static Property useAdaptiveBanner = new Property(null, new GUIContent("Use Adaptive Banner", "Use adaptive banner ad when use smart banner"));
         }
-        
+
         #region properties
 
         //Runtime auto initialization
@@ -58,16 +58,14 @@ namespace Snorlax.AdsEditor
         public static bool callFromEditorWindow = false;
 
         private const float ACTION_FIELD_WIDTH = 60f;
-        private const float NETWORK_FIELD_MIN_WIDTH = 120f;
-        private const float VERSION_FIELD_MIN_WIDTH = 120f;
+        private const float NETWORK_FIELD_MIN_WIDTH = 110f;
+        private const float VERSION_FIELD_MIN_WIDTH = 100f;
         private static readonly GUILayoutOption NetworkWidthOption = GUILayout.Width(NETWORK_FIELD_MIN_WIDTH);
         private static readonly GUILayoutOption VersionWidthOption = GUILayout.Width(VERSION_FIELD_MIN_WIDTH);
         private static readonly GUILayoutOption FieldWidth = GUILayout.Width(ACTION_FIELD_WIDTH);
         private GUIContent _warningIcon;
         private GUIContent _iconUnintall;
         private GUIStyle _headerLabelStyle;
-
-
 
         #endregion
 
@@ -76,8 +74,8 @@ namespace Snorlax.AdsEditor
         private void Init()
         {
             _warningIcon = IconContent("console.warnicon.sml", "Adapter not compatible, please update to the latest version.");
-            _iconUnintall = IconContent("d_TreeEditor.Trash", "Uninstall entry");
-            _headerLabelStyle = new GUIStyle(EditorStyles.label) { fontSize = 12, fontStyle = FontStyle.Bold, fixedHeight = 18 };
+            _iconUnintall = IconContent("d_TreeEditor.Trash", "Uninstall");
+            _headerLabelStyle = new GUIStyle(EditorStyles.label) {fontSize = 12, fontStyle = FontStyle.Bold, fixedHeight = 18};
 
             _autoInitializeProperty = serializedObject.FindProperty("runtimeAutoInitialize");
 
@@ -230,7 +228,7 @@ namespace Snorlax.AdsEditor
                     isActionEnabled = false;
                 }
             }
-            
+
             GUILayout.Space(4);
             using (new EditorGUILayout.HorizontalScope(GUILayout.ExpandHeight(false)))
             {
@@ -261,12 +259,14 @@ namespace Snorlax.AdsEditor
                 if (GUILayout.Button(_iconUnintall))
                 {
                     EditorUtility.DisplayProgressBar("Ads", "Deleting " + network.displayName + "...", 0.5f);
-                    //var pluginRoot = AppLovinIntegrationManager.MediationSpecificPluginParentDirectory;
-                    //foreach (var pluginFilePath in network.PluginFilePaths)
-                    //{
-                    //    FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, pluginFilePath));
-                    //}
-
+                    var pluginRoot = SettingManager.MediationSpecificPluginParentDirectory;
+                    foreach (var pluginFilePath in network.pluginFilePath)
+                    {
+                        FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, pluginFilePath));
+                        FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, pluginFilePath + ".meta"));
+                    }
+                    
+                    SettingManager.RemoveAllEmptyFolder(new DirectoryInfo(pluginRoot));
                     SettingManager.Instance.UpdateCurrentVersion(network);
 
                     // Refresh UI
@@ -277,7 +277,7 @@ namespace Snorlax.AdsEditor
                 GUI.enabled = true;
                 GUILayout.Space(5);
             }
-            
+
             if (isInstalled)
             {
             }
@@ -303,7 +303,7 @@ namespace Snorlax.AdsEditor
 
         public static GUIStyle UppercaseSectionHeaderCollapse
         {
-            get { return uppercaseSectionHeaderCollapse ??= new GUIStyle(GetCustomStyle("Uppercase Section Header")) { normal = new GUIStyleState() }; }
+            get { return uppercaseSectionHeaderCollapse ??= new GUIStyle(GetCustomStyle("Uppercase Section Header")) {normal = new GUIStyleState()}; }
         }
 
         public static GUIStyle GetCustomStyle(string styleName)

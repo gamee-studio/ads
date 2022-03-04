@@ -35,8 +35,8 @@ namespace Snorlax.AdsEditor
         public static SettingManager Instance => instance;
         public static UnityWebRequest webRequest;
         public static readonly string DefaultPluginExportPath = Path.Combine("Assets", "GoogleMobileAds");
-        private const string DEFAULT_ADMOB_SDK_ASSET_EXPORT_PATH = "GoogleMobileAds/Editor/GoogleMobileAdsSettings.cs";
-        private static readonly string AdmobSdkAssetExportPath = Path.Combine("GoogleMobileAds", "Editor/GoogleMobileAdsSettings.cs");
+        private const string DEFAULT_ADMOB_SDK_ASSET_EXPORT_PATH = "GoogleMobileAds/GoogleMobileAds.dll";
+        private static readonly string AdmobSdkAssetExportPath = Path.Combine("GoogleMobileAds", "GoogleMobileAds.dll");
         public static DownloadPluginProgressCallback downloadPluginProgressCallback;
         public static ImportPackageCompletedCallback importPackageCompletedCallback;
 
@@ -67,6 +67,12 @@ namespace Snorlax.AdsEditor
             }
         }
 
+        /// <summary>
+        /// When the base plugin is outside the <c>Assets/</c> directory, the mediation plugin files are still imported to the default location under <c>Assets/</c>.
+        /// Returns the parent directory where the mediation adapter plugins are imported.
+        /// </summary>
+        public static string MediationSpecificPluginParentDirectory => IsPluginOutsideAssetsDirectory ? "Assets" : PluginParentDirectory;
+
         public SettingManager()
         {
             AssetDatabase.importPackageCompleted += packageName =>
@@ -78,23 +84,20 @@ namespace Snorlax.AdsEditor
                 MovePluginFilesIfNeeded(pluginParentDir, isPluginOutsideAssetsDir);
                 AddLabelsToAssetsIfNeeded(pluginParentDir, isPluginOutsideAssetsDir);
                 AssetDatabase.Refresh();
-                
+
                 CallImportPackageCompletedCallback(Settings.AdmobSettings.importingNetwork);
                 Settings.AdmobSettings.importingNetwork = null;
             };
 
             AssetDatabase.importPackageCancelled += packageName =>
             {
-                Debug.Log("Cancel import");
                 if (!IsImportingNetwork(packageName)) return;
 
-                Debug.Log("Package import cancelled.");
                 Settings.AdmobSettings.importingNetwork = null;
             };
 
             AssetDatabase.importPackageFailed += (packageName, errorMessage) =>
             {
-                Debug.Log("Faild import");
                 if (!IsImportingNetwork(packageName)) return;
 
                 Debug.LogError(errorMessage);
@@ -112,7 +115,7 @@ namespace Snorlax.AdsEditor
         /// <summary>
         /// Adds labels to assets so that they can be easily found.
         /// </summary>
-        /// <param name="pluginParentDir">The MAX Unity plugin's parent directory.</param>
+        /// <param name="pluginParentDir">The GoogleMobileAds Unity plugin's parent directory.</param>
         /// <param name="isPluginOutsideAssetsDirectory">Whether or not the plugin is outside the Assets directory.</param>
         public static void AddLabelsToAssetsIfNeeded(string pluginParentDir, bool isPluginOutsideAssetsDirectory)
         {
@@ -157,13 +160,13 @@ namespace Snorlax.AdsEditor
 
             var labelsToAdd = labels.ToList();
             var didAddLabels = false;
-            if (!labels.Contains("al_admob"))
+            if (!labels.Contains("Al_admob"))
             {
-                labelsToAdd.Add("al_admob");
+                labelsToAdd.Add("Al_admob");
                 didAddLabels = true;
             }
 
-            var exportPathLabel = "al_admob_export_path-" + assetPath.Replace(pluginParentDir, "");
+            var exportPathLabel = "Al_admob_export_path-" + assetPath.Replace(pluginParentDir, "");
             if (!labels.Contains(exportPathLabel))
             {
                 labelsToAdd.Add(exportPathLabel);
@@ -198,14 +201,15 @@ namespace Snorlax.AdsEditor
         }
 
         /// <summary>
-        /// Gets the path of the asset in the project for a given MAX plugin export path.
+        /// Gets the path of the asset in the project for a given GoogleMobileAds plugin export path.
+        /// ex : Al_admob_export_path-GoogleMobileAds\GoogleMobileAds.dll
         /// </summary>
         /// <param name="exportPath">The actual exported path of the asset.</param>
         /// <returns>The exported path of the MAX plugin asset or the default export path if the asset is not found.</returns>
         public static string GetAssetPathForExportPath(string exportPath)
         {
             var defaultPath = Path.Combine("Assets", exportPath);
-            var assetGuids = AssetDatabase.FindAssets("l:al_admob_export_path-" + exportPath);
+            var assetGuids = AssetDatabase.FindAssets("l:Al_admob_export_path-" + exportPath);
 
             return assetGuids.Length < 1 ? defaultPath : AssetDatabase.GUIDToAssetPath(assetGuids[0]);
         }
@@ -297,12 +301,25 @@ namespace Snorlax.AdsEditor
 
         private string GetPluginFileName(Network network) { return $"GoogleMobileAds{network.displayName}Mediation.unitypackage"; }
 
+        public void Load()
+        {
+            using var curl = new WebClient();
+            curl.Headers.Add(HttpRequestHeader.UserAgent, "request");
+            const string url = "https://gist.githubusercontent.com/yenmoc/d79936098344befbd8edfa882c17bf20/raw";
+            string json = curl.DownloadString(url);
+            Settings.AdmobSettings.MediationNetworks = JsonConvert.DeserializeObject<List<Network>>(json);
+            foreach (var n in Settings.AdmobSettings.MediationNetworks)
+            {
+                UpdateCurrentVersion(n);
+            }
+        }
+
         public IEnumerator DownloadPlugin(Network network)
         {
             string pathFile = Path.Combine(Application.temporaryCachePath, $"{network.name.ToLowerInvariant()}_{network.lastVersion.unity}.zip");
             string urlDownload = string.Format(network.path, network.lastVersion.unity);
             var downloadHandler = new DownloadHandlerFile(pathFile);
-            webRequest = new UnityWebRequest(urlDownload) { method = UnityWebRequest.kHttpVerbGET, downloadHandler = downloadHandler };
+            webRequest = new UnityWebRequest(urlDownload) {method = UnityWebRequest.kHttpVerbGET, downloadHandler = downloadHandler};
             var operation = webRequest.SendWebRequest();
 
             static void CallDownloadPluginProgressCallback(string pluginName, float progress, bool isDone)
@@ -488,21 +505,41 @@ namespace Snorlax.AdsEditor
             return currentVersion;
         }
 
-        public static void RemoveNetworkUnityVersion(string name) { EditorPrefs.DeleteKey($"{Application.identifier}_ads_{name}_unity"); }
-        public static void SetNetworkUnityVersion(string name, string version) { EditorPrefs.SetString($"{Application.identifier}_ads_{name}_unity", version); }
-        public static string GetNetworkUnityVersion(string name) { return EditorPrefs.GetString($"{Application.identifier}_ads_{name}_unity"); }
-
-        public void Load()
+        private static bool GetEmptyDirectories(DirectoryInfo dir, List<DirectoryInfo> results)
         {
-            using var curl = new WebClient();
-            curl.Headers.Add(HttpRequestHeader.UserAgent, "request");
-            const string url = "https://gist.githubusercontent.com/yenmoc/d79936098344befbd8edfa882c17bf20/raw";
-            string json = curl.DownloadString(url);
-            Settings.AdmobSettings.MediationNetworks = JsonConvert.DeserializeObject<List<Network>>(json);
-            foreach (var n in Settings.AdmobSettings.MediationNetworks)
+            var isEmpty = true;
+            try
             {
-                UpdateCurrentVersion(n);
+                isEmpty = dir.GetDirectories().Count(x => !GetEmptyDirectories(x, results)) == 0 // Are sub directories empty?
+                          && dir.GetFiles("*.*").All(x => x.Extension == ".meta"); // No file exist?
+            }
+            catch
+            {
+            }
+
+            // Store empty directory to results.
+            if (isEmpty) results.Add(dir);
+            
+            return isEmpty;
+        }
+
+        public static void RemoveAllEmptyFolder(DirectoryInfo dir)
+        {
+            var result = new List<DirectoryInfo>();
+            GetEmptyDirectories(dir, result);
+
+            if (result.Count > 0)
+            {
+                foreach (var d in result)
+                {
+                    FileUtil.DeleteFileOrDirectory(d.FullName);
+                    FileUtil.DeleteFileOrDirectory(d.Parent + "\\" + d.Name + ".meta"); // unity 2020.2 need to delete the meta too
+                }
+                AssetDatabase.Refresh();
             }
         }
+
+        public static void SetNetworkUnityVersion(string name, string version) { EditorPrefs.SetString($"{Application.identifier}_ads_{name}_unity", version); }
+        public static string GetNetworkUnityVersion(string name) { return EditorPrefs.GetString($"{Application.identifier}_ads_{name}_unity"); }
     }
 }

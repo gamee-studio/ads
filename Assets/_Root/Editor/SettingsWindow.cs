@@ -1,4 +1,3 @@
-using System;
 using Snorlax.Ads;
 using UnityEditor;
 using UnityEngine;
@@ -10,10 +9,6 @@ namespace Snorlax.AdsEditor
     {
         private Vector2 _scrollPosition;
         private Editor _editor;
-        private const int LEFT = 5;
-        private const int RIGHT = 5;
-        private const int TOP = 3;
-        private const int BOTTOM = 3;
 
         private void OnGUI()
         {
@@ -29,7 +24,7 @@ namespace Snorlax.AdsEditor
 
             _editor.DrawHeader();
             _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition);
-            EditorGUILayout.BeginVertical(new GUIStyle { padding = new RectOffset(LEFT, RIGHT, TOP, BOTTOM) });
+            EditorGUILayout.BeginVertical(new GUIStyle {padding = new RectOffset(6, 3, 3, 3)});
             _editor.OnInspectorGUI();
             EditorGUILayout.EndVertical();
             EditorGUILayout.EndScrollView();
@@ -56,7 +51,7 @@ namespace Snorlax.AdsEditor
                 return;
             }
 
-            window.minSize = new Vector2(300, 0);
+            window.minSize = new Vector2(475, 0);
 
             window.Show();
         }

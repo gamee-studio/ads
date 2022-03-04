@@ -10,6 +10,7 @@ namespace Snorlax.Ads
         public string[] versions;
         public string path;
         public string dependenciesFilePath;
+        public string[] pluginFilePath;
         public NetworkVersion lastVersion;
         [NonSerialized] public NetworkVersion currentVersion;
         [NonSerialized] public EVersionComparisonResult CurrentToLatestVersionComparisonResult = EVersionComparisonResult.Lesser;
