@@ -1,6 +1,4 @@
-using System.Collections.Generic;
-using System.Net;
-using Newtonsoft.Json;
+using System;
 using Snorlax.Ads;
 using UnityEditor;
 using UnityEngine;
@@ -38,7 +36,6 @@ namespace Snorlax.AdsEditor
             SettingsEditor.callFromEditorWindow = false;
         }
 
-
         private static SettingsWindow GetWindow()
         {
             // Get the window and make sure it will be opened in the same panel with inspector window.
@@ -48,15 +45,6 @@ namespace Snorlax.AdsEditor
             window.titleContent = new GUIContent("Ads");
 
             return window;
-        }
-
-        private static void Load()
-        {
-            using var curl = new WebClient();
-            curl.Headers.Add(HttpRequestHeader.UserAgent, "request");
-            const string url = "https://gist.githubusercontent.com/yenmoc/d79936098344befbd8edfa882c17bf20/raw";
-            string json = curl.DownloadString(url);
-            Settings.AdmobSettings.MediationNetworks = JsonConvert.DeserializeObject<List<Network>>(json);
         }
 
         public static void ShowWindow()
@@ -70,14 +58,29 @@ namespace Snorlax.AdsEditor
 
             window.minSize = new Vector2(300, 0);
 
-            SettingsEditor.downloadPluginProgressCallback = OnDownloadPluginProgress;
-            SettingsEditor.importPackageCompletedCallback = OnImportPackageCompleted;
-
-            Load();
             window.Show();
         }
 
-        private static void OnImportPackageCompleted(Network network) { }
+        private void OnEnable()
+        {
+            SettingManager.downloadPluginProgressCallback = OnDownloadPluginProgress;
+            SettingManager.importPackageCompletedCallback = OnImportPackageCompleted;
+
+            SettingManager.Instance.Load();
+        }
+
+        private void OnDisable()
+        {
+            SettingManager.webRequest?.Abort();
+            EditorUtility.ClearProgressBar();
+            AssetDatabase.SaveAssets();
+        }
+
+        private static void OnImportPackageCompleted(Network network)
+        {
+            SettingManager.SetNetworkUnityVersion(network.name, network.lastVersion.unity);
+            SettingManager.Instance.UpdateCurrentVersion(network);
+        }
 
         /// <summary>
         /// Callback method that will be called with progress updates when the plugin is being downloaded.
@@ -94,7 +97,7 @@ namespace Snorlax.AdsEditor
             {
                 if (EditorUtility.DisplayCancelableProgressBar("Ads", string.Format("Downloading {0} plugin...", pluginName), progress))
                 {
-                    SettingsEditor.webRequest?.Abort();
+                    SettingManager.webRequest?.Abort();
                     EditorUtility.ClearProgressBar();
                 }
             }

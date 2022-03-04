@@ -1,12 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using ICSharpCode.SharpZipLib.Zip;
 using Snorlax.Ads;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Networking;
 using Network = Snorlax.Ads.Network;
 
 namespace Snorlax.AdsEditor
@@ -54,20 +51,6 @@ namespace Snorlax.AdsEditor
             public static Property useAdaptiveBanner = new Property(null, new GUIContent("Use Adaptive Banner", "Use adaptive banner ad when use smart banner"));
         }
         
-        /// <summary>
-        /// Delegate to be called when downloading a plugin with the progress percentage. 
-        /// </summary>
-        /// <param name="pluginName">The name of the plugin being downloaded.</param>
-        /// <param name="progress">Percentage downloaded.</param>
-        /// <param name="done">Whether or not the download is complete.</param>
-        public delegate void DownloadPluginProgressCallback(string pluginName, float progress, bool done);
-
-        /// <summary>
-        /// Delegate to be called when a plugin package is imported.
-        /// </summary>
-        /// <param name="network">The network data for which the package is imported.</param>
-        public delegate void ImportPackageCompletedCallback(Network network);
-
         #region properties
 
         //Runtime auto initialization
@@ -82,10 +65,9 @@ namespace Snorlax.AdsEditor
         private static readonly GUILayoutOption FieldWidth = GUILayout.Width(ACTION_FIELD_WIDTH);
         private GUIContent _warningIcon;
         private GUIContent _iconUnintall;
-        public static UnityWebRequest webRequest;
-        private Network importingNetwork;
-        public static DownloadPluginProgressCallback downloadPluginProgressCallback;
-        public static ImportPackageCompletedCallback importPackageCompletedCallback;
+        private GUIStyle _headerLabelStyle;
+
+
 
         #endregion
 
@@ -95,6 +77,7 @@ namespace Snorlax.AdsEditor
         {
             _warningIcon = IconContent("console.warnicon.sml", "Adapter not compatible, please update to the latest version.");
             _iconUnintall = IconContent("d_TreeEditor.Trash", "Uninstall entry");
+            _headerLabelStyle = new GUIStyle(EditorStyles.label) { fontSize = 12, fontStyle = FontStyle.Bold, fixedHeight = 18 };
 
             _autoInitializeProperty = serializedObject.FindProperty("runtimeAutoInitialize");
 
@@ -173,6 +156,19 @@ namespace Snorlax.AdsEditor
                             "MEDIATION",
                             () =>
                             {
+                                using (new EditorGUILayout.HorizontalScope())
+                                {
+                                    GUILayout.Space(5);
+                                    EditorGUILayout.LabelField("Network", _headerLabelStyle, NetworkWidthOption);
+                                    EditorGUILayout.LabelField("Current Version", _headerLabelStyle, VersionWidthOption);
+                                    GUILayout.Space(3);
+                                    EditorGUILayout.LabelField("Latest Version", _headerLabelStyle, VersionWidthOption);
+                                    GUILayout.Space(3);
+                                    GUILayout.FlexibleSpace();
+                                    GUILayout.Button("Actions", _headerLabelStyle, FieldWidth);
+                                    GUILayout.Space(5);
+                                }
+
                                 foreach (var network in Settings.AdmobSettings.MediationNetworks)
                                 {
                                     DrawNetworkDetailRow(network);
@@ -199,8 +195,8 @@ namespace Snorlax.AdsEditor
         private void DrawNetworkDetailRow(Network network)
         {
             string action;
-            string currentVersion = network.currentVersion;
-            string latestVersion = network.lastVersion;
+            string currentVersion = network.currentVersion != null ? network.currentVersion.unity : "";
+            string latestVersion = network.lastVersion.unity;
             bool isActionEnabled;
             bool isInstalled;
             if (string.IsNullOrEmpty(currentVersion))
@@ -234,7 +230,7 @@ namespace Snorlax.AdsEditor
                     isActionEnabled = false;
                 }
             }
-
+            
             GUILayout.Space(4);
             using (new EditorGUILayout.HorizontalScope(GUILayout.ExpandHeight(false)))
             {
@@ -251,26 +247,27 @@ namespace Snorlax.AdsEditor
                     GUILayout.Label(_warningIcon);
                 }
 
-                GUI.enabled = isActionEnabled;
+                GUI.enabled = isActionEnabled && !EditorApplication.isCompiling;
                 if (GUILayout.Button(new GUIContent(action), FieldWidth))
                 {
                     // Download the plugin.
+                    EditorCoroutine.StartCoroutine(SettingManager.Instance.DownloadPlugin(network));
                 }
 
                 GUI.enabled = true;
                 GUILayout.Space(2);
 
-                GUI.enabled = isInstalled;
+                GUI.enabled = isInstalled && !EditorApplication.isCompiling;
                 if (GUILayout.Button(_iconUnintall))
                 {
-                    //EditorUtility.DisplayProgressBar("Integration Manager", "Deleting " + network.Name + "...", 0.5f);
+                    EditorUtility.DisplayProgressBar("Ads", "Deleting " + network.displayName + "...", 0.5f);
                     //var pluginRoot = AppLovinIntegrationManager.MediationSpecificPluginParentDirectory;
                     //foreach (var pluginFilePath in network.PluginFilePaths)
                     //{
                     //    FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, pluginFilePath));
                     //}
 
-                    //AppLovinIntegrationManager.UpdateCurrentVersions(network, pluginRoot);
+                    SettingManager.Instance.UpdateCurrentVersion(network);
 
                     // Refresh UI
                     AssetDatabase.Refresh();
@@ -280,86 +277,9 @@ namespace Snorlax.AdsEditor
                 GUI.enabled = true;
                 GUILayout.Space(5);
             }
-
+            
             if (isInstalled)
             {
-            }
-        }
-
-        public IEnumerator DownloadPlugin(Network network)
-        {
-            string pathFile = Path.Combine(Application.temporaryCachePath, network.name.ToLowerInvariant() + "_" + network.lastVersion);
-            string urlDownload = string.Format(network.path, network.lastVersion);
-            var downloadHandler = new DownloadHandlerFile(pathFile);
-            webRequest = new UnityWebRequest(urlDownload) { method = UnityWebRequest.kHttpVerbGET, downloadHandler = downloadHandler };
-            var operation = webRequest.SendWebRequest();
-            
-            static void CallDownloadPluginProgressCallback(string pluginName, float progress, bool isDone)
-            {
-                if (downloadPluginProgressCallback == null) return;
-
-                downloadPluginProgressCallback(pluginName, progress, isDone);
-            }
-            
-            while (!operation.isDone)
-            {
-                yield return new WaitForSeconds(0.1f); // Just wait till webRequest is completed. Our coroutine is pretty rudimentary.
-                CallDownloadPluginProgressCallback(network.displayName, operation.progress, operation.isDone);
-            }
-            
-#if UNITY_2020_1_OR_NEWER
-            if (webRequest.result != UnityWebRequest.Result.Success)
-#elif UNITY_2017_2_OR_NEWER
-            if (webRequest.isNetworkError || webRequest.isHttpError)
-#else
-            if (webRequest.isError)
-#endif
-            {
-               Debug.LogError(webRequest.error);
-            }
-            else
-            {
-                importingNetwork = network;
-                
-                AssetDatabase.ImportPackage(pathFile, true);
-            }
-
-            webRequest = null;
-        }
-        
-        public IEnumerator ExtractZipFile(byte[] zipFileData, string targetDirectory, int bufferSize = 256 * 1024)
-        {
-            Directory.CreateDirectory(targetDirectory);
-
-            using (MemoryStream fileStream = new MemoryStream())
-            {
-                fileStream.Write(zipFileData, 0, zipFileData.Length);
-                fileStream.Flush();
-                fileStream.Seek(0, SeekOrigin.Begin);
-
-                ZipFile zipFile = new ZipFile(fileStream);
-
-                foreach (ZipEntry entry in zipFile)
-                {
-                    string targetFile = Path.Combine(targetDirectory, entry.Name);
-
-                    using (FileStream outputFile = File.Create(targetFile))
-                    {
-                        if (entry.Size > 0)
-                        {
-                            Stream zippedStream = zipFile.GetInputStream(entry);
-                            byte[] dataBuffer = new byte[bufferSize];
-
-                            int readBytes;
-                            while ((readBytes = zippedStream.Read(dataBuffer, 0, bufferSize)) > 0)
-                            {
-                                outputFile.Write(dataBuffer, 0, readBytes);
-                                outputFile.Flush();
-                                yield return null;
-                            }
-                        }
-                    }
-                }
             }
         }
 

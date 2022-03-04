@@ -17,6 +17,7 @@ namespace Snorlax.Ads
         [SerializeField] private bool useAdaptiveBanner;
         
         private List<Network> _mediationNetworks = new List<Network>();
+        public Network importingNetwork; 
 
         public bool Enable => enable;
         public List<string> DevicesTest => devicesTest;
