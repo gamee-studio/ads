@@ -75,6 +75,7 @@ namespace Snorlax.AdsEditor
         {
             SettingManager.SetNetworkUnityVersion(network.name, network.lastVersion.unity);
             SettingManager.Instance.UpdateCurrentVersion(network);
+            SettingManager.Instance.RemoveMediationExtras(network);
         }
 
         /// <summary>

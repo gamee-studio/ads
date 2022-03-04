@@ -444,6 +444,20 @@ namespace Snorlax.AdsEditor
             }
         }
 
+        /// <summary>
+        /// since MediationExtras class is already added in Admob package
+        /// so we don't need MediationExtras class from importing mediation package anymore it will be confusing
+        /// </summary>
+        public void RemoveMediationExtras(Network network)
+        {
+            if (network.name.Equals("ADCOLONY_NETWORK") || network.name.Equals("VUNGLE_NETWORK"))
+            {
+                FileUtil.DeleteFileOrDirectory(Path.Combine(MediationSpecificPluginParentDirectory, "GoogleMobileAds/Api/Mediation/MediationExtras.cs"));
+                FileUtil.DeleteFileOrDirectory(Path.Combine(MediationSpecificPluginParentDirectory, "GoogleMobileAds/Api/Mediation/MediationExtras.cs.meta"));
+                AssetDatabase.Refresh();
+            }
+        }
+
         private NetworkVersion GetCurrentVersion(string dependencyFilePath, string nameNetwork)
         {
             XDocument dependency;
