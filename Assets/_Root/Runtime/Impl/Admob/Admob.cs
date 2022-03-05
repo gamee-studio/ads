@@ -1,3 +1,4 @@
+#if PANCAKE_ADMOB_ENABLE
 using GoogleMobileAds.Api;
 
 namespace Snorlax.Ads
@@ -20,3 +21,4 @@ namespace Snorlax.Ads
         }
     }
 }
+#endif

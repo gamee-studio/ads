@@ -1,10 +1,13 @@
+#if PANCAKE_ADMOB_ENABLE
 using System;
 using GoogleMobileAds.Api;
+#endif
 
 namespace Snorlax.Ads
 {
     public class AdmobRewardedLoader : AdLoader<AdUnit>
     {
+#if PANCAKE_ADMOB_ENABLE
         private RewardedAd _rewardedAd;
         public bool IsEarnRewarded { get; private set; }
         public event Action<AdmobRewardedLoader> OnCompleted = delegate { };
@@ -80,5 +83,6 @@ namespace Snorlax.Ads
             _rewardedAd?.Destroy();
             _rewardedAd = null;
         }
+#endif
     }
 }

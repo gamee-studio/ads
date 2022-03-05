@@ -1,10 +1,13 @@
+#if PANCAKE_ADMOB_ENABLE
 using System;
 using GoogleMobileAds.Api;
+#endif
 
 namespace Snorlax.Ads
 {
     public class AdmobAppOpenLoader : AdLoader<AdUnit>
     {
+#if PANCAKE_ADMOB_ENABLE
         private AppOpenAd _appOpenAd;
         public event Action<AdmobAppOpenLoader> OnCompleted = delegate { };
         public event Action<AdmobAppOpenLoader, object, AdValueEventArgs> OnPaidEvent = delegate { };
@@ -18,7 +21,7 @@ namespace Snorlax.Ads
         internal override bool IsReady() { return _appOpenAd != null; }
 
         public AdmobAppOpenLoader() { unit = Settings.AdmobSettings.AppOpenAdUnit; }
-
+        
         internal override void Load() { AppOpenAd.LoadAd(unit.Id, ((AdmobAppOpenUnit) unit).orientation, Admob.CreateRequest(), OnAdLoadCallback); }
 
         private void OnAdLoadCallback(AppOpenAd appOpenAd, AdFailedToLoadEventArgs error)
@@ -68,5 +71,6 @@ namespace Snorlax.Ads
             _appOpenAd?.Destroy();
             _appOpenAd = null;
         }
+#endif
     }
 }

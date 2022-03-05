@@ -1,12 +1,15 @@
+#if PANCAKE_ADMOB_ENABLE
 using System;
 using System.Collections;
 using GoogleMobileAds.Api;
 using UnityEngine;
+#endif
 
 namespace Snorlax.Ads
 {
     public class AdmobBannerLoader : AdLoader<AdUnit>
     {
+#if PANCAKE_ADMOB_ENABLE
         private BannerView _bannerView;
         private bool _isLoaded;
         public event Action<AdmobBannerLoader, object, EventArgs> OnClosedEvent = delegate { };
@@ -56,8 +59,16 @@ namespace Snorlax.Ads
             _bannerView = null;
             _isLoaded = false;
         }
+#endif
 
-        internal void Hide() { _bannerView?.Hide(); }
+
+        internal void Hide()
+        {
+#if PANCAKE_ADMOB_ENABLE
+            _bannerView?.Hide();
+#endif
+        }
+#if PANCAKE_ADMOB_ENABLE
         internal override bool IsReady() { return _isLoaded; }
 
         private IEnumerator DelayReload(float delay)
@@ -65,5 +76,6 @@ namespace Snorlax.Ads
             yield return new WaitForSeconds(delay);
             Load();
         }
+#endif
     }
 }

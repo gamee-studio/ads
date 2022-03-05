@@ -1,5 +1,8 @@
+#if PANCAKE_ADMOB_ENABLE
 using System;
 using GoogleMobileAds.Api;
+#endif
+
 
 namespace Snorlax.Ads
 {
@@ -24,7 +27,7 @@ namespace Snorlax.Ads
         {
             get
             {
-#if USE_ADMOB
+#if PANCAKE_ADMOB_ENABLE
                 return true;
 #else
                 return false;
@@ -45,6 +48,7 @@ namespace Snorlax.Ads
 
         protected override void InternalInit()
         {
+#if PANCAKE_ADMOB_ENABLE
             MobileAds.Initialize(status =>
             {
                 RuntimeHelper.RunOnMainThread(() =>
@@ -96,8 +100,10 @@ namespace Snorlax.Ads
             _appOpen.OnOpeningEvent += InvokeAppOpenAdOpening;
             _appOpen.OnPaidEvent += InvokeAppOpenAdPaid;
             _appOpen.OnCompleted += HandleAppOpenCompleted;
+#endif
         }
 
+#if PANCAKE_ADMOB_ENABLE
         public event EventHandler<EventArgs> OnBannerAdClosed;
         public event EventHandler<AdFailedToLoadEventArgs> OnBannerAdFailedToLoad;
         public event EventHandler<EventArgs> OnBannerAdLoaded;
@@ -170,28 +176,13 @@ namespace Snorlax.Ads
 
         private void HandleInterstitialCompleted(AdmobInterstitialLoader instance) { InternalInterstitialCompleted(instance); }
 
-        protected virtual void InternalInterstitialCompleted(AdmobInterstitialLoader instance) { RuntimeHelper.RunOnMainThread(InvokeInterstitialAdCompleted); }
         private void HandleRewaredCompleted(AdmobRewardedLoader instance) { InternalRewaredCompleted(instance); }
 
-        protected virtual void InternalRewaredCompleted(AdmobRewardedLoader instance) { RuntimeHelper.RunOnMainThread(InvokeRewardedAdCompleted); }
-
         private void HandleRewardedSkipped(AdmobRewardedLoader instance) { InternalRewardSkipped(instance); }
-
-        protected virtual void InternalRewardSkipped(AdmobRewardedLoader instance) { RuntimeHelper.RunOnMainThread(InvokeRewardedAdSkipped); }
 
         private void HandleRewardedInterstitialSkipped(AdmobRewardedInterstitialLoader instance) { InternalRewardedInterstitialSkipped(instance); }
 
         private void HandleRewaredInterstitialCompleted(AdmobRewardedInterstitialLoader instance) { InternalRewaredInterstitialCompleted(instance); }
-
-        protected virtual void InternalRewardedInterstitialSkipped(AdmobRewardedInterstitialLoader loader)
-        {
-            RuntimeHelper.RunOnMainThread(InvokeRewardedInterstitialAdSkipped);
-        }
-
-        protected virtual void InternalRewaredInterstitialCompleted(AdmobRewardedInterstitialLoader loader)
-        {
-            RuntimeHelper.RunOnMainThread(InvokeRewardedInterstitialAdCompleted);
-        }
 
         private void InvokeRewardedInterstitialAdRewared(AdmobRewardedInterstitialLoader instance, Reward args) { OnRewardedInterstitialAdRewarded?.Invoke(null, args); }
 
@@ -222,7 +213,7 @@ namespace Snorlax.Ads
             OnRewardedInterstitialAdClosed?.Invoke(sender, args);
         }
 
-        private void HandleAppOpenCompleted(AdmobAppOpenLoader instance) { RuntimeHelper.RunOnMainThread(InvokeAppOpenAdCompleted); }
+        private void HandleAppOpenCompleted(AdmobAppOpenLoader instance) { InternalAppOpenCompleted(instance); }
 
         private void InvokeAppOpenAdPaid(AdmobAppOpenLoader instance, object sender, AdValueEventArgs args) { OnAppOpenAdPaid?.Invoke(sender, args); }
 
@@ -235,6 +226,26 @@ namespace Snorlax.Ads
         private void InvokeAppOpenAdFailedToLoad(AdmobAppOpenLoader instance, AdFailedToLoadEventArgs args) { OnAppOpenAdFailedToLoad?.Invoke(null, args); }
 
         private void InvokeAppOpenAdClosed(AdmobAppOpenLoader instance, object sender, EventArgs args) { OnAppOpenAdClosed?.Invoke(sender, args); }
+#endif
+
+
+        protected virtual void InternalInterstitialCompleted(AdmobInterstitialLoader instance) { RuntimeHelper.RunOnMainThread(InvokeInterstitialAdCompleted); }
+
+        protected virtual void InternalRewardSkipped(AdmobRewardedLoader instance) { RuntimeHelper.RunOnMainThread(InvokeRewardedAdSkipped); }
+
+        protected virtual void InternalRewaredCompleted(AdmobRewardedLoader instance) { RuntimeHelper.RunOnMainThread(InvokeRewardedAdCompleted); }
+
+        protected virtual void InternalRewardedInterstitialSkipped(AdmobRewardedInterstitialLoader instance)
+        {
+            RuntimeHelper.RunOnMainThread(InvokeRewardedInterstitialAdSkipped);
+        }
+
+        protected virtual void InternalRewaredInterstitialCompleted(AdmobRewardedInterstitialLoader instance)
+        {
+            RuntimeHelper.RunOnMainThread(InvokeRewardedInterstitialAdCompleted);
+        }
+
+        protected virtual void InternalAppOpenCompleted(AdmobAppOpenLoader instance) { RuntimeHelper.RunOnMainThread(InvokeAppOpenAdCompleted); }
 
         protected override void InternalShowBannerAd()
         {

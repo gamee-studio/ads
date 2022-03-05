@@ -1,10 +1,13 @@
+#if PANCAKE_ADMOB_ENABLE
 using System;
 using GoogleMobileAds.Api;
+#endif
 
 namespace Snorlax.Ads
 {
     public class AdmobInterstitialLoader : AdLoader<AdUnit>
     {
+#if PANCAKE_ADMOB_ENABLE
         private InterstitialAd _interstitialAd;
         public event Action<AdmobInterstitialLoader> OnCompleted = delegate { };
         public event Action<AdmobInterstitialLoader, object, EventArgs> OnClosedEvent = delegate { };
@@ -59,5 +62,6 @@ namespace Snorlax.Ads
             _interstitialAd?.Destroy();
             _interstitialAd = null;
         }
+#endif
     }
 }

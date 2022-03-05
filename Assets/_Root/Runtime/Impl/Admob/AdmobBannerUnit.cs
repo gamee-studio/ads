@@ -1,5 +1,7 @@
 using System;
+#if PANCAKE_ADMOB_ENABLE
 using GoogleMobileAds.Api;
+#endif
 
 namespace Snorlax.Ads
 {
@@ -13,6 +15,7 @@ namespace Snorlax.Ads
         {
         }
 
+#if PANCAKE_ADMOB_ENABLE
         public AdSize ConvertSize()
         {
             switch (size)
@@ -46,5 +49,6 @@ namespace Snorlax.Ads
                     return AdPosition.Bottom;
             }
         }
+#endif
     }
 }
