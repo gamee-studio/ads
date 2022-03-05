@@ -31,15 +31,15 @@ namespace Snorlax.AdsEditor
 
     public class SettingManager
     {
+        // ReSharper disable once InconsistentNaming
         private static readonly SettingManager instance = new SettingManager();
         public static SettingManager Instance => instance;
         public static UnityWebRequest webRequest;
         public static readonly string DefaultPluginExportPath = Path.Combine("Assets", "GoogleMobileAds");
-        private const string DEFAULT_ADMOB_SDK_ASSET_EXPORT_PATH = @"GoogleMobileAds\GoogleMobileAds.dll";
+        public const string DEFAULT_ADMOB_SDK_ASSET_EXPORT_PATH = @"GoogleMobileAds\GoogleMobileAds.dll";
         private static readonly string AdmobSdkAssetExportPath = Path.Combine("GoogleMobileAds", "GoogleMobileAds.dll");
         public static DownloadPluginProgressCallback downloadPluginProgressCallback;
         public static ImportPackageCompletedCallback importPackageCompletedCallback;
-
         private static readonly List<string> PluginPathsToIgnoreMoveWhenPluginOutsideAssetsDirectory = new List<string>();
 
         public static bool IsPluginOutsideAssetsDirectory => !PluginParentDirectory.StartsWith("Assets");
@@ -54,8 +54,7 @@ namespace Snorlax.AdsEditor
                 if (File.Exists(admobSdkScriptAssetPath))
                 {
                     // admobSdkScriptAssetPath will always have AltDirectorySeparatorChar (/) as the path separator. Convert to platform specific path.
-                    return admobSdkScriptAssetPath
-                        .Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar)
+                    return admobSdkScriptAssetPath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar)
                         .Replace(DEFAULT_ADMOB_SDK_ASSET_EXPORT_PATH, "")
                         .Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
                 }
@@ -160,13 +159,13 @@ namespace Snorlax.AdsEditor
 
             var labelsToAdd = labels.ToList();
             var didAddLabels = false;
-            if (!labels.Contains("Al_admob"))
+            if (!labels.Contains("pancake_admob"))
             {
-                labelsToAdd.Add("Al_admob");
+                labelsToAdd.Add("pancake_admob");
                 didAddLabels = true;
             }
 
-            var exportPathLabel = "Al_admob_export_path-" + assetPath.Replace(pluginParentDir, "");
+            var exportPathLabel = "pancake_admob_export_path-" + assetPath.Replace(pluginParentDir, "");
             if (!labels.Contains(exportPathLabel))
             {
                 labelsToAdd.Add(exportPathLabel);
@@ -202,14 +201,14 @@ namespace Snorlax.AdsEditor
 
         /// <summary>
         /// Gets the path of the asset in the project for a given GoogleMobileAds plugin export path.
-        /// ex : Al_admob_export_path-GoogleMobileAds\GoogleMobileAds.dll
+        /// ex : pancake_admob_export_path-GoogleMobileAds\GoogleMobileAds.dll
         /// </summary>
         /// <param name="exportPath">The actual exported path of the asset.</param>
         /// <returns>The exported path of the MAX plugin asset or the default export path if the asset is not found.</returns>
         public static string GetAssetPathForExportPath(string exportPath)
         {
             var defaultPath = Path.Combine("Assets", exportPath);
-            var assetGuids = AssetDatabase.FindAssets("l:Al_admob_export_path-" + exportPath);
+            var assetGuids = AssetDatabase.FindAssets("l:pancake_admob_export_path-" + exportPath);
 
             return assetGuids.Length < 1 ? defaultPath : AssetDatabase.GUIDToAssetPath(assetGuids[0]);
         }
@@ -551,6 +550,29 @@ namespace Snorlax.AdsEditor
                 }
 
                 AssetDatabase.Refresh();
+            }
+        }
+
+        private static bool IsAdmobSDKImported()
+        {
+            if (AssetDatabase.FindAssets(AdsUtil.DEFAULT_FILTER_ADMOB_DLL).Length >= 1 ||
+                AssetDatabase.FindAssets(@"l:pancake_exportpath-" + PluginParentDirectory).Length >= 1)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static void ValidateAdmobSdkImported()
+        {
+            if (IsAdmobSDKImported())
+            {
+                ScriptingDefinition.AddDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_ADMOB);
+            }
+            else
+            {
+                ScriptingDefinition.RemoveDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_ADMOB);
             }
         }
 

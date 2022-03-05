@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Snorlax.Ads;
@@ -67,6 +68,18 @@ namespace Snorlax.AdsEditor
         private GUIContent _warningIcon;
         private GUIContent _iconUnintall;
         private GUIStyle _headerLabelStyle;
+
+        private bool IsAdmobSdkAvaiable
+        {
+            get
+            {
+#if PANCAKE_ADMOB_ENABLE
+                return true;
+#else
+                return false;
+#endif
+            }
+        }
 
         #endregion
 
@@ -142,45 +155,56 @@ namespace Snorlax.AdsEditor
                     EditorGUILayout.PropertyField(AdmobProperties.enable.property, AdmobProperties.enable.content);
                     if (Settings.AdmobSettings.Enable)
                     {
-                        EditorGUILayout.PropertyField(AdmobProperties.bannerAdUnit.property, AdmobProperties.bannerAdUnit.content, true);
-                        EditorGUILayout.PropertyField(AdmobProperties.interstitialAdUnit.property, AdmobProperties.interstitialAdUnit.content, true);
-                        EditorGUILayout.PropertyField(AdmobProperties.rewardedAdUnit.property, AdmobProperties.rewardedAdUnit.content, true);
-                        EditorGUILayout.PropertyField(AdmobProperties.rewardedInterstitialAdUnit.property, AdmobProperties.rewardedInterstitialAdUnit.content, true);
-                        EditorGUILayout.PropertyField(AdmobProperties.appOpenAdUnit.property, AdmobProperties.appOpenAdUnit.content, true);
-
-                        if (Settings.AdmobSettings.BannerAdUnit.size == EBannerSize.SmartBanner)
+                        SettingManager.ValidateAdmobSdkImported();
+                        if (IsAdmobSdkAvaiable)
                         {
-                            EditorGUILayout.PropertyField(AdmobProperties.useAdaptiveBanner.property, AdmobProperties.useAdaptiveBanner.content);
-                        }
-
-                        DrawUppercaseSection("ADMOB_MODULE_MEDIATION",
-                            "MEDIATION",
-                            () =>
+                            EditorGUILayout.HelpBox("Admob plugin was imported", MessageType.Info);
+                            EditorGUILayout.Space();
+                            if (GUILayout.Button("Open GoogleMobileAds Setting", GUILayout.Height(EditorGUIUtility.singleLineHeight * 1.3f)))
                             {
-                                using (new EditorGUILayout.HorizontalScope())
-                                {
-                                    GUILayout.Space(5);
-                                    EditorGUILayout.LabelField("Network", _headerLabelStyle, NetworkWidthOption);
-                                    EditorGUILayout.LabelField("Current Version", _headerLabelStyle, VersionWidthOption);
-                                    GUILayout.Space(3);
-                                    EditorGUILayout.LabelField("Latest Version", _headerLabelStyle, VersionWidthOption);
-                                    GUILayout.Space(3);
-                                    GUILayout.FlexibleSpace();
-                                    GUILayout.Button("Actions", _headerLabelStyle, FieldWidth);
-                                    GUILayout.Space(5);
-                                }
+#if PANCAKE_ADMOB_ENABLE
+                                GoogleMobileAds.Editor.GoogleMobileAdsSettingsEditor.OpenInspector();
+                                EditorWindow.GetWindow(typeof(Editor).Assembly.GetType("UnityEditor.InspectorWindow")).Focus();
+#endif
+                            }
 
-                                foreach (var network in Settings.AdmobSettings.MediationNetworks)
-                                {
-                                    DrawNetworkDetailRow(network);
-                                }
-                            });
+                            EditorGUILayout.Space();
+                            EditorGUILayout.PropertyField(AdmobProperties.bannerAdUnit.property, AdmobProperties.bannerAdUnit.content, true);
+                            EditorGUILayout.PropertyField(AdmobProperties.interstitialAdUnit.property, AdmobProperties.interstitialAdUnit.content, true);
+                            EditorGUILayout.PropertyField(AdmobProperties.rewardedAdUnit.property, AdmobProperties.rewardedAdUnit.content, true);
+                            EditorGUILayout.PropertyField(AdmobProperties.rewardedInterstitialAdUnit.property, AdmobProperties.rewardedInterstitialAdUnit.content, true);
+                            EditorGUILayout.PropertyField(AdmobProperties.appOpenAdUnit.property, AdmobProperties.appOpenAdUnit.content, true);
 
-                        EditorGUILayout.Space();
-                        EditorGUILayout.PropertyField(AdmobProperties.enableTestMode.property, AdmobProperties.enableTestMode.content);
-                        if (Settings.AdmobSettings.EnableTestMode)
+                            if (Settings.AdmobSettings.BannerAdUnit.size == EBannerSize.SmartBanner)
+                            {
+                                EditorGUILayout.PropertyField(AdmobProperties.useAdaptiveBanner.property, AdmobProperties.useAdaptiveBanner.content);
+                            }
+
+                            DrawUppercaseSection("ADMOB_MODULE_MEDIATION",
+                                "MEDIATION",
+                                () =>
+                                {
+                                    DrawHeaderAdmobMediation();
+                                    foreach (var network in Settings.AdmobSettings.MediationNetworks)
+                                    {
+                                        DrawNetworkDetailRow(network);
+                                    }
+                                });
+
+                            EditorGUILayout.Space();
+                            EditorGUILayout.PropertyField(AdmobProperties.enableTestMode.property, AdmobProperties.enableTestMode.content);
+                            if (Settings.AdmobSettings.EnableTestMode)
+                            {
+                                EditorGUILayout.PropertyField(AdmobProperties.devicesTest.property, AdmobProperties.devicesTest.content);
+                            }
+                        }
+                        else
                         {
-                            EditorGUILayout.PropertyField(AdmobProperties.devicesTest.property, AdmobProperties.devicesTest.content);
+                            EditorGUILayout.HelpBox("Admob plugin not found. Please download and import it to show ads from Admob", MessageType.Warning);
+                            if (GUILayout.Button("Download Admob Plugin", GUILayout.Height(EditorGUIUtility.singleLineHeight * 1.3f)))
+                            {
+                                Application.OpenURL("https://github.com/googleads/googleads-mobile-unity/releases");
+                            }
                         }
                     }
                 });
@@ -189,6 +213,22 @@ namespace Snorlax.AdsEditor
 
             EditorGUI.EndDisabledGroup();
             serializedObject.ApplyModifiedProperties();
+        }
+
+        private void DrawHeaderAdmobMediation()
+        {
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.Space(5);
+                EditorGUILayout.LabelField("Network", _headerLabelStyle, NetworkWidthOption);
+                EditorGUILayout.LabelField("Current Version", _headerLabelStyle, VersionWidthOption);
+                GUILayout.Space(3);
+                EditorGUILayout.LabelField("Latest Version", _headerLabelStyle, VersionWidthOption);
+                GUILayout.Space(3);
+                GUILayout.FlexibleSpace();
+                GUILayout.Button("Actions", _headerLabelStyle, FieldWidth);
+                GUILayout.Space(5);
+            }
         }
 
         private void DrawNetworkDetailRow(Network network)

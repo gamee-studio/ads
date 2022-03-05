@@ -71,6 +71,10 @@ namespace Snorlax.AdsEditor
             AssetDatabase.SaveAssets();
         }
 
+        /// <summary>
+        /// Callback method that will be called when package import completed
+        /// </summary>
+        /// <param name="network"></param>
         private static void OnImportPackageCompleted(Network network)
         {
             SettingManager.SetNetworkUnityVersion(network.name, network.lastVersion.unity);

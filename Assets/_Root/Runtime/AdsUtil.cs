@@ -6,79 +6,83 @@ namespace Snorlax.Ads
 {
     public class AdsUtil
     {
-/// <summary>
-    /// Compares its two arguments for order.  Returns <see cref="EVersionComparisonResult.Lesser"/>, <see cref="EVersionComparisonResult.Equal"/>,
-    /// or <see cref="EVersionComparisonResult.Greater"/> as the first version is less than, equal to, or greater than the second.
-    /// </summary>
-    /// <param name="versionA">The first version to be compared.</param>
-    /// <param name="versionB">The second version to be compared.</param>
-    /// <returns>
-    /// <see cref="EVersionComparisonResult.Lesser"/> if versionA is less than versionB.
-    /// <see cref="EVersionComparisonResult.Equal"/> if versionA and versionB are equal.
-    /// <see cref="EVersionComparisonResult.Greater"/> if versionA is greater than versionB.
-    /// </returns>
-    public static EVersionComparisonResult CompareVersions(string versionA, string versionB)
-    {
-        if (versionA.Equals(versionB)) return EVersionComparisonResult.Equal;
+        public const string SCRIPTING_DEFINITION_ADMOB = "PANCAKE_ADMOB_ENABLE";
+        public const string DEFAULT_FILTER_ADMOB_DLL = "l:gvhp_exportpath-GoogleMobileAds/GoogleMobileAds.dll";
 
-        // Check if either of the versions are beta versions. Beta versions could be of format x.y.z-beta or x.y.z-betaX.
-        // Split the version string into beta component and the underlying version.
-        int piece;
-        var isVersionABeta = versionA.Contains("-beta");
-        var versionABetaNumber = 0;
-        if (isVersionABeta)
-        {
-            var components = versionA.Split(new[] {"-beta"}, StringSplitOptions.None);
-            versionA = components[0];
-            versionABetaNumber = int.TryParse(components[1], out piece) ? piece : 0;
-        }
 
-        var isVersionBBeta = versionB.Contains("-beta");
-        var versionBBetaNumber = 0;
-        if (isVersionBBeta)
+        /// <summary>
+        /// Compares its two arguments for order.  Returns <see cref="EVersionComparisonResult.Lesser"/>, <see cref="EVersionComparisonResult.Equal"/>,
+        /// or <see cref="EVersionComparisonResult.Greater"/> as the first version is less than, equal to, or greater than the second.
+        /// </summary>
+        /// <param name="versionA">The first version to be compared.</param>
+        /// <param name="versionB">The second version to be compared.</param>
+        /// <returns>
+        /// <see cref="EVersionComparisonResult.Lesser"/> if versionA is less than versionB.
+        /// <see cref="EVersionComparisonResult.Equal"/> if versionA and versionB are equal.
+        /// <see cref="EVersionComparisonResult.Greater"/> if versionA is greater than versionB.
+        /// </returns>
+        public static EVersionComparisonResult CompareVersions(string versionA, string versionB)
         {
-            var components = versionB.Split(new[] {"-beta"}, StringSplitOptions.None);
-            versionB = components[0];
-            versionBBetaNumber = int.TryParse(components[1], out piece) ? piece : 0;
-        }
+            if (versionA.Equals(versionB)) return EVersionComparisonResult.Equal;
 
-        // Now that we have separated the beta component, check if the underlying versions are the same.
-        if (versionA.Equals(versionB))
-        {
-            // The versions are the same, compare the beta components.
-            if (isVersionABeta && isVersionBBeta)
+            // Check if either of the versions are beta versions. Beta versions could be of format x.y.z-beta or x.y.z-betaX.
+            // Split the version string into beta component and the underlying version.
+            int piece;
+            var isVersionABeta = versionA.Contains("-beta");
+            var versionABetaNumber = 0;
+            if (isVersionABeta)
             {
-                if (versionABetaNumber < versionBBetaNumber) return EVersionComparisonResult.Lesser;
-
-                if (versionABetaNumber > versionBBetaNumber) return EVersionComparisonResult.Greater;
+                var components = versionA.Split(new[] {"-beta"}, StringSplitOptions.None);
+                versionA = components[0];
+                versionABetaNumber = int.TryParse(components[1], out piece) ? piece : 0;
             }
-            // Only VersionA is beta, so A is older.
-            else if (isVersionABeta)
+
+            var isVersionBBeta = versionB.Contains("-beta");
+            var versionBBetaNumber = 0;
+            if (isVersionBBeta)
             {
-                return EVersionComparisonResult.Lesser;
+                var components = versionB.Split(new[] {"-beta"}, StringSplitOptions.None);
+                versionB = components[0];
+                versionBBetaNumber = int.TryParse(components[1], out piece) ? piece : 0;
             }
-            // Only VersionB is beta, A is newer.
-            else
+
+            // Now that we have separated the beta component, check if the underlying versions are the same.
+            if (versionA.Equals(versionB))
             {
-                return EVersionComparisonResult.Greater;
+                // The versions are the same, compare the beta components.
+                if (isVersionABeta && isVersionBBeta)
+                {
+                    if (versionABetaNumber < versionBBetaNumber) return EVersionComparisonResult.Lesser;
+
+                    if (versionABetaNumber > versionBBetaNumber) return EVersionComparisonResult.Greater;
+                }
+                // Only VersionA is beta, so A is older.
+                else if (isVersionABeta)
+                {
+                    return EVersionComparisonResult.Lesser;
+                }
+                // Only VersionB is beta, A is newer.
+                else
+                {
+                    return EVersionComparisonResult.Greater;
+                }
             }
+
+            // Compare the non beta component of the version string.
+            var versionAComponents = versionA.Split('.').Select(version => int.TryParse(version, out piece) ? piece : 0).ToArray();
+            var versionBComponents = versionB.Split('.').Select(version => int.TryParse(version, out piece) ? piece : 0).ToArray();
+            var length = Mathf.Max(versionAComponents.Length, versionBComponents.Length);
+            for (var i = 0; i < length; i++)
+            {
+                var aComponent = i < versionAComponents.Length ? versionAComponents[i] : 0;
+                var bComponent = i < versionBComponents.Length ? versionBComponents[i] : 0;
+
+                if (aComponent < bComponent) return EVersionComparisonResult.Lesser;
+
+                if (aComponent > bComponent) return EVersionComparisonResult.Greater;
+            }
+
+            return EVersionComparisonResult.Equal;
         }
-
-        // Compare the non beta component of the version string.
-        var versionAComponents = versionA.Split('.').Select(version => int.TryParse(version, out piece) ? piece : 0).ToArray();
-        var versionBComponents = versionB.Split('.').Select(version => int.TryParse(version, out piece) ? piece : 0).ToArray();
-        var length = Mathf.Max(versionAComponents.Length, versionBComponents.Length);
-        for (var i = 0; i < length; i++)
-        {
-            var aComponent = i < versionAComponents.Length ? versionAComponents[i] : 0;
-            var bComponent = i < versionBComponents.Length ? versionBComponents[i] : 0;
-
-            if (aComponent < bComponent) return EVersionComparisonResult.Lesser;
-
-            if (aComponent > bComponent) return EVersionComparisonResult.Greater;
-        }
-
-        return EVersionComparisonResult.Equal;
-    }
     }
 }
