@@ -43,10 +43,11 @@ namespace Snorlax.AdsEditor
             public static SerializedProperty main;
             public static Property enable = new Property(null, new GUIContent("Enable", "Enable using admob ad"));
             public static Property devicesTest = new Property(null, new GUIContent("Devices Test", "List devices show real ad but mark test user"));
-            public static Property bannerAdUnit = new Property(null, new GUIContent("Banner Ad"));
-            public static Property interstitialAdUnit = new Property(null, new GUIContent("Interstitial Ad"));
+            public static Property bannerAdUnit = new Property(null, new GUIContent("Banner ad"));
+            public static Property interstitialAdUnit = new Property(null, new GUIContent("Interstitial ad"));
             public static Property rewardedAdUnit = new Property(null, new GUIContent("Rewarded Ad"));
-            public static Property rewardedInterstitialAdUnit = new Property(null, new GUIContent("Rewarded Interstitial Ad"));
+            public static Property rewardedInterstitialAdUnit = new Property(null, new GUIContent("Rewarded interstitial ad"));
+            public static Property appOpenAdUnit = new Property(null, new GUIContent("App open ad"));
             public static Property enableTestMode = new Property(null, new GUIContent("Enable Test Mode", "Enable true when want show test ad"));
             public static Property useAdaptiveBanner = new Property(null, new GUIContent("Use Adaptive Banner", "Use adaptive banner ad when use smart banner"));
         }
@@ -92,6 +93,7 @@ namespace Snorlax.AdsEditor
             AdmobProperties.interstitialAdUnit.property = AdmobProperties.main.FindPropertyRelative("interstitialAdUnit");
             AdmobProperties.rewardedAdUnit.property = AdmobProperties.main.FindPropertyRelative("rewardedAdUnit");
             AdmobProperties.rewardedInterstitialAdUnit.property = AdmobProperties.main.FindPropertyRelative("rewardedInterstitialAdUnit");
+            AdmobProperties.appOpenAdUnit.property = AdmobProperties.main.FindPropertyRelative("appOpenAdUnit");
             AdmobProperties.enableTestMode.property = AdmobProperties.main.FindPropertyRelative("enableTestMode");
             AdmobProperties.useAdaptiveBanner.property = AdmobProperties.main.FindPropertyRelative("useAdaptiveBanner");
         }
@@ -144,6 +146,7 @@ namespace Snorlax.AdsEditor
                         EditorGUILayout.PropertyField(AdmobProperties.interstitialAdUnit.property, AdmobProperties.interstitialAdUnit.content, true);
                         EditorGUILayout.PropertyField(AdmobProperties.rewardedAdUnit.property, AdmobProperties.rewardedAdUnit.content, true);
                         EditorGUILayout.PropertyField(AdmobProperties.rewardedInterstitialAdUnit.property, AdmobProperties.rewardedInterstitialAdUnit.content, true);
+                        EditorGUILayout.PropertyField(AdmobProperties.appOpenAdUnit.property, AdmobProperties.appOpenAdUnit.content, true);
 
                         if (Settings.AdmobSettings.BannerAdUnit.size == EBannerSize.SmartBanner)
                         {
@@ -177,9 +180,7 @@ namespace Snorlax.AdsEditor
                         EditorGUILayout.PropertyField(AdmobProperties.enableTestMode.property, AdmobProperties.enableTestMode.content);
                         if (Settings.AdmobSettings.EnableTestMode)
                         {
-                            EditorGUI.indentLevel++;
                             EditorGUILayout.PropertyField(AdmobProperties.devicesTest.property, AdmobProperties.devicesTest.content);
-                            EditorGUI.indentLevel--;
                         }
                     }
                 });

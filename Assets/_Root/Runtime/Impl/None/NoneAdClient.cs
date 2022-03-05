@@ -10,7 +10,7 @@ namespace Snorlax.Ads
         public override bool IsAppOpenAdSupport => false;
         public override bool IsSdkAvaiable => true;
         protected override string NoSdkMessage => "";
-        
+
         private static NoneAdClient client;
         public static NoneAdClient Instance => client ??= new NoneAdClient();
         protected override void InternalInit() { }
@@ -38,5 +38,11 @@ namespace Snorlax.Ads
         protected override bool InternalIsRewardedInterstitialAdReady() { return false; }
 
         protected override void InternalShowRewardedInterstitialAd() { }
+
+        protected override void InternalLoadAppOpenAd() { }
+
+        protected override void InternalShowAppOpenAd() { }
+
+        protected override bool InternalIsAppOpenAdReady() { return false; }
     }
 }

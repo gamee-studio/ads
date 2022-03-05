@@ -6,6 +6,12 @@ namespace Snorlax.Ads
     public abstract class AdClient : IAdClient
     {
         protected bool isInitialized;
+        public event Action<IAdClient> OnInterstitialAdCompleted;
+        public event Action<IAdClient> OnRewardedAdSkipped;
+        public event Action<IAdClient> OnRewardedAdCompleted;
+        public event Action<IAdClient> OnRewardedInterstitialAdSkipped;
+        public event Action<IAdClient> OnRewardedInterstitialAdCompleted;
+        public event Action<IAdClient> OnAppOpenAdCompleted;
         public abstract EAdNetwork Network { get; }
         public abstract bool IsBannerAdSupported { get; }
         public abstract bool IsInsterstitialAdSupport { get; }
@@ -38,19 +44,21 @@ namespace Snorlax.Ads
         }
 
         protected abstract void InternalInit();
-
         protected abstract void InternalShowBannerAd();
         protected abstract void InternalHideBannerAd();
         protected abstract void InternalDestroyBannerAd();
         protected abstract void InternalLoadInterstitialAd();
-        protected abstract bool InternalIsInterstitialAdReady();
         protected abstract void InternalShowInterstitialAd();
+        protected abstract bool InternalIsInterstitialAdReady();
         protected abstract void InternalLoadRewardedAd();
-        protected abstract bool InternalIsRewardedAdReady();
         protected abstract void InternalShowRewardedAd();
+        protected abstract bool InternalIsRewardedAdReady();
         protected abstract void InternalLoadRewardedInterstitialAd();
-        protected abstract bool InternalIsRewardedInterstitialAdReady();
         protected abstract void InternalShowRewardedInterstitialAd();
+        protected abstract bool InternalIsRewardedInterstitialAdReady();
+        protected abstract void InternalLoadAppOpenAd();
+        protected abstract void InternalShowAppOpenAd();
+        protected abstract bool InternalIsAppOpenAdReady();
 
         public virtual void ShowBannerAd()
         {
@@ -74,8 +82,6 @@ namespace Snorlax.Ads
             if (CheckInitialize()) InternalDestroyBannerAd();
         }
 
-        public event Action<IAdClient> OnInterstitialAdCompleted;
-
         protected virtual void InvokeInterstitialAdCompleted() { RuntimeHelper.RunOnMainThread(() => { OnInterstitialAdCompleted?.Invoke(this); }); }
 
         public void LoadInterstitialAd()
@@ -91,8 +97,6 @@ namespace Snorlax.Ads
                 Debug.Log(NoSdkMessage);
             }
         }
-
-        public bool IsInterstitialAdReady() { return CheckInitialize(false) && InternalIsInterstitialAdReady(); }
 
         public void ShowInterstitialAd()
         {
@@ -113,10 +117,11 @@ namespace Snorlax.Ads
             }
         }
 
-        public event Action<IAdClient> OnRewardedAdSkipped;
-        public event Action<IAdClient> OnRewardedAdCompleted;
+        public bool IsInterstitialAdReady() { return CheckInitialize(false) && InternalIsInterstitialAdReady(); }
+
         protected virtual void InvokeRewardedAdSkipped() { RuntimeHelper.RunOnMainThread(() => { OnRewardedAdSkipped?.Invoke(this); }); }
         protected virtual void InvokeRewardedAdCompleted() { RuntimeHelper.RunOnMainThread(() => { OnRewardedAdCompleted?.Invoke(this); }); }
+
         public void LoadRewardedAd()
         {
             if (IsSdkAvaiable)
@@ -129,8 +134,6 @@ namespace Snorlax.Ads
                 Debug.Log(NoSdkMessage);
             }
         }
-
-        public bool IsRewardedAdReady() { return CheckInitialize(false) && InternalIsRewardedAdReady(); }
 
         public void ShowRewardedAd()
         {
@@ -151,8 +154,8 @@ namespace Snorlax.Ads
             }
         }
 
-        public event Action<IAdClient> OnRewardedInterstitialAdSkipped;
-        public event Action<IAdClient> OnRewardedInterstitialAdCompleted;
+        public bool IsRewardedAdReady() { return CheckInitialize(false) && InternalIsRewardedAdReady(); }
+
         protected virtual void InvokeRewardedInterstitialAdSkipped() { RuntimeHelper.RunOnMainThread(() => { OnRewardedInterstitialAdSkipped?.Invoke(this); }); }
         protected virtual void InvokeRewardedInterstitialAdCompleted() { RuntimeHelper.RunOnMainThread(() => { OnRewardedInterstitialAdCompleted?.Invoke(this); }); }
 
@@ -168,8 +171,6 @@ namespace Snorlax.Ads
                 Debug.Log(NoSdkMessage);
             }
         }
-
-        public bool IsRewardedInterstitialAdReady() { return CheckInitialize(false) && InternalIsRewardedInterstitialAdReady(); }
 
         public void ShowRewardedInterstitialAd()
         {
@@ -190,11 +191,42 @@ namespace Snorlax.Ads
             }
         }
 
-        public event Action<IAdClient> OnAppOpenAdCompleted;
-        public void LoadAppOpenAd() { throw new NotImplementedException(); }
+        public bool IsRewardedInterstitialAdReady() { return CheckInitialize(false) && InternalIsRewardedInterstitialAdReady(); }
 
-        public bool IsAppOpenAdReady() { throw new NotImplementedException(); }
+        protected virtual void InvokeAppOpenAdCompleted() { RuntimeHelper.RunOnMainThread(() => { OnAppOpenAdCompleted?.Invoke(this); }); }
 
-        public void ShowAppOpenAd() { throw new NotImplementedException(); }
+        public void LoadAppOpenAd()
+        {
+            if (IsSdkAvaiable)
+            {
+                if (!CheckInitialize()) return;
+                if (!IsAppOpenAdReady()) InternalLoadAppOpenAd();
+            }
+            else
+            {
+                Debug.Log(NoSdkMessage);
+            }
+        }
+
+        public void ShowAppOpenAd()
+        {
+            if (IsSdkAvaiable)
+            {
+                if (!CheckInitialize()) return;
+                if (!IsAppOpenAdReady())
+                {
+                    Debug.LogFormat($"Cannot show {Network} app open ad : ad is not loaded.");
+                    return;
+                }
+
+                InternalShowAppOpenAd();
+            }
+            else
+            {
+                Debug.Log(NoSdkMessage);
+            }
+        }
+
+        public bool IsAppOpenAdReady() { return CheckInitialize(false) && InternalIsAppOpenAdReady(); }
     }
 }

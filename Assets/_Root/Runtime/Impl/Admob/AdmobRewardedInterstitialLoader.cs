@@ -27,15 +27,15 @@ namespace Snorlax.Ads
             RewardedInterstitialAd.LoadAd(unit.Id, Admob.CreateRequest(), OnAdLoadCallback);
         }
 
-        private void OnAdLoadCallback(RewardedInterstitialAd arg1, AdFailedToLoadEventArgs arg2)
+        private void OnAdLoadCallback(RewardedInterstitialAd rewardedInterstitialAd, AdFailedToLoadEventArgs error)
         {
-            if (arg2 != null)
+            if (error != null)
             {
-                OnAdFailedToLoad(arg2);
+                OnAdFailedToLoad(error);
                 return;
             }
 
-            _rewardedInterstitialAd = arg1;
+            _rewardedInterstitialAd = rewardedInterstitialAd;
             OnAdLoaded();
 
             _rewardedInterstitialAd.OnAdDidDismissFullScreenContent += OnAdClosed;

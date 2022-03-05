@@ -10,6 +10,7 @@ namespace Snorlax.Ads
         private AdmobInterstitialLoader _interstitial = new AdmobInterstitialLoader();
         private AdmobRewardedLoader _rewarded = new AdmobRewardedLoader();
         private AdmobRewardedInterstitialLoader _rewardedInterstitial = new AdmobRewardedInterstitialLoader();
+        private AdmobAppOpenLoader _appOpen = new AdmobAppOpenLoader();
         private static AdmobAdClient client;
         public static AdmobAdClient Instance => client ??= new AdmobAdClient();
         public override EAdNetwork Network => EAdNetwork.Admob;
@@ -40,6 +41,7 @@ namespace Snorlax.Ads
         public AdmobRewardedLoader Rewarded => _rewarded;
 
         public AdmobRewardedInterstitialLoader RewardedInterstitial => _rewardedInterstitial;
+        public AdmobAppOpenLoader AppOpen => _appOpen;
 
         protected override void InternalInit()
         {
@@ -86,6 +88,14 @@ namespace Snorlax.Ads
             _rewardedInterstitial.OnRewardEvent += InvokeRewardedInterstitialAdRewared;
             _rewardedInterstitial.OnCompleted += HandleRewaredInterstitialCompleted;
             _rewardedInterstitial.OnSkipped += HandleRewardedInterstitialSkipped;
+
+            _appOpen.OnClosedEvent += InvokeAppOpenAdClosed;
+            _appOpen.OnFailToLoadEvent += InvokeAppOpenAdFailedToLoad;
+            _appOpen.OnFailToShowEvent += InvokeAppOpenAdFailedToShow;
+            _appOpen.OnLoadedEvent += InvokeAppOpenAdLoaded;
+            _appOpen.OnOpeningEvent += InvokeAppOpenAdOpening;
+            _appOpen.OnPaidEvent += InvokeAppOpenAdPaid;
+            _appOpen.OnCompleted += HandleAppOpenCompleted;
         }
 
         public event EventHandler<EventArgs> OnBannerAdClosed;
@@ -109,7 +119,6 @@ namespace Snorlax.Ads
         public event EventHandler<EventArgs> OnRewardedAdClosed;
         public event EventHandler<Reward> OnRewardedAdRewarded;
 
-
         public event EventHandler<AdValueEventArgs> OnRewardedInterstitialAdPaid;
         public event EventHandler<EventArgs> OnRewardedInterstitialAdOpening;
         public event EventHandler<EventArgs> OnRewardedInterstitialAdLoaded;
@@ -117,6 +126,13 @@ namespace Snorlax.Ads
         public event EventHandler<AdFailedToLoadEventArgs> OnRewardedInterstitialAdFailedToLoad;
         public event EventHandler<EventArgs> OnRewardedInterstitialAdClosed;
         public event EventHandler<Reward> OnRewardedInterstitialAdRewarded;
+
+        public event EventHandler<AdValueEventArgs> OnAppOpenAdPaid;
+        public event EventHandler<EventArgs> OnAppOpenAdOpening;
+        public event EventHandler<EventArgs> OnAppOpenAdLoaded;
+        public event EventHandler<AdErrorEventArgs> OnRAppOpenAdFailedToShow;
+        public event EventHandler<AdFailedToLoadEventArgs> OnAppOpenAdFailedToLoad;
+        public event EventHandler<EventArgs> OnAppOpenAdClosed;
 
 
         private void InvokeBannerAdLoaded(AdLoader<AdUnit> instance, object sender, EventArgs args) { OnBannerAdLoaded?.Invoke(sender, args); }
@@ -206,6 +222,20 @@ namespace Snorlax.Ads
             OnRewardedInterstitialAdClosed?.Invoke(sender, args);
         }
 
+        private void HandleAppOpenCompleted(AdmobAppOpenLoader instance) { RuntimeHelper.RunOnMainThread(InvokeAppOpenAdCompleted); }
+
+        private void InvokeAppOpenAdPaid(AdmobAppOpenLoader instance, object sender, AdValueEventArgs args) { OnAppOpenAdPaid?.Invoke(sender, args); }
+
+        private void InvokeAppOpenAdOpening(AdmobAppOpenLoader instance, object sender, EventArgs args) { OnAppOpenAdOpening?.Invoke(sender, args); }
+
+        private void InvokeAppOpenAdLoaded(AdmobAppOpenLoader instance) { OnAppOpenAdLoaded?.Invoke(null, null); }
+
+        private void InvokeAppOpenAdFailedToShow(AdmobAppOpenLoader instance, object sender, AdErrorEventArgs args) { OnRAppOpenAdFailedToShow?.Invoke(sender, args); }
+
+        private void InvokeAppOpenAdFailedToLoad(AdmobAppOpenLoader instance, AdFailedToLoadEventArgs args) { OnAppOpenAdFailedToLoad?.Invoke(null, args); }
+
+        private void InvokeAppOpenAdClosed(AdmobAppOpenLoader instance, object sender, EventArgs args) { OnAppOpenAdClosed?.Invoke(sender, args); }
+
         protected override void InternalShowBannerAd()
         {
             _banner.Load();
@@ -233,5 +263,11 @@ namespace Snorlax.Ads
         protected override bool InternalIsRewardedInterstitialAdReady() { return _rewardedInterstitial.IsReady(); }
 
         protected override void InternalShowRewardedInterstitialAd() { _rewardedInterstitial.Show(); }
+
+        protected override void InternalLoadAppOpenAd() { _appOpen.Load(); }
+
+        protected override void InternalShowAppOpenAd() { _appOpen.Show(); }
+
+        protected override bool InternalIsAppOpenAdReady() { return _appOpen.IsReady(); }
     }
 }
