@@ -35,15 +35,12 @@ namespace Snorlax.AdsEditor
         public static SettingManager Instance => instance;
         public static UnityWebRequest webRequest;
         public static readonly string DefaultPluginExportPath = Path.Combine("Assets", "GoogleMobileAds");
-        private const string DEFAULT_ADMOB_SDK_ASSET_EXPORT_PATH = "GoogleMobileAds/GoogleMobileAds.dll";
+        private const string DEFAULT_ADMOB_SDK_ASSET_EXPORT_PATH = @"GoogleMobileAds\GoogleMobileAds.dll";
         private static readonly string AdmobSdkAssetExportPath = Path.Combine("GoogleMobileAds", "GoogleMobileAds.dll");
         public static DownloadPluginProgressCallback downloadPluginProgressCallback;
         public static ImportPackageCompletedCallback importPackageCompletedCallback;
 
-        private static readonly List<string> PluginPathsToIgnoreMoveWhenPluginOutsideAssetsDirectory = new List<string>
-        {
-            "MaxSdk/Mediation", "MaxSdk/Mediation.meta", "MaxSdk/Resources.meta"
-        };
+        private static readonly List<string> PluginPathsToIgnoreMoveWhenPluginOutsideAssetsDirectory = new List<string>();
 
         public static bool IsPluginOutsideAssetsDirectory => !PluginParentDirectory.StartsWith("Assets");
 
@@ -57,7 +54,10 @@ namespace Snorlax.AdsEditor
                 if (File.Exists(admobSdkScriptAssetPath))
                 {
                     // admobSdkScriptAssetPath will always have AltDirectorySeparatorChar (/) as the path separator. Convert to platform specific path.
-                    return admobSdkScriptAssetPath.Replace(DEFAULT_ADMOB_SDK_ASSET_EXPORT_PATH, "").Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+                    return admobSdkScriptAssetPath
+                        .Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar)
+                        .Replace(DEFAULT_ADMOB_SDK_ASSET_EXPORT_PATH, "")
+                        .Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
                 }
 
                 // We should never reach this line but leaving this in out of paranoia.
@@ -409,7 +409,7 @@ namespace Snorlax.AdsEditor
 
         public void UpdateCurrentVersion(Network network)
         {
-            var dependencyFilePath = Path.Combine("Assets", network.dependenciesFilePath);
+            var dependencyFilePath = Path.Combine(PluginParentDirectory, network.dependenciesFilePath);
             var currentVersion = GetCurrentVersion(dependencyFilePath, network.name);
             network.currentVersion = currentVersion;
             SetNetworkUnityVersion(network.name, network.currentVersion.unity);
@@ -533,7 +533,7 @@ namespace Snorlax.AdsEditor
 
             // Store empty directory to results.
             if (isEmpty) results.Add(dir);
-            
+
             return isEmpty;
         }
 
@@ -549,6 +549,7 @@ namespace Snorlax.AdsEditor
                     FileUtil.DeleteFileOrDirectory(d.FullName);
                     FileUtil.DeleteFileOrDirectory(d.Parent + "\\" + d.Name + ".meta"); // unity 2020.2 need to delete the meta too
                 }
+
                 AssetDatabase.Refresh();
             }
         }

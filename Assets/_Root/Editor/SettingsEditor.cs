@@ -262,10 +262,18 @@ namespace Snorlax.AdsEditor
                     var pluginRoot = SettingManager.MediationSpecificPluginParentDirectory;
                     foreach (var pluginFilePath in network.pluginFilePath)
                     {
-                        FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, pluginFilePath));
-                        FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, pluginFilePath + ".meta"));
+                        if (pluginFilePath.StartsWith("Plugins"))
+                        {
+                            FileUtil.DeleteFileOrDirectory(Path.Combine("Assets", pluginFilePath));
+                            FileUtil.DeleteFileOrDirectory(Path.Combine("Assets", pluginFilePath + ".meta"));
+                        }
+                        else
+                        {
+                            FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, pluginFilePath));
+                            FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, pluginFilePath + ".meta"));
+                        }
                     }
-                    
+
                     SettingManager.RemoveAllEmptyFolder(new DirectoryInfo(pluginRoot));
                     SettingManager.Instance.UpdateCurrentVersion(network);
 
