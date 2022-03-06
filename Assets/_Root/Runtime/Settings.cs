@@ -31,6 +31,7 @@ namespace Snorlax.Ads
         [SerializeField] private bool runtimeAutoInitialize = true;
         [SerializeField] private AdSettings adSettings = new AdSettings();
         [SerializeField] private AdmobSettings admobSettings = new AdmobSettings();
+        [SerializeField] private ApplovinSettings applovinSettings = new ApplovinSettings();
 
         #endregion
 
@@ -41,6 +42,8 @@ namespace Snorlax.Ads
         public static AdSettings AdSettings => Instance.adSettings;
 
         public static AdmobSettings AdmobSettings => Instance.admobSettings;
+
+        public static ApplovinSettings ApplovinSettings => Instance.applovinSettings;
 
         #endregion
 

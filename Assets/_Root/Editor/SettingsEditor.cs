@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Snorlax.Ads;
@@ -53,6 +52,12 @@ namespace Snorlax.AdsEditor
             public static Property useAdaptiveBanner = new Property(null, new GUIContent("Use Adaptive Banner", "Use adaptive banner ad when use smart banner"));
         }
 
+        private static class ApplovinProperties
+        {
+            public static SerializedProperty main;
+            public static Property enable = new Property(null, new GUIContent("Enable", "Enable using applovin ad"));
+        }
+
         #region properties
 
         //Runtime auto initialization
@@ -74,6 +79,18 @@ namespace Snorlax.AdsEditor
             get
             {
 #if PANCAKE_ADMOB_ENABLE
+                return true;
+#else
+                return false;
+#endif
+            }
+        }
+
+        private bool IsApplovinSdkAvaiable
+        {
+            get
+            {
+#if PANCAKE_MAX_ENABLE
                 return true;
 #else
                 return false;
@@ -109,6 +126,9 @@ namespace Snorlax.AdsEditor
             AdmobProperties.appOpenAdUnit.property = AdmobProperties.main.FindPropertyRelative("appOpenAdUnit");
             AdmobProperties.enableTestMode.property = AdmobProperties.main.FindPropertyRelative("enableTestMode");
             AdmobProperties.useAdaptiveBanner.property = AdmobProperties.main.FindPropertyRelative("useAdaptiveBanner");
+
+            ApplovinProperties.main = serializedObject.FindProperty("applovinSettings");
+            ApplovinProperties.enable.property = ApplovinProperties.main.FindPropertyRelative("enable");
         }
 
         public override void OnInspectorGUI()
@@ -204,6 +224,28 @@ namespace Snorlax.AdsEditor
                             if (GUILayout.Button("Download Admob Plugin", GUILayout.Height(EditorGUIUtility.singleLineHeight * 1.3f)))
                             {
                                 Application.OpenURL("https://github.com/googleads/googleads-mobile-unity/releases");
+                            }
+                        }
+                    }
+                });
+
+            EditorGUILayout.Space();
+            DrawUppercaseSection("MAX_MODULE",
+                "MAX",
+                () =>
+                {
+                    EditorGUILayout.PropertyField(ApplovinProperties.enable.property, ApplovinProperties.enable.content);
+                    if (Settings.ApplovinSettings.Enable)
+                    {
+                        if (IsApplovinSdkAvaiable)
+                        {
+                        }
+                        else
+                        {
+                            EditorGUILayout.HelpBox("Max plugin not found. Please import it to show ads from Applovin", MessageType.Warning);
+                            if (GUILayout.Button("Import MAX Plugin", GUILayout.Height(EditorGUIUtility.singleLineHeight * 1.3f)))
+                            {
+                                ImportPackage.ImportMax();
                             }
                         }
                     }
