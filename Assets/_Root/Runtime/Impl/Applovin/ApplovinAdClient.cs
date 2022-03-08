@@ -115,29 +115,75 @@ namespace Snorlax.Ads
             isInitialized = true;
         }
 
-        protected override void InternalShowBannerAd() { MaxSdk.ShowBanner(Settings.ApplovinSettings.BannerAdUnit.Id); }
+        protected override void InternalShowBannerAd()
+        {
+            if (string.IsNullOrEmpty(Settings.ApplovinSettings.BannerAdUnit.Id)) return;
+            MaxSdk.ShowBanner(Settings.ApplovinSettings.BannerAdUnit.Id);
+        }
 
-        protected override void InternalHideBannerAd() { MaxSdk.HideBanner(Settings.ApplovinSettings.BannerAdUnit.Id); }
+        protected override void InternalHideBannerAd()
+        {
+            if (string.IsNullOrEmpty(Settings.ApplovinSettings.BannerAdUnit.Id)) return;
+            MaxSdk.HideBanner(Settings.ApplovinSettings.BannerAdUnit.Id);
+        }
 
-        protected override void InternalDestroyBannerAd() { MaxSdk.DestroyBanner(Settings.ApplovinSettings.BannerAdUnit.Id); }
+        protected override void InternalDestroyBannerAd()
+        {
+            if (string.IsNullOrEmpty(Settings.ApplovinSettings.BannerAdUnit.Id)) return;
+            MaxSdk.DestroyBanner(Settings.ApplovinSettings.BannerAdUnit.Id);
+        }
 
-        protected override void InternalLoadInterstitialAd() { MaxSdk.LoadInterstitial(Settings.ApplovinSettings.InterstitialAdUnit.Id); }
+        protected override void InternalLoadInterstitialAd()
+        {
+            if (string.IsNullOrEmpty(Settings.ApplovinSettings.InterstitialAdUnit.Id)) return;
+            MaxSdk.LoadInterstitial(Settings.ApplovinSettings.InterstitialAdUnit.Id);
+        }
 
-        protected override void InternalShowInterstitialAd() { MaxSdk.ShowInterstitial(Settings.ApplovinSettings.InterstitialAdUnit.Id); }
+        protected override void InternalShowInterstitialAd()
+        {
+            if (string.IsNullOrEmpty(Settings.ApplovinSettings.InterstitialAdUnit.Id)) return;
+            MaxSdk.ShowInterstitial(Settings.ApplovinSettings.InterstitialAdUnit.Id);
+        }
 
-        protected override bool InternalIsInterstitialAdReady() { return MaxSdk.IsInterstitialReady(Settings.ApplovinSettings.InterstitialAdUnit.Id); }
+        protected override bool InternalIsInterstitialAdReady()
+        {
+            if (string.IsNullOrEmpty(Settings.ApplovinSettings.InterstitialAdUnit.Id)) return false;
+            return MaxSdk.IsInterstitialReady(Settings.ApplovinSettings.InterstitialAdUnit.Id);
+        }
 
-        protected override void InternalLoadRewardedAd() { MaxSdk.LoadRewardedAd(Settings.ApplovinSettings.RewardedAdUnit.Id); }
+        protected override void InternalLoadRewardedAd()
+        {
+            if (string.IsNullOrEmpty(Settings.ApplovinSettings.RewardedAdUnit.Id)) return;
+            MaxSdk.LoadRewardedAd(Settings.ApplovinSettings.RewardedAdUnit.Id);
+        }
 
-        protected override void InternalShowRewardedAd() { MaxSdk.ShowRewardedAd(Settings.ApplovinSettings.RewardedAdUnit.Id); }
+        protected override void InternalShowRewardedAd()
+        {
+            if (string.IsNullOrEmpty(Settings.ApplovinSettings.RewardedAdUnit.Id)) return;
+            MaxSdk.ShowRewardedAd(Settings.ApplovinSettings.RewardedAdUnit.Id);
+        }
 
-        protected override bool InternalIsRewardedAdReady() { return MaxSdk.IsRewardedAdReady(Settings.ApplovinSettings.RewardedAdUnit.Id); }
+        protected override bool InternalIsRewardedAdReady()
+        {
+            if (string.IsNullOrEmpty(Settings.ApplovinSettings.RewardedAdUnit.Id)) return false;
+            return MaxSdk.IsRewardedAdReady(Settings.ApplovinSettings.RewardedAdUnit.Id);
+        }
 
-        protected override void InternalLoadRewardedInterstitialAd() { MaxSdk.LoadRewardedInterstitialAd(Settings.ApplovinSettings.RewardedInterstitialAdUnit.Id); }
-        protected override void InternalShowRewardedInterstitialAd() { MaxSdk.ShowRewardedInterstitialAd(Settings.ApplovinSettings.RewardedInterstitialAdUnit.Id); }
+        protected override void InternalLoadRewardedInterstitialAd()
+        {
+            if (string.IsNullOrEmpty(Settings.ApplovinSettings.RewardedInterstitialAdUnit.Id)) return;
+            MaxSdk.LoadRewardedInterstitialAd(Settings.ApplovinSettings.RewardedInterstitialAdUnit.Id);
+        }
+
+        protected override void InternalShowRewardedInterstitialAd()
+        {
+            if (string.IsNullOrEmpty(Settings.ApplovinSettings.RewardedInterstitialAdUnit.Id)) return;
+            MaxSdk.ShowRewardedInterstitialAd(Settings.ApplovinSettings.RewardedInterstitialAdUnit.Id);
+        }
 
         protected override bool InternalIsRewardedInterstitialAdReady()
         {
+            if (string.IsNullOrEmpty(Settings.ApplovinSettings.RewardedInterstitialAdUnit.Id)) return false;
             return MaxSdk.IsRewardedInterstitialAdReady(Settings.ApplovinSettings.RewardedInterstitialAdUnit.Id);
         }
     }

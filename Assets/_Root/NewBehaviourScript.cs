@@ -1,3 +1,4 @@
+using System;
 using Snorlax.Ads;
 using UnityEngine;
 
@@ -6,6 +7,11 @@ public class NewBehaviourScript : MonoBehaviour
     public GameObject fetchInterstitial;
     public GameObject fetchRewarded;
     public GameObject fetchRewardedInterstitial;
+
+    private void Awake()
+    {
+        Advertising.SetCurrentNetwork("applovin");
+    }
 
     private void Update()
     {

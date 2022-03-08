@@ -8,13 +8,13 @@ namespace Snorlax.Ads
     public class Advertising : MonoBehaviour
     {
         public static Advertising Instance { get; private set; }
-        public static event Action<EInterstitialAdNetwork> interstitialAdCompletedEvent;
-        public static event Action<ERewardedAdNetwork> rewardedAdCompletedEvent;
-        public static event Action<ERewardedAdNetwork> rewardedAdSkippedEvent;
-        public static event Action<ERewardedInterstitialAdNetwork> rewardedInterstitialAdCompletedEvent;
-        public static event Action<ERewardedInterstitialAdNetwork> rewardedInterstitialAdSkippedEvent;
-        public static event Action<EAppOpenAdNetwork> appOpenAdCompletedEvent;
-        public static event Action removeAdsEvent;
+        public static event Action<EInterstitialAdNetwork> InterstitialAdCompletedEvent;
+        public static event Action<ERewardedAdNetwork> RewardedAdCompletedEvent;
+        public static event Action<ERewardedAdNetwork> RewardedAdSkippedEvent;
+        public static event Action<ERewardedInterstitialAdNetwork> RewardedInterstitialAdCompletedEvent;
+        public static event Action<ERewardedInterstitialAdNetwork> RewardedInterstitialAdSkippedEvent;
+        public static event Action<EAppOpenAdNetwork> AppOpenAdCompletedEvent;
+        public static event Action RemoveAdsEvent;
 
         private static AdmobAdClient admobAdClient;
         private static ApplovinAdClient applovinAdClient;
@@ -134,6 +134,9 @@ namespace Snorlax.Ads
                 case "admob":
                     currentNetwork = EAdNetwork.Admob;
                     break;
+                case "applovin":
+                    currentNetwork = EAdNetwork.Applovin;
+                    break;
                 default:
                     currentNetwork = EAdNetwork.Admob;
                     break;
@@ -185,23 +188,23 @@ namespace Snorlax.Ads
             lastTimeLoadRewardedInterstitialTimestamp = Time.realtimeSinceStartup;
         }
 
-        private static void OnInterstitialAdCompleted(IAdClient client) { interstitialAdCompletedEvent?.Invoke((EInterstitialAdNetwork)client.Network); }
+        private static void OnInterstitialAdCompleted(IAdClient client) { InterstitialAdCompletedEvent?.Invoke((EInterstitialAdNetwork)client.Network); }
 
-        private static void OnRewardedAdCompleted(IAdClient client) { rewardedAdCompletedEvent?.Invoke((ERewardedAdNetwork)client.Network); }
+        private static void OnRewardedAdCompleted(IAdClient client) { RewardedAdCompletedEvent?.Invoke((ERewardedAdNetwork)client.Network); }
 
-        private static void OnRewardedAdSkipped(IAdClient client) { rewardedAdSkippedEvent?.Invoke((ERewardedAdNetwork)client.Network); }
+        private static void OnRewardedAdSkipped(IAdClient client) { RewardedAdSkippedEvent?.Invoke((ERewardedAdNetwork)client.Network); }
 
         private static void OnRewardedInterstitialAdCompleted(IAdClient client)
         {
-            rewardedInterstitialAdCompletedEvent?.Invoke((ERewardedInterstitialAdNetwork)client.Network);
+            RewardedInterstitialAdCompletedEvent?.Invoke((ERewardedInterstitialAdNetwork)client.Network);
         }
 
         private static void OnRewardedInterstitialAdSkipped(IAdClient client)
         {
-            rewardedInterstitialAdSkippedEvent?.Invoke((ERewardedInterstitialAdNetwork)client.Network);
+            RewardedInterstitialAdSkippedEvent?.Invoke((ERewardedInterstitialAdNetwork)client.Network);
         }
 
-        private static void OnAppOpenAdCompleted(IAdClient client) { appOpenAdCompletedEvent?.Invoke((EAppOpenAdNetwork)client.Network); }
+        private static void OnAppOpenAdCompleted(IAdClient client) { AppOpenAdCompletedEvent?.Invoke((EAppOpenAdNetwork)client.Network); }
 
         private static AdClient GetClient(EAdNetwork network)
         {
@@ -257,7 +260,7 @@ namespace Snorlax.Ads
             StorageUtil.SetBool(REMOVE_ADS_KEY, true);
             StorageUtil.Save();
 
-            removeAdsEvent?.Invoke();
+            RemoveAdsEvent?.Invoke();
         }
 
         private static void ShowBannerAd(IAdClient client)
