@@ -13,9 +13,11 @@ namespace Snorlax.Ads
         public static event Action<ERewardedAdNetwork> rewardedAdSkippedEvent;
         public static event Action<ERewardedInterstitialAdNetwork> rewardedInterstitialAdCompletedEvent;
         public static event Action<ERewardedInterstitialAdNetwork> rewardedInterstitialAdSkippedEvent;
+        public static event Action<EAppOpenAdNetwork> appOpenAdCompletedEvent;
         public static event Action removeAdsEvent;
 
         private static AdmobAdClient admobAdClient;
+        private static ApplovinAdClient applovinAdClient;
         private static bool isInitialized;
         private static EAutoLoadingAd autoLoadingAdMode = EAutoLoadingAd.None;
         private static bool flagAutoLoadingModeChange;
@@ -64,8 +66,17 @@ namespace Snorlax.Ads
             {
                 if (!InitializeCheck()) return null;
                 if (admobAdClient == null) admobAdClient = SetupClient(EAdNetwork.Admob) as AdmobAdClient;
-
                 return admobAdClient;
+            }
+        }
+
+        public static ApplovinAdClient ApplovinAdClient
+        {
+            get
+            {
+                if (!InitializeCheck()) return null;
+                if (applovinAdClient == null) applovinAdClient = SetupClient(EAdNetwork.Applovin) as ApplovinAdClient;
+                return applovinAdClient;
             }
         }
 
@@ -163,13 +174,13 @@ namespace Snorlax.Ads
             LoadRewardedAd();
             lastTimeLoadRewardedTimestamp = Time.realtimeSinceStartup;
         }
-        
+
         private static void AutoLoadRewardedInterstitialAd()
         {
             if (IsRewardedInterstitialAdReady()) return;
 
             if (Time.realtimeSinceStartup - lastTimeLoadRewardedInterstitialTimestamp < Settings.AdSettings.AdLoadingInterval) return;
-            
+
             LoadRewardedInterstitialAd();
             lastTimeLoadRewardedInterstitialTimestamp = Time.realtimeSinceStartup;
         }
@@ -190,12 +201,15 @@ namespace Snorlax.Ads
             rewardedInterstitialAdSkippedEvent?.Invoke((ERewardedInterstitialAdNetwork)client.Network);
         }
 
+        private static void OnAppOpenAdCompleted(IAdClient client) { appOpenAdCompletedEvent?.Invoke((EAppOpenAdNetwork)client.Network); }
+
         private static AdClient GetClient(EAdNetwork network)
         {
             switch (network)
             {
                 case EAdNetwork.None: return NoneAdClient.Instance;
                 case EAdNetwork.Admob: return AdmobAdClient.Instance;
+                case EAdNetwork.Applovin: return ApplovinAdClient.Instance;
                 default: return null;
             }
         }
@@ -207,6 +221,7 @@ namespace Snorlax.Ads
             {
                 case EAdNetwork.None: return NoneAdClient.Instance;
                 case EAdNetwork.Admob: return AdmobAdClient;
+                case EAdNetwork.Applovin: return ApplovinAdClient;
                 default: return null;
             }
         }
@@ -220,6 +235,7 @@ namespace Snorlax.Ads
             client.OnRewardedAdSkipped += OnRewardedAdSkipped;
             client.OnRewardedInterstitialAdCompleted += OnRewardedInterstitialAdCompleted;
             client.OnRewardedInterstitialAdSkipped += OnRewardedInterstitialAdSkipped;
+            client.OnAppOpenAdCompleted += OnAppOpenAdCompleted;
         }
 
         private static AdClient SetupClient(EAdNetwork network)
@@ -289,7 +305,7 @@ namespace Snorlax.Ads
 
         private static bool IsRewardedAdReady(IAdClient client)
         {
-            if (!Application.isMobilePlatform) return false;
+            if (!IsInitialized || !Application.isMobilePlatform) return false;
             return client.IsRewardedAdReady();
         }
 
@@ -303,11 +319,29 @@ namespace Snorlax.Ads
 
         private static bool IsRewardedInterstitialAdReady(IAdClient client)
         {
-            if (!Application.isMobilePlatform) return false;
+            if (!IsInitialized || !Application.isMobilePlatform) return false;
             return client.IsRewardedInterstitialAdReady();
         }
 
         private static void ShowRewardedInterstitialAd(IAdClient client) { client.ShowRewardedInterstitialAd(); }
+
+        private static void LoadAppOpenAd(IAdClient client)
+        {
+            if (IsAdRemoved() || !Application.isMobilePlatform) return;
+            client.LoadAppOpenAd();
+        }
+
+        private static bool IsAppOpenAdReady(IAdClient client)
+        {
+            if (!IsInitialized || IsAdRemoved() || !Application.isMobilePlatform) return false;
+            return client.IsAppOpenAdReady();
+        }
+
+        private static void ShowAppOpenAd(IAdClient client)
+        {
+            if (IsAdRemoved() || !Application.isMobilePlatform) return;
+            client.ShowAppOpenAd();
+        }
 
         public static void ShowBannerAd() { ShowBannerAd(GetClientAlreadySetup(currentNetwork)); }
 
@@ -332,5 +366,11 @@ namespace Snorlax.Ads
         public static bool IsRewardedInterstitialAdReady() { return IsRewardedInterstitialAdReady(GetClientAlreadySetup(currentNetwork)); }
 
         public static void ShowRewardedInterstitialAd() { ShowRewardedInterstitialAd(GetClientAlreadySetup(currentNetwork)); }
+
+        public static void LoadAppOpenAd() { LoadAppOpenAd(GetClientAlreadySetup(currentNetwork)); }
+
+        public static bool IsAppOpenAdReady() { return IsAppOpenAdReady(GetClientAlreadySetup(currentNetwork)); }
+
+        public static void ShowAppOpenAd() { ShowAppOpenAd(GetClientAlreadySetup(currentNetwork)); }
     }
 }

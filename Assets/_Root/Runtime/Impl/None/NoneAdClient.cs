@@ -32,17 +32,5 @@ namespace Snorlax.Ads
         protected override bool InternalIsRewardedAdReady() { return false; }
 
         protected override void InternalShowRewardedAd() { }
-
-        protected override void InternalLoadRewardedInterstitialAd() { }
-
-        protected override bool InternalIsRewardedInterstitialAdReady() { return false; }
-
-        protected override void InternalShowRewardedInterstitialAd() { }
-
-        protected override void InternalLoadAppOpenAd() { }
-
-        protected override void InternalShowAppOpenAd() { }
-
-        protected override bool InternalIsAppOpenAdReady() { return false; }
     }
 }

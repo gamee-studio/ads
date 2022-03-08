@@ -53,12 +53,12 @@ namespace Snorlax.Ads
         protected abstract void InternalLoadRewardedAd();
         protected abstract void InternalShowRewardedAd();
         protected abstract bool InternalIsRewardedAdReady();
-        protected abstract void InternalLoadRewardedInterstitialAd();
-        protected abstract void InternalShowRewardedInterstitialAd();
-        protected abstract bool InternalIsRewardedInterstitialAdReady();
-        protected abstract void InternalLoadAppOpenAd();
-        protected abstract void InternalShowAppOpenAd();
-        protected abstract bool InternalIsAppOpenAdReady();
+        protected virtual void InternalLoadRewardedInterstitialAd() { }
+        protected virtual void InternalShowRewardedInterstitialAd() { }
+        protected virtual bool InternalIsRewardedInterstitialAdReady() { return false; }
+        protected virtual void InternalLoadAppOpenAd() { }
+        protected virtual void InternalShowAppOpenAd() { }
+        protected virtual bool InternalIsAppOpenAdReady() { return false; }
 
         public virtual void ShowBannerAd()
         {

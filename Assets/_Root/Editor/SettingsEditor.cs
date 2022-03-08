@@ -56,6 +56,12 @@ namespace Snorlax.AdsEditor
         {
             public static SerializedProperty main;
             public static Property enable = new Property(null, new GUIContent("Enable", "Enable using applovin ad"));
+            public static Property sdkKey = new Property(null, new GUIContent("Sdk Key", "Sdk of applovin"));
+            public static Property bannerAdUnit = new Property(null, new GUIContent("Banner ad"));
+            public static Property interstitialAdUnit = new Property(null, new GUIContent("Interstitial ad"));
+            public static Property rewardedAdUnit = new Property(null, new GUIContent("Rewarded Ad"));
+            public static Property rewardedInterstitialAdUnit = new Property(null, new GUIContent("Rewarded Interstitial Ad"));
+            public static Property enableAgeRestrictedUser = new Property(null, new GUIContent("Age Restrictd User"));
         }
 
         #region properties
@@ -106,7 +112,7 @@ namespace Snorlax.AdsEditor
         {
             _warningIcon = IconContent("console.warnicon.sml", "Adapter not compatible, please update to the latest version.");
             _iconUnintall = IconContent("d_TreeEditor.Trash", "Uninstall");
-            _headerLabelStyle = new GUIStyle(EditorStyles.label) {fontSize = 12, fontStyle = FontStyle.Bold, fixedHeight = 18};
+            _headerLabelStyle = new GUIStyle(EditorStyles.label) { fontSize = 12, fontStyle = FontStyle.Bold, fixedHeight = 18 };
 
             _autoInitializeProperty = serializedObject.FindProperty("runtimeAutoInitialize");
 
@@ -129,6 +135,12 @@ namespace Snorlax.AdsEditor
 
             ApplovinProperties.main = serializedObject.FindProperty("applovinSettings");
             ApplovinProperties.enable.property = ApplovinProperties.main.FindPropertyRelative("enable");
+            ApplovinProperties.sdkKey.property = ApplovinProperties.main.FindPropertyRelative("sdkKey");
+            ApplovinProperties.bannerAdUnit.property = ApplovinProperties.main.FindPropertyRelative("bannerAdUnit");
+            ApplovinProperties.interstitialAdUnit.property = ApplovinProperties.main.FindPropertyRelative("interstitialAdUnit");
+            ApplovinProperties.rewardedAdUnit.property = ApplovinProperties.main.FindPropertyRelative("rewardedAdUnit");
+            ApplovinProperties.rewardedInterstitialAdUnit.property = ApplovinProperties.main.FindPropertyRelative("rewardedInterstitialAdUnit");
+            ApplovinProperties.enableAgeRestrictedUser.property = ApplovinProperties.main.FindPropertyRelative("enableAgeRestrictedUser");
         }
 
         public override void OnInspectorGUI()
@@ -239,11 +251,17 @@ namespace Snorlax.AdsEditor
                     if (Settings.ApplovinSettings.Enable)
                     {
                         SettingManager.ValidateApplovinSdkImported();
-                        // problem with unity refresh scripting definition and i must add more condition
                         if (IsApplovinSdkAvaiable)
                         {
                             EditorGUILayout.HelpBox("Applovin plugin was imported", MessageType.Info);
                             EditorGUILayout.Space();
+                            EditorGUILayout.PropertyField(ApplovinProperties.sdkKey.property, ApplovinProperties.sdkKey.content);
+                            EditorGUILayout.PropertyField(ApplovinProperties.enableAgeRestrictedUser.property, ApplovinProperties.enableAgeRestrictedUser.content);
+                            EditorGUILayout.Space();
+                            EditorGUILayout.PropertyField(ApplovinProperties.bannerAdUnit.property, ApplovinProperties.bannerAdUnit.content);
+                            EditorGUILayout.PropertyField(ApplovinProperties.interstitialAdUnit.property, ApplovinProperties.interstitialAdUnit.content);
+                            EditorGUILayout.PropertyField(ApplovinProperties.rewardedAdUnit.property, ApplovinProperties.rewardedAdUnit.content);
+                            EditorGUILayout.PropertyField(ApplovinProperties.rewardedInterstitialAdUnit.property, ApplovinProperties.rewardedInterstitialAdUnit.content);
                         }
                         else
                         {
@@ -399,7 +417,7 @@ namespace Snorlax.AdsEditor
 
         public static GUIStyle UppercaseSectionHeaderCollapse
         {
-            get { return uppercaseSectionHeaderCollapse ??= new GUIStyle(GetCustomStyle("Uppercase Section Header")) {normal = new GUIStyleState()}; }
+            get { return uppercaseSectionHeaderCollapse ??= new GUIStyle(GetCustomStyle("Uppercase Section Header")) { normal = new GUIStyleState() }; }
         }
 
         public static GUIStyle GetCustomStyle(string styleName)
