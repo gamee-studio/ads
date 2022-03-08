@@ -553,7 +553,7 @@ namespace Snorlax.AdsEditor
             }
         }
 
-        private static bool IsAdmobSDKImported()
+        public static bool IsAdmobSdkImported()
         {
             if (AssetDatabase.FindAssets(AdsUtil.DEFAULT_FILTER_ADMOB_DLL).Length >= 1 ||
                 AssetDatabase.FindAssets(@"l:pancake_exportpath-" + PluginParentDirectory).Length >= 1)
@@ -566,13 +566,27 @@ namespace Snorlax.AdsEditor
 
         public static void ValidateAdmobSdkImported()
         {
-            if (IsAdmobSDKImported())
+            if (IsAdmobSdkImported())
             {
                 ScriptingDefinition.AddDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_ADMOB);
             }
-            else
+        }
+        
+        public static bool IsMaxSdkImported()
+        {
+            if (AssetDatabase.FindAssets(AdsUtil.DEFAULT_FILTER_MAX_MAXSDK).Length >= 1
+                 || AssetDatabase.FindAssets(AdsUtil.DEFAULT_FILTER_MAX_MAXSDK2).Length >= 1)
             {
-                ScriptingDefinition.RemoveDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_ADMOB);
+                return true;
+            }
+
+            return false;
+        }
+        public static void ValidateApplovinSdkImported()
+        {
+            if (IsMaxSdkImported())
+            {
+                ScriptingDefinition.AddDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_APPLOVIN);
             }
         }
 

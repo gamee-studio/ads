@@ -133,6 +133,7 @@ namespace Snorlax.AdsEditor
 
         public override void OnInspectorGUI()
         {
+            Debug.Log("IsApplovinSdkAvaiable :" + IsApplovinSdkAvaiable);
             serializedObject.Update();
             Init();
 
@@ -237,8 +238,12 @@ namespace Snorlax.AdsEditor
                     EditorGUILayout.PropertyField(ApplovinProperties.enable.property, ApplovinProperties.enable.content);
                     if (Settings.ApplovinSettings.Enable)
                     {
+                        SettingManager.ValidateApplovinSdkImported();
+                        // problem with unity refresh scripting definition and i must add more condition
                         if (IsApplovinSdkAvaiable)
                         {
+                            EditorGUILayout.HelpBox("Applovin plugin was imported", MessageType.Info);
+                            EditorGUILayout.Space();
                         }
                         else
                         {

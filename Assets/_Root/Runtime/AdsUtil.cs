@@ -7,7 +7,10 @@ namespace Snorlax.Ads
     public class AdsUtil
     {
         public const string SCRIPTING_DEFINITION_ADMOB = "PANCAKE_ADMOB_ENABLE";
+        public const string SCRIPTING_DEFINITION_APPLOVIN = "PANCAKE_MAX_ENABLE";
         public const string DEFAULT_FILTER_ADMOB_DLL = "l:gvhp_exportpath-GoogleMobileAds/GoogleMobileAds.dll";
+        public const string DEFAULT_FILTER_MAX_MAXSDK = "l:al_max_export_path-MaxSdk/Scripts/MaxSdk.cs";
+        public const string DEFAULT_FILTER_MAX_MAXSDK2 = @"l:al_max_export_path-MaxSdk\Scripts\MaxSdk.cs";
 
 
         /// <summary>

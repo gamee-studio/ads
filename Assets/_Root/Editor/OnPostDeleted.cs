@@ -1,4 +1,3 @@
-using System.IO;
 using Snorlax.Ads;
 using UnityEditor;
 
@@ -8,8 +7,15 @@ namespace Snorlax.AdsEditor
     {
         private static AssetDeleteResult OnWillDeleteAsset(string assetPath, RemoveAssetOptions options)
         {
-            if (Path.GetFileName(assetPath).Equals(Path.GetFileName("GoogleMobileAds.dll")) || assetPath.Equals("Assets/GoogleMobileAds"))
+            if (!SettingManager.IsAdmobSdkImported())
+            {
                 ScriptingDefinition.RemoveDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_ADMOB);
+            }
+
+            if (SettingManager.IsMaxSdkImported())
+            {
+                ScriptingDefinition.RemoveDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_APPLOVIN);
+            }
 
             return AssetDeleteResult.DidNotDelete;
         }
