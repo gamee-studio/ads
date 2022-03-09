@@ -318,7 +318,7 @@ namespace Snorlax.AdsEditor
             string pathFile = Path.Combine(Application.temporaryCachePath, $"{network.name.ToLowerInvariant()}_{network.lastVersion.unity}.zip");
             string urlDownload = string.Format(network.path, network.lastVersion.unity);
             var downloadHandler = new DownloadHandlerFile(pathFile);
-            webRequest = new UnityWebRequest(urlDownload) {method = UnityWebRequest.kHttpVerbGET, downloadHandler = downloadHandler};
+            webRequest = new UnityWebRequest(urlDownload) { method = UnityWebRequest.kHttpVerbGET, downloadHandler = downloadHandler };
             var operation = webRequest.SendWebRequest();
 
             static void CallDownloadPluginProgressCallback(string pluginName, float progress, bool isDone)
@@ -413,33 +413,27 @@ namespace Snorlax.AdsEditor
             network.currentVersion = currentVersion;
             SetNetworkUnityVersion(network.name, network.currentVersion.unity);
 
-            try
-            {
-                var unityVersionComparison = AdsUtil.CompareVersions(network.currentVersion.unity, network.lastVersion.unity);
-                var androidVersionComparison = AdsUtil.CompareVersions(network.currentVersion.android, network.lastVersion.android);
-                var iosVersionComparison = AdsUtil.CompareVersions(network.currentVersion.ios, network.lastVersion.ios);
 
-                // Overall version is same if all the current and latest (from db) versions are same.
-                if (unityVersionComparison == EVersionComparisonResult.Equal && androidVersionComparison == EVersionComparisonResult.Equal &&
-                    iosVersionComparison == EVersionComparisonResult.Equal)
-                {
-                    network.CurrentToLatestVersionComparisonResult = EVersionComparisonResult.Equal;
-                }
-                // One of the installed versions is newer than the latest versions which means that the publisher is on a beta version.
-                else if (unityVersionComparison == EVersionComparisonResult.Greater || androidVersionComparison == EVersionComparisonResult.Greater ||
-                         iosVersionComparison == EVersionComparisonResult.Greater)
-                {
-                    network.CurrentToLatestVersionComparisonResult = EVersionComparisonResult.Greater;
-                }
-                // We have a new version available if all Android, iOS and Unity has a newer version available in db.
-                else
-                {
-                    network.CurrentToLatestVersionComparisonResult = EVersionComparisonResult.Lesser;
-                }
-            }
-            catch (Exception)
+            var unityVersionComparison = AdsUtil.CompareVersions(network.currentVersion.unity, network.lastVersion.unity);
+            var androidVersionComparison = AdsUtil.CompareVersions(network.currentVersion.android, network.lastVersion.android);
+            var iosVersionComparison = AdsUtil.CompareVersions(network.currentVersion.ios, network.lastVersion.ios);
+
+            // Overall version is same if all the current and latest (from db) versions are same.
+            if (unityVersionComparison == EVersionComparisonResult.Equal && androidVersionComparison == EVersionComparisonResult.Equal &&
+                iosVersionComparison == EVersionComparisonResult.Equal)
             {
-                Debug.Log("S");
+                network.CurrentToLatestVersionComparisonResult = EVersionComparisonResult.Equal;
+            }
+            // One of the installed versions is newer than the latest versions which means that the publisher is on a beta version.
+            else if (unityVersionComparison == EVersionComparisonResult.Greater || androidVersionComparison == EVersionComparisonResult.Greater ||
+                     iosVersionComparison == EVersionComparisonResult.Greater)
+            {
+                network.CurrentToLatestVersionComparisonResult = EVersionComparisonResult.Greater;
+            }
+            // We have a new version available if all Android, iOS and Unity has a newer version available in db.
+            else
+            {
+                network.CurrentToLatestVersionComparisonResult = EVersionComparisonResult.Lesser;
             }
         }
 
@@ -571,17 +565,17 @@ namespace Snorlax.AdsEditor
                 ScriptingDefinition.AddDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_ADMOB);
             }
         }
-        
+
         public static bool IsMaxSdkImported()
         {
-            if (AssetDatabase.FindAssets(AdsUtil.DEFAULT_FILTER_MAX_MAXSDK).Length >= 1
-                 || AssetDatabase.FindAssets(AdsUtil.DEFAULT_FILTER_MAX_MAXSDK2).Length >= 1)
+            if (AssetDatabase.FindAssets(AdsUtil.DEFAULT_FILTER_MAX_MAXSDK).Length >= 1 || AssetDatabase.FindAssets(AdsUtil.DEFAULT_FILTER_MAX_MAXSDK2).Length >= 1)
             {
                 return true;
             }
 
             return false;
         }
+
         public static void ValidateApplovinSdkImported()
         {
             if (IsMaxSdkImported())

@@ -29,7 +29,7 @@ namespace Snorlax.Ads
         private void OnAdHidden(string unit, MaxSdkBase.AdInfo info)
         {
             _client.InvokeInterstitialAdHidden();
-            if (Settings.ApplovinSettings.EnableRequestAdAfterHidden) _client.LoadInterstitialAd();
+            if (Settings.MaxSettings.EnableRequestAdAfterHidden) _client.LoadInterstitialAd();
         }
 
         private void OnAdDisplayed(string unit, MaxSdkBase.AdInfo info) { _client.InvokeInterstitialAdDisplay(); }

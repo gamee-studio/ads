@@ -22,10 +22,10 @@ namespace Snorlax.Ads
             MaxSdkCallbacks.Banner.OnAdLoadFailedEvent += OnAdLoadFailed;
             MaxSdkCallbacks.Banner.OnAdCollapsedEvent += OnAdCollapsed;
             MaxSdkCallbacks.Banner.OnAdRevenuePaidEvent += OnAdRevenuePaid;
-            MaxSdk.CreateBanner(Settings.ApplovinSettings.BannerAdUnit.Id, Settings.ApplovinSettings.BannerAdUnit.ConvertPosition());
-            if (Settings.ApplovinSettings.BannerAdUnit.useAdaptiveBanner)
+            MaxSdk.CreateBanner(Settings.MaxSettings.BannerAdUnit.Id, Settings.MaxSettings.BannerAdUnit.ConvertPosition());
+            if (Settings.MaxSettings.BannerAdUnit.useAdaptiveBanner)
             {
-                MaxSdk.SetBannerExtraParameter(Settings.ApplovinSettings.BannerAdUnit.Id, "adaptive_banner", "true");
+                MaxSdk.SetBannerExtraParameter(Settings.MaxSettings.BannerAdUnit.Id, "adaptive_banner", "true");
             }
 #endif
         }

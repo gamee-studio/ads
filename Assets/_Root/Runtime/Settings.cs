@@ -31,7 +31,7 @@ namespace Snorlax.Ads
         [SerializeField] private bool runtimeAutoInitialize = true;
         [SerializeField] private AdSettings adSettings = new AdSettings();
         [SerializeField] private AdmobSettings admobSettings = new AdmobSettings();
-        [SerializeField] private ApplovinSettings applovinSettings = new ApplovinSettings();
+        [SerializeField] private MaxSettings maxSettings = new MaxSettings();
 
         #endregion
 
@@ -43,7 +43,7 @@ namespace Snorlax.Ads
 
         public static AdmobSettings AdmobSettings => Instance.admobSettings;
 
-        public static ApplovinSettings ApplovinSettings => Instance.applovinSettings;
+        public static MaxSettings MaxSettings => Instance.maxSettings;
 
         #endregion
 

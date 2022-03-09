@@ -3,7 +3,8 @@
     "rootNamespace": "Snorlax.AdsEditor",
     "references": [
         "GUID:8f6ac78e86e04ef4aaab5df990e55dd6",
-        "GUID:cbb42e4cfd9484f52972c8f05e1c3252"
+        "GUID:cbb42e4cfd9484f52972c8f05e1c3252",
+        "GUID:a10a05a8449c42519fd80f2b8b580de3"
     ],
     "includePlatforms": [
         "Editor"

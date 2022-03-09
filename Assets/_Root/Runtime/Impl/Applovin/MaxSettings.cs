@@ -4,7 +4,8 @@ using UnityEngine;
 namespace Snorlax.Ads
 {
     [Serializable]
-    public class ApplovinSettings
+    // avoid config name with AppLovinSettings
+    public class MaxSettings
     {
         [SerializeField] private bool enable;
         [SerializeField] private string sdkKey;
@@ -14,6 +15,7 @@ namespace Snorlax.Ads
         [SerializeField] private ApplovinRewardedInterstitialUnit rewardedInterstitialAdUnit;
         [SerializeField] private bool enableAgeRestrictedUser;
         [SerializeField] private bool enableRequestAdAfterHidden = true;
+        [SerializeField] private bool enableMaxAdReview;
 
         public bool Enable => enable;
         public string SdkKey => sdkKey;
@@ -26,5 +28,7 @@ namespace Snorlax.Ads
         public bool EnableAgeRestrictedUser => enableAgeRestrictedUser;
 
         public bool EnableRequestAdAfterHidden => enableRequestAdAfterHidden;
+
+        public bool EnableMaxAdReview => enableMaxAdReview;
     }
 }

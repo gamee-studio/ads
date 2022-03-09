@@ -110,9 +110,9 @@ namespace Snorlax.Ads
         protected override void InternalInit()
         {
 #if PANCAKE_MAX_ENABLE
-            MaxSdk.SetSdkKey(Settings.ApplovinSettings.SdkKey);
+            MaxSdk.SetSdkKey(Settings.MaxSettings.SdkKey);
             MaxSdk.InitializeSdk();
-            MaxSdk.SetIsAgeRestrictedUser(Settings.ApplovinSettings.EnableAgeRestrictedUser);
+            MaxSdk.SetIsAgeRestrictedUser(Settings.MaxSettings.EnableAgeRestrictedUser);
 #endif
 
             _banner = new ApplovinBannerLoader(this);
@@ -130,55 +130,55 @@ namespace Snorlax.Ads
         protected override void InternalShowBannerAd()
         {
 #if PANCAKE_MAX_ENABLE
-            if (string.IsNullOrEmpty(Settings.ApplovinSettings.BannerAdUnit.Id)) return;
+            if (string.IsNullOrEmpty(Settings.MaxSettings.BannerAdUnit.Id)) return;
             if (_isBannerDestroyed)
             {
-                MaxSdk.CreateBanner(Settings.ApplovinSettings.BannerAdUnit.Id, Settings.ApplovinSettings.BannerAdUnit.ConvertPosition());
+                MaxSdk.CreateBanner(Settings.MaxSettings.BannerAdUnit.Id, Settings.MaxSettings.BannerAdUnit.ConvertPosition());
                 _isBannerDestroyed = false;
             }
 
-            MaxSdk.ShowBanner(Settings.ApplovinSettings.BannerAdUnit.Id);
+            MaxSdk.ShowBanner(Settings.MaxSettings.BannerAdUnit.Id);
 #endif
         }
 
         protected override void InternalHideBannerAd()
         {
 #if PANCAKE_MAX_ENABLE
-            if (string.IsNullOrEmpty(Settings.ApplovinSettings.BannerAdUnit.Id)) return;
-            MaxSdk.HideBanner(Settings.ApplovinSettings.BannerAdUnit.Id);
+            if (string.IsNullOrEmpty(Settings.MaxSettings.BannerAdUnit.Id)) return;
+            MaxSdk.HideBanner(Settings.MaxSettings.BannerAdUnit.Id);
 #endif
         }
 
         protected override void InternalDestroyBannerAd()
         {
 #if PANCAKE_MAX_ENABLE
-            if (string.IsNullOrEmpty(Settings.ApplovinSettings.BannerAdUnit.Id)) return;
+            if (string.IsNullOrEmpty(Settings.MaxSettings.BannerAdUnit.Id)) return;
             _isBannerDestroyed = true;
-            MaxSdk.DestroyBanner(Settings.ApplovinSettings.BannerAdUnit.Id);
+            MaxSdk.DestroyBanner(Settings.MaxSettings.BannerAdUnit.Id);
 #endif
         }
 
         protected override void InternalLoadInterstitialAd()
         {
 #if PANCAKE_MAX_ENABLE
-            if (string.IsNullOrEmpty(Settings.ApplovinSettings.InterstitialAdUnit.Id)) return;
-            MaxSdk.LoadInterstitial(Settings.ApplovinSettings.InterstitialAdUnit.Id);
+            if (string.IsNullOrEmpty(Settings.MaxSettings.InterstitialAdUnit.Id)) return;
+            MaxSdk.LoadInterstitial(Settings.MaxSettings.InterstitialAdUnit.Id);
 #endif
         }
 
         protected override void InternalShowInterstitialAd()
         {
 #if PANCAKE_MAX_ENABLE
-            if (string.IsNullOrEmpty(Settings.ApplovinSettings.InterstitialAdUnit.Id)) return;
-            MaxSdk.ShowInterstitial(Settings.ApplovinSettings.InterstitialAdUnit.Id);
+            if (string.IsNullOrEmpty(Settings.MaxSettings.InterstitialAdUnit.Id)) return;
+            MaxSdk.ShowInterstitial(Settings.MaxSettings.InterstitialAdUnit.Id);
 #endif
         }
 
         protected override bool InternalIsInterstitialAdReady()
         {
 #if PANCAKE_MAX_ENABLE
-            if (string.IsNullOrEmpty(Settings.ApplovinSettings.InterstitialAdUnit.Id)) return false;
-            return MaxSdk.IsInterstitialReady(Settings.ApplovinSettings.InterstitialAdUnit.Id);
+            if (string.IsNullOrEmpty(Settings.MaxSettings.InterstitialAdUnit.Id)) return false;
+            return MaxSdk.IsInterstitialReady(Settings.MaxSettings.InterstitialAdUnit.Id);
 #else
             return false;
 #endif
@@ -187,24 +187,24 @@ namespace Snorlax.Ads
         protected override void InternalLoadRewardedAd()
         {
 #if PANCAKE_MAX_ENABLE
-            if (string.IsNullOrEmpty(Settings.ApplovinSettings.RewardedAdUnit.Id)) return;
-            MaxSdk.LoadRewardedAd(Settings.ApplovinSettings.RewardedAdUnit.Id);
+            if (string.IsNullOrEmpty(Settings.MaxSettings.RewardedAdUnit.Id)) return;
+            MaxSdk.LoadRewardedAd(Settings.MaxSettings.RewardedAdUnit.Id);
 #endif
         }
 
         protected override void InternalShowRewardedAd()
         {
 #if PANCAKE_MAX_ENABLE
-            if (string.IsNullOrEmpty(Settings.ApplovinSettings.RewardedAdUnit.Id)) return;
-            MaxSdk.ShowRewardedAd(Settings.ApplovinSettings.RewardedAdUnit.Id);
+            if (string.IsNullOrEmpty(Settings.MaxSettings.RewardedAdUnit.Id)) return;
+            MaxSdk.ShowRewardedAd(Settings.MaxSettings.RewardedAdUnit.Id);
 #endif
         }
 
         protected override bool InternalIsRewardedAdReady()
         {
 #if PANCAKE_MAX_ENABLE
-            if (string.IsNullOrEmpty(Settings.ApplovinSettings.RewardedAdUnit.Id)) return false;
-            return MaxSdk.IsRewardedAdReady(Settings.ApplovinSettings.RewardedAdUnit.Id);
+            if (string.IsNullOrEmpty(Settings.MaxSettings.RewardedAdUnit.Id)) return false;
+            return MaxSdk.IsRewardedAdReady(Settings.MaxSettings.RewardedAdUnit.Id);
 #else
             return false;
 #endif
@@ -213,24 +213,24 @@ namespace Snorlax.Ads
         protected override void InternalLoadRewardedInterstitialAd()
         {
 #if PANCAKE_MAX_ENABLE
-            if (string.IsNullOrEmpty(Settings.ApplovinSettings.RewardedInterstitialAdUnit.Id)) return;
-            MaxSdk.LoadRewardedInterstitialAd(Settings.ApplovinSettings.RewardedInterstitialAdUnit.Id);
+            if (string.IsNullOrEmpty(Settings.MaxSettings.RewardedInterstitialAdUnit.Id)) return;
+            MaxSdk.LoadRewardedInterstitialAd(Settings.MaxSettings.RewardedInterstitialAdUnit.Id);
 #endif
         }
 
         protected override void InternalShowRewardedInterstitialAd()
         {
 #if PANCAKE_MAX_ENABLE
-            if (string.IsNullOrEmpty(Settings.ApplovinSettings.RewardedInterstitialAdUnit.Id)) return;
-            MaxSdk.ShowRewardedInterstitialAd(Settings.ApplovinSettings.RewardedInterstitialAdUnit.Id);
+            if (string.IsNullOrEmpty(Settings.MaxSettings.RewardedInterstitialAdUnit.Id)) return;
+            MaxSdk.ShowRewardedInterstitialAd(Settings.MaxSettings.RewardedInterstitialAdUnit.Id);
 #endif
         }
 
         protected override bool InternalIsRewardedInterstitialAdReady()
         {
 #if PANCAKE_MAX_ENABLE
-            if (string.IsNullOrEmpty(Settings.ApplovinSettings.RewardedInterstitialAdUnit.Id)) return false;
-            return MaxSdk.IsRewardedInterstitialAdReady(Settings.ApplovinSettings.RewardedInterstitialAdUnit.Id);
+            if (string.IsNullOrEmpty(Settings.MaxSettings.RewardedInterstitialAdUnit.Id)) return false;
+            return MaxSdk.IsRewardedInterstitialAdReady(Settings.MaxSettings.RewardedInterstitialAdUnit.Id);
 #else
             return false;
 #endif
