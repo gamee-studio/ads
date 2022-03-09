@@ -35,7 +35,11 @@ namespace Snorlax.Ads
 
         private void OnAdLoaded(string unit, MaxSdkBase.AdInfo info) { _client.InvokeRewardedAdLoaded(); }
 
-        private void OnAdHidden(string unit, MaxSdkBase.AdInfo info) { _client.InvokeRewardedAdHidden(); }
+        private void OnAdHidden(string unit, MaxSdkBase.AdInfo info)
+        {
+            _client.InvokeRewardedAdHidden();
+            if (Settings.ApplovinSettings.EnableRequestAdAfterHidden) _client.LoadRewardedAd();
+        }
 
         private void OnAdDisplayed(string unit, MaxSdkBase.AdInfo info) { _client.InvokeRewardedAdDisplay(); }
 

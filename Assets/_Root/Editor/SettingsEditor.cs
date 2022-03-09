@@ -62,6 +62,7 @@ namespace Snorlax.AdsEditor
             public static Property rewardedAdUnit = new Property(null, new GUIContent("Rewarded Ad"));
             public static Property rewardedInterstitialAdUnit = new Property(null, new GUIContent("Rewarded Interstitial Ad"));
             public static Property enableAgeRestrictedUser = new Property(null, new GUIContent("Age Restrictd User"));
+            public static Property enableRequestAdAfterHidden = new Property(null, new GUIContent("Request Ad After Hidden", "Request to add new interstitial and rewarded ad after user finish view ad. Need kick-off request to cache ads as quickly as possible"));
         }
 
         #region properties
@@ -141,6 +142,7 @@ namespace Snorlax.AdsEditor
             ApplovinProperties.rewardedAdUnit.property = ApplovinProperties.main.FindPropertyRelative("rewardedAdUnit");
             ApplovinProperties.rewardedInterstitialAdUnit.property = ApplovinProperties.main.FindPropertyRelative("rewardedInterstitialAdUnit");
             ApplovinProperties.enableAgeRestrictedUser.property = ApplovinProperties.main.FindPropertyRelative("enableAgeRestrictedUser");
+            ApplovinProperties.enableRequestAdAfterHidden.property = ApplovinProperties.main.FindPropertyRelative("enableRequestAdAfterHidden");
         }
 
         public override void OnInspectorGUI()
@@ -257,6 +259,7 @@ namespace Snorlax.AdsEditor
                             EditorGUILayout.Space();
                             EditorGUILayout.PropertyField(ApplovinProperties.sdkKey.property, ApplovinProperties.sdkKey.content);
                             EditorGUILayout.PropertyField(ApplovinProperties.enableAgeRestrictedUser.property, ApplovinProperties.enableAgeRestrictedUser.content);
+                            EditorGUILayout.PropertyField(ApplovinProperties.enableRequestAdAfterHidden.property, ApplovinProperties.enableRequestAdAfterHidden.content);
                             EditorGUILayout.Space();
                             EditorGUILayout.PropertyField(ApplovinProperties.bannerAdUnit.property, ApplovinProperties.bannerAdUnit.content);
                             EditorGUILayout.PropertyField(ApplovinProperties.interstitialAdUnit.property, ApplovinProperties.interstitialAdUnit.content);

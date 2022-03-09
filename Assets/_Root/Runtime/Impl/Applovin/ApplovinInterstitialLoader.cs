@@ -26,7 +26,11 @@ namespace Snorlax.Ads
 #if PANCAKE_MAX_ENABLE
         private void OnAdDisplayFailed(string unit, MaxSdkBase.ErrorInfo error, MaxSdkBase.AdInfo info) { _client.InvokeInterstitialAdFaildToDisplay(); }
 
-        private void OnAdHidden(string unit, MaxSdkBase.AdInfo info) { _client.InvokeInterstitialAdHidden(); }
+        private void OnAdHidden(string unit, MaxSdkBase.AdInfo info)
+        {
+            _client.InvokeInterstitialAdHidden();
+            if (Settings.ApplovinSettings.EnableRequestAdAfterHidden) _client.LoadInterstitialAd();
+        }
 
         private void OnAdDisplayed(string unit, MaxSdkBase.AdInfo info) { _client.InvokeInterstitialAdDisplay(); }
 

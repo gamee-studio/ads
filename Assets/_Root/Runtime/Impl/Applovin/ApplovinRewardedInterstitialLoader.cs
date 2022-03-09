@@ -35,7 +35,11 @@ namespace Snorlax.Ads
 
         private void OnAdDisplayFailed(string unit, MaxSdkBase.ErrorInfo error, MaxSdkBase.AdInfo info) { _client.InvokeRewardedInterstitialAdFaildToDisplay(); }
 
-        private void OnAdHidden(string unit, MaxSdkBase.AdInfo info) { _client.InvokeRewardedInterstitialAdHidden(); }
+        private void OnAdHidden(string unit, MaxSdkBase.AdInfo info)
+        {
+            _client.InvokeRewardedInterstitialAdHidden();
+            if (Settings.ApplovinSettings.EnableRequestAdAfterHidden) _client.LoadRewardedInterstitialAd();
+        }
 
         private void OnAdDisplayed(string unit, MaxSdkBase.AdInfo info) { _client.InvokeRewardedInterstitialAdDisplay(); }
 

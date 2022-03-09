@@ -13,6 +13,7 @@ namespace Snorlax.Ads
         [SerializeField] private ApplovinRewardedUnit rewardedAdUnit;
         [SerializeField] private ApplovinRewardedInterstitialUnit rewardedInterstitialAdUnit;
         [SerializeField] private bool enableAgeRestrictedUser;
+        [SerializeField] private bool enableRequestAdAfterHidden = true;
 
         public bool Enable => enable;
         public string SdkKey => sdkKey;
@@ -23,5 +24,7 @@ namespace Snorlax.Ads
         public ApplovinRewardedInterstitialUnit RewardedInterstitialAdUnit => rewardedInterstitialAdUnit;
 
         public bool EnableAgeRestrictedUser => enableAgeRestrictedUser;
+
+        public bool EnableRequestAdAfterHidden => enableRequestAdAfterHidden;
     }
 }
