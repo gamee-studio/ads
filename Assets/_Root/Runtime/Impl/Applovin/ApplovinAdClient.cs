@@ -1,6 +1,8 @@
 using System;
 
+#pragma warning disable CS0414
 // ReSharper disable AccessToStaticMemberViaDerivedType
+// ReSharper disable NotAccessedField.Local
 namespace Snorlax.Ads
 {
     public class ApplovinAdClient : AdClient

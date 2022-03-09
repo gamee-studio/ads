@@ -12,7 +12,7 @@ PlayerSettings:
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
-  companyName: DefaultCompany
+  companyName: pancake
   productName: ads
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
@@ -153,12 +153,12 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
-    Android: com.DefaultCompany.ads
+    Android: com.pancake.ads
   buildNumber:
     Standalone: 0
     iPhone: 0
     tvOS: 0
-  overrideDefaultApplicationIdentifier: 0
+  overrideDefaultApplicationIdentifier: 1
   AndroidBundleVersionCode: 1
   AndroidMinSdkVersion: 19
   AndroidTargetSdkVersion: 0
@@ -653,21 +653,21 @@ PlayerSettings:
   webGLThreadsSupport: 0
   webGLDecompressionFallback: 0
   scriptingDefineSymbols:
-    1: PANCAKE_MAX_ENABLE
-    4: PANCAKE_MAX_ENABLE
-    7: PANCAKE_MAX_ENABLE
-    13: PANCAKE_MAX_ENABLE
-    14: PANCAKE_MAX_ENABLE
-    19: PANCAKE_MAX_ENABLE
-    21: PANCAKE_MAX_ENABLE
-    25: PANCAKE_MAX_ENABLE
-    27: PANCAKE_MAX_ENABLE
-    28: PANCAKE_MAX_ENABLE
-    29: PANCAKE_MAX_ENABLE
-    30: PANCAKE_MAX_ENABLE
-    31: PANCAKE_MAX_ENABLE
-    32: PANCAKE_MAX_ENABLE
-    33: PANCAKE_MAX_ENABLE
+    1: 
+    4: 
+    7: 
+    13: 
+    14: 
+    19: 
+    21: 
+    25: 
+    27: 
+    28: 
+    29: 
+    30: 
+    31: 
+    32: 
+    33: 
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend: {}

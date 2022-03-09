@@ -11,8 +11,11 @@
     "url": "https://github.com/yenmoc"
   },
   "license": "MIT",
-  "keywords": ["ads","iap" ],
-  "dependencies": {},
+  "keywords": ["ads","iap", "admob", "applovin" ],
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "2.0.2",
+    "com.unity.sharp-zip-lib": "1.2.2-preview.2"
+  },
   "repository": {
     "type": "git",
     "url": "git@github.com:gamee-studio/ads.git",
