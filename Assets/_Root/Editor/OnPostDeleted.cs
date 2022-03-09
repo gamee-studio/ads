@@ -12,7 +12,7 @@ namespace Snorlax.AdsEditor
                 ScriptingDefinition.RemoveDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_ADMOB);
             }
 
-            if (SettingManager.IsMaxSdkImported())
+            if (!SettingManager.IsMaxSdkImported())
             {
                 ScriptingDefinition.RemoveDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_APPLOVIN);
             }

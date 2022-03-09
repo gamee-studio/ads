@@ -229,5 +229,7 @@ namespace Snorlax.Ads
         }
 
         public bool IsAppOpenAdReady() { return CheckInitialize(false) && InternalIsAppOpenAdReady(); }
+
+        public virtual void ShowConsentForm() { }
     }
 }

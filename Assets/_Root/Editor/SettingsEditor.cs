@@ -36,6 +36,12 @@ namespace Snorlax.AdsEditor
             public static Property adLoadingInterval = new Property(null,
                 new GUIContent("Ad Loading Interval",
                     "Minimum time (seconds) between two ad-loading requests, this is to restrict the number of requests sent to ad networks"));
+
+            public static Property privacyPolicyUrl = new Property(null, new GUIContent("Privacy&Policy Url", "Privacy policy url"));
+
+            public static Property enableGDPR = new Property(null,
+                new GUIContent("GDPR",
+                    "General data protection regulation \nApp requires user consent before these events can be sent, you can delay app measurement until you explicitly initialize the Mobile Ads SDK or load an ad."));
         }
 
         private static class AdmobProperties
@@ -76,12 +82,13 @@ namespace Snorlax.AdsEditor
         private SerializedProperty _autoInitializeProperty;
         public static bool callFromEditorWindow = false;
 
-        private const float ACTION_FIELD_WIDTH = 60f;
-        private const float NETWORK_FIELD_MIN_WIDTH = 110f;
-        private const float VERSION_FIELD_MIN_WIDTH = 100f;
+        private const float ACTION_FIELD_WIDTH = 65f;
+        private const float NETWORK_FIELD_MIN_WIDTH = 150f;
+        private const float VERSION_FIELD_MIN_WIDTH = 150f;
         private static readonly GUILayoutOption NetworkWidthOption = GUILayout.Width(NETWORK_FIELD_MIN_WIDTH);
         private static readonly GUILayoutOption VersionWidthOption = GUILayout.Width(VERSION_FIELD_MIN_WIDTH);
         private static readonly GUILayoutOption FieldWidth = GUILayout.Width(ACTION_FIELD_WIDTH);
+
         private GUIContent _warningIcon;
         private GUIContent _iconUnintall;
         private GUIStyle _headerLabelStyle;
@@ -127,6 +134,8 @@ namespace Snorlax.AdsEditor
             AdProperties.autoLoadAdsMode.property = AdProperties.main.FindPropertyRelative("autoLoadingAd");
             AdProperties.adCheckingInterval.property = AdProperties.main.FindPropertyRelative("adCheckingInterval");
             AdProperties.adLoadingInterval.property = AdProperties.main.FindPropertyRelative("adLoadingInterval");
+            AdProperties.enableGDPR.property = AdProperties.main.FindPropertyRelative("enableGDPR");
+            AdProperties.privacyPolicyUrl.property = AdProperties.main.FindPropertyRelative("privacyPolicyUrl");
 
             AdmobProperties.main = serializedObject.FindProperty("admobSettings");
             AdmobProperties.enable.property = AdmobProperties.main.FindPropertyRelative("enable");
@@ -171,8 +180,13 @@ namespace Snorlax.AdsEditor
             #region draw
 
             DrawUppercaseSection("AUTO_INITIALIZE_FOLDOUT_KEY",
-                "AUTO INITIALIZE",
-                () => { EditorGUILayout.PropertyField(AdProperties.autoInit.property, AdProperties.autoInit.content); });
+                "BASIC",
+                () =>
+                {
+                    EditorGUILayout.PropertyField(AdProperties.autoInit.property, AdProperties.autoInit.content);
+                    EditorGUILayout.PropertyField(AdProperties.enableGDPR.property, AdProperties.enableGDPR.content);
+                    EditorGUILayout.PropertyField(AdProperties.privacyPolicyUrl.property, AdProperties.privacyPolicyUrl.content);
+                });
 
             EditorGUILayout.Space();
             DrawUppercaseSection("AUTO_AD_LOADING_CONFIG_FOLDOUT_KEY",
@@ -199,6 +213,11 @@ namespace Snorlax.AdsEditor
                         if (IsAdmobSdkAvaiable)
                         {
                             EditorGUILayout.HelpBox("Admob plugin was imported", MessageType.Info);
+                            if (Settings.AdSettings.EnableGDPR)
+                            {
+                                EditorGUILayout.HelpBox("GDPR is enable so you should turn on Delay app measurement in GoogleMobileAds setting", MessageType.Info);
+                            }
+
                             EditorGUILayout.Space();
                             if (GUILayout.Button("Open GoogleMobileAds Setting", GUILayout.Height(EditorGUIUtility.singleLineHeight * 1.3f)))
                             {
@@ -224,10 +243,10 @@ namespace Snorlax.AdsEditor
                                 "MEDIATION",
                                 () =>
                                 {
-                                    DrawHeaderAdmobMediation();
+                                    DrawHeaderMediation();
                                     foreach (var network in Settings.AdmobSettings.MediationNetworks)
                                     {
-                                        DrawNetworkDetailRow(network);
+                                        DrawAdmobNetworkDetailRow(network);
                                     }
                                 });
 
@@ -268,12 +287,27 @@ namespace Snorlax.AdsEditor
                             EditorGUILayout.PropertyField(ApplovinProperties.enableMaxAdReview.property, ApplovinProperties.enableMaxAdReview.content);
 #if PANCAKE_MAX_ENABLE
                             AppLovinSettings.Instance.QualityServiceEnabled = Settings.MaxSettings.EnableMaxAdReview;
+                            AppLovinSettings.Instance.ConsentFlowEnabled = Settings.AdSettings.EnableGDPR;
+                            AppLovinSettings.Instance.ConsentFlowPrivacyPolicyUrl = Settings.AdSettings.PrivacyPolicyUrl;
 #endif
                             EditorGUILayout.Space();
                             EditorGUILayout.PropertyField(ApplovinProperties.bannerAdUnit.property, ApplovinProperties.bannerAdUnit.content);
                             EditorGUILayout.PropertyField(ApplovinProperties.interstitialAdUnit.property, ApplovinProperties.interstitialAdUnit.content);
                             EditorGUILayout.PropertyField(ApplovinProperties.rewardedAdUnit.property, ApplovinProperties.rewardedAdUnit.content);
                             EditorGUILayout.PropertyField(ApplovinProperties.rewardedInterstitialAdUnit.property, ApplovinProperties.rewardedInterstitialAdUnit.content);
+                            EditorGUILayout.Space();
+
+                            DrawUppercaseSection("APPLOVIN_MODULE_MEDIATION",
+                                "MEDIATION",
+                                () =>
+                                {
+                                    DrawHeaderMaxMediation();
+                                    foreach (var network in Settings.MaxSettings.MediationNetworks)
+                                    {
+                                        DrawApplovinNetworkDetailRow(network);
+                                    }
+                                });
+                            EditorGUILayout.Space();
                         }
                         else
                         {
@@ -292,7 +326,7 @@ namespace Snorlax.AdsEditor
             serializedObject.ApplyModifiedProperties();
         }
 
-        private void DrawHeaderAdmobMediation()
+        private void DrawHeaderMediation()
         {
             using (new EditorGUILayout.HorizontalScope())
             {
@@ -308,7 +342,23 @@ namespace Snorlax.AdsEditor
             }
         }
 
-        private void DrawNetworkDetailRow(Network network)
+        private void DrawHeaderMaxMediation()
+        {
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.Space(5);
+                EditorGUILayout.LabelField("Network", _headerLabelStyle, NetworkWidthOption);
+                EditorGUILayout.LabelField("Current Version", _headerLabelStyle, VersionWidthOption);
+                GUILayout.Space(3);
+                EditorGUILayout.LabelField("Latest Version", _headerLabelStyle, VersionWidthOption);
+                GUILayout.Space(3);
+                GUILayout.FlexibleSpace();
+                GUILayout.Button("Actions", _headerLabelStyle, FieldWidth);
+                GUILayout.Space(5);
+            }
+        }
+
+        private void DrawAdmobNetworkDetailRow(Network network)
         {
             string action;
             string currentVersion = network.currentVersion != null ? network.currentVersion.unity : "";
@@ -370,7 +420,7 @@ namespace Snorlax.AdsEditor
                     EditorCoroutine.StartCoroutine(SettingManager.Instance.DownloadPlugin(network));
                 }
 
-                GUI.enabled = true;
+                GUI.enabled = !EditorApplication.isCompiling;
                 GUILayout.Space(2);
 
                 GUI.enabled = isInstalled && !EditorApplication.isCompiling;
@@ -400,7 +450,7 @@ namespace Snorlax.AdsEditor
                     EditorUtility.ClearProgressBar();
                 }
 
-                GUI.enabled = true;
+                GUI.enabled = !EditorApplication.isCompiling;
                 GUILayout.Space(5);
             }
 
@@ -409,11 +459,124 @@ namespace Snorlax.AdsEditor
             }
         }
 
+        private void DrawApplovinNetworkDetailRow(MaxNetwork network)
+        {
+            string action;
+            string currentVersion = network.CurrentVersions != null ? network.CurrentVersions.Unity : "";
+            string latestVersion = network.LatestVersions.Unity;
+            bool isActionEnabled;
+            bool isInstalled;
+            if (string.IsNullOrEmpty(currentVersion))
+            {
+                action = "Install";
+                currentVersion = "Not Installed";
+                isActionEnabled = true;
+                isInstalled = false;
+            }
+            else
+            {
+                isInstalled = true;
+
+                var comparison = network.CurrentToLatestVersionComparisonResult;
+                // A newer version is available
+                if (comparison == EVersionComparisonResult.Lesser)
+                {
+                    action = "Upgrade";
+                    isActionEnabled = true;
+                }
+                // Current installed version is newer than latest version from DB (beta version)
+                else if (comparison == EVersionComparisonResult.Greater)
+                {
+                    action = "Installed";
+                    isActionEnabled = false;
+                }
+                // Already on the latest version
+                else
+                {
+                    action = "Installed";
+                    isActionEnabled = false;
+                }
+            }
+
+            GUILayout.Space(4);
+            using (new EditorGUILayout.HorizontalScope(GUILayout.ExpandHeight(false)))
+            {
+                GUILayout.Space(5);
+                EditorGUILayout.LabelField(new GUIContent(network.DisplayName), NetworkWidthOption);
+                EditorGUILayout.LabelField(new GUIContent(currentVersion), VersionWidthOption);
+                GUILayout.Space(3);
+                EditorGUILayout.LabelField(new GUIContent(latestVersion), VersionWidthOption);
+                GUILayout.Space(3);
+                GUILayout.FlexibleSpace();
+
+                if (network.RequiresUpdate)
+                {
+                    GUILayout.Label(_warningIcon);
+                }
+
+                GUI.enabled = isActionEnabled && !EditorApplication.isCompiling;
+                if (GUILayout.Button(new GUIContent(action), FieldWidth))
+                {
+                    // Download the plugin.
+                    EditorCoroutine.StartCoroutine(MaxManager.Instance.DownloadPlugin(network));
+                }
+
+                GUI.enabled = !EditorApplication.isCompiling;
+                GUILayout.Space(2);
+
+                GUI.enabled = isInstalled && !EditorApplication.isCompiling;
+                if (GUILayout.Button(_iconUnintall))
+                {
+                    EditorUtility.DisplayProgressBar("Ads", "Deleting " + network.DisplayName + "...", 0.5f);
+                    var pluginRoot = SettingManager.MediationSpecificPluginParentDirectory;
+                    foreach (var pluginFilePath in network.PluginFilePaths)
+                    {
+                        FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, pluginFilePath));
+                        FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, pluginFilePath + ".meta"));
+                    }
+
+                    MaxManager.UpdateCurrentVersions(network, pluginRoot);
+
+                    // Refresh UI
+                    AssetDatabase.Refresh();
+                    EditorUtility.ClearProgressBar();
+                }
+
+                GUI.enabled = !EditorApplication.isCompiling;
+                GUILayout.Space(5);
+            }
+
+            if (isInstalled)
+            {
+                if (network.Name.Equals("ADMOB_NETWORK"))
+                {
+#if PANCAKE_MAX_ENABLE
+                    // ReSharper disable once PossibleNullReferenceException
+                    if ((int)MaxSdkUtils.CompareUnityMediationVersions(network.CurrentVersions.Unity, "android_19.0.1.0_ios_7.57.0.0") ==
+                        (int)EVersionComparisonResult.Greater)
+                    {
+                        GUILayout.BeginHorizontal();
+                        GUILayout.Space(20);
+
+                        using (new EditorGUILayout.VerticalScope())
+                        {
+                            AppLovinSettings.Instance.AdMobAndroidAppId =
+                                DrawTextField("App ID (Android)", AppLovinSettings.Instance.AdMobAndroidAppId, NetworkWidthOption);
+                            AppLovinSettings.Instance.AdMobIosAppId = DrawTextField("App ID (iOS)", AppLovinSettings.Instance.AdMobIosAppId, NetworkWidthOption);
+                        }
+
+                        GUILayout.EndHorizontal();
+                    }
+#endif
+                }
+            }
+        }
+
         #endregion
 
         #region gui
 
-        private readonly Dictionary<string, bool> _uppercaseSectionsFoldoutStates = new Dictionary<string, bool>();
+        private static readonly Dictionary<string, bool> UppercaseSectionsFoldoutStates = new Dictionary<string, bool>();
         private static readonly Dictionary<string, GUIStyle> CustomStyles = new Dictionary<string, GUIStyle>();
         private static GUISkin skin;
         private const string SKIN_PATH = "Assets/_Root/GUISkins/";
@@ -494,10 +657,10 @@ namespace Snorlax.AdsEditor
 
         private void DrawUppercaseSection(string key, string sectionName, Action drawer, Texture2D sectionIcon = null, bool defaultFoldout = true)
         {
-            if (!_uppercaseSectionsFoldoutStates.ContainsKey(key))
-                _uppercaseSectionsFoldoutStates.Add(key, defaultFoldout);
+            if (!UppercaseSectionsFoldoutStates.ContainsKey(key))
+                UppercaseSectionsFoldoutStates.Add(key, defaultFoldout);
 
-            bool foldout = _uppercaseSectionsFoldoutStates[key];
+            bool foldout = UppercaseSectionsFoldoutStates[key];
 
             EditorGUILayout.BeginVertical(GetCustomStyle("Uppercase Section Box"), GUILayout.MinHeight(foldout ? 30 : 0));
 
@@ -505,7 +668,7 @@ namespace Snorlax.AdsEditor
 
             // Header label (and button).
             if (GUILayout.Button(sectionName, GetCustomStyle("Uppercase Section Header Label")))
-                _uppercaseSectionsFoldoutStates[key] = !_uppercaseSectionsFoldoutStates[key];
+                UppercaseSectionsFoldoutStates[key] = !UppercaseSectionsFoldoutStates[key];
 
             // The expand/collapse icon.
             var buttonRect = GUILayoutUtility.GetLastRect();
@@ -529,6 +692,20 @@ namespace Snorlax.AdsEditor
         {
             var builtinIcon = EditorGUIUtility.IconContent(name);
             return new GUIContent(builtinIcon.image, tooltip);
+        }
+
+        private static string DrawTextField(string fieldTitle, string text, GUILayoutOption labelWidth, GUILayoutOption textFieldWidthOption = null)
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(4);
+            EditorGUILayout.LabelField(new GUIContent(fieldTitle), labelWidth);
+            GUILayout.Space(4);
+            text = textFieldWidthOption == null ? GUILayout.TextField(text) : GUILayout.TextField(text, textFieldWidthOption);
+            GUILayout.Space(4);
+            GUILayout.EndHorizontal();
+            GUILayout.Space(4);
+
+            return text;
         }
 
         #endregion

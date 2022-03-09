@@ -284,5 +284,29 @@ namespace Snorlax.Ads
         protected override void InternalShowAppOpenAd() { _appOpen.Show(); }
 
         protected override bool InternalIsAppOpenAdReady() { return _appOpen.IsReady(); }
+
+        public override void ShowConsentForm()
+        {
+#if UNITY_ANDROID
+#if PANCAKE_ADMOB_ENABLE
+            if (AdsUtil.IsInEEA())
+            {
+                var prefab = UnityEngine.Resources.Load<UnityEngine.GameObject>("GDPR");
+                if (prefab != null)
+                {
+                    UnityEngine.GameObject.Instantiate(prefab);
+                    UnityEngine.Time.timeScale = 0;
+                }
+            }
+#endif
+#elif UNITY_IOS
+            if (Unity.Advertisement.IosSupport.ATTrackingStatusBinding.GetAuthorizationTrackingStatus() ==
+                Unity.Advertisement.IosSupport.ATTrackingStatusBinding.AuthorizationTrackingStatus.NOT_DETERMINED)
+            {
+                Unity.Advertisement.IosSupport.ATTrackingStatusBinding.RequestAuthorizationTracking();
+            }
+
+#endif
+        }
     }
 }

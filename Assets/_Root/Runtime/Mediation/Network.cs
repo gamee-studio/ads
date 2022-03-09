@@ -1,4 +1,6 @@
+#if UNITY_EDITOR
 using System;
+using System.Collections.Generic;
 
 namespace Snorlax.Ads
 {
@@ -51,4 +53,55 @@ namespace Snorlax.Ads
             return index > 0 ? adapterVersion.Substring(0, index) : adapterVersion;
         }
     }
+
+    [Serializable]
+    public class MaxPluginData
+    {
+        public MaxNetwork AppLovinMax;
+        public List<MaxNetwork> MediatedNetworks;
+    }
+
+    [Serializable]
+    public class MaxNetwork
+    {
+        public string Name;
+        public string DisplayName;
+        public string DownloadUrl;
+        public string DependenciesFilePath;
+        public string[] PluginFilePaths;
+        public MaxVersions LatestVersions;
+        [NonSerialized] public MaxVersions CurrentVersions;
+        [NonSerialized] public EVersionComparisonResult CurrentToLatestVersionComparisonResult = EVersionComparisonResult.Lesser;
+        [NonSerialized] public bool RequiresUpdate;
+    }
+
+    [Serializable]
+    public class MaxVersions
+    {
+        public string Unity;
+        public string Android;
+        public string Ios;
+
+        public override bool Equals(object value)
+        {
+            var versions = value as MaxVersions;
+
+            return versions != null && Unity.Equals(versions.Unity) && (Android == null || Android.Equals(versions.Android)) && (Ios == null || Ios.Equals(versions.Ios));
+        }
+
+        public bool HasEqualSdkVersions(MaxVersions versions)
+        {
+            return versions != null && AdapterSdkVersion(Android).Equals(AdapterSdkVersion(versions.Android)) &&
+                   AdapterSdkVersion(Ios).Equals(AdapterSdkVersion(versions.Ios));
+        }
+
+        public override int GetHashCode() { return new { Unity, Android, Ios }.GetHashCode(); }
+
+        private static string AdapterSdkVersion(string adapterVersion)
+        {
+            var index = adapterVersion.LastIndexOf(".");
+            return index > 0 ? adapterVersion.Substring(0, index) : adapterVersion;
+        }
+    }
 }
+#endif

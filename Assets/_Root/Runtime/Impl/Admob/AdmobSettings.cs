@@ -17,8 +17,10 @@ namespace Snorlax.Ads
         [SerializeField] private bool enableTestMode;
         [SerializeField] private bool useAdaptiveBanner;
 
+#if UNITY_EDITOR
         private List<Network> _mediationNetworks = new List<Network>();
         public Network importingNetwork;
+#endif
 
         public bool Enable => enable;
         public List<string> DevicesTest => devicesTest;
@@ -29,6 +31,9 @@ namespace Snorlax.Ads
         public AdmobRewardedUnit RewardedAdUnit => rewardedAdUnit;
         public AdmobRewardedInterstitialUnit RewardedInterstitialAdUnit => rewardedInterstitialAdUnit;
         public AdmobAppOpenUnit AppOpenAdUnit => appOpenAdUnit;
+
+#if UNITY_EDITOR
         public List<Network> MediationNetworks { get => _mediationNetworks; set => _mediationNetworks = value; }
+#endif
     }
 }

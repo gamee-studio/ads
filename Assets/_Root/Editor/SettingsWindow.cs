@@ -24,7 +24,7 @@ namespace Snorlax.AdsEditor
 
             _editor.DrawHeader();
             _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition);
-            EditorGUILayout.BeginVertical(new GUIStyle {padding = new RectOffset(6, 3, 3, 3)});
+            EditorGUILayout.BeginVertical(new GUIStyle { padding = new RectOffset(6, 3, 3, 3) });
             _editor.OnInspectorGUI();
             EditorGUILayout.EndVertical();
             EditorGUILayout.EndScrollView();
@@ -51,7 +51,7 @@ namespace Snorlax.AdsEditor
                 return;
             }
 
-            window.minSize = new Vector2(475, 0);
+            window.minSize = new Vector2(635, 0);
 
             window.Show();
         }
@@ -61,7 +61,11 @@ namespace Snorlax.AdsEditor
             SettingManager.downloadPluginProgressCallback = OnDownloadPluginProgress;
             SettingManager.importPackageCompletedCallback = OnImportPackageCompleted;
 
+            MaxManager.downloadPluginProgressCallback = OnMaxDownloadPluginProgress;
+            MaxManager.importPackageCompletedCallback = OnMaxImportPackageCompleted;
+
             SettingManager.Instance.Load();
+            MaxManager.Instance.Load();
         }
 
         private void OnDisable()
@@ -98,6 +102,37 @@ namespace Snorlax.AdsEditor
                 if (EditorUtility.DisplayCancelableProgressBar("Ads", string.Format("Downloading {0} plugin...", pluginName), progress))
                 {
                     SettingManager.webRequest?.Abort();
+                    EditorUtility.ClearProgressBar();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Callback method that will be called when package import completed
+        /// </summary>
+        /// <param name="network"></param>
+        private static void OnMaxImportPackageCompleted(MaxNetwork network)
+        {
+            string parentDirectory = network.Name.Equals("APPLOVIN_NETWORK") ? MaxManager.PluginParentDirectory : MaxManager.MediationSpecificPluginParentDirectory;
+            MaxManager.UpdateCurrentVersions(network, parentDirectory);
+        }
+
+        /// <summary>
+        /// Callback method that will be called with progress updates when the plugin is being downloaded.
+        /// </summary>
+        public static void OnMaxDownloadPluginProgress(string pluginName, float progress, bool done)
+        {
+            // Download is complete. Clear progress bar.
+            if (done)
+            {
+                EditorUtility.ClearProgressBar();
+            }
+            // Download is in progress, update progress bar.
+            else
+            {
+                if (EditorUtility.DisplayCancelableProgressBar("Ads", string.Format("Downloading {0} plugin...", pluginName), progress))
+                {
+                    MaxManager.Instance.CancelDownload();
                     EditorUtility.ClearProgressBar();
                 }
             }

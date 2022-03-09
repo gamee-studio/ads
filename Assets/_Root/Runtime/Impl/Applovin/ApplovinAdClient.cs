@@ -113,6 +113,7 @@ namespace Snorlax.Ads
         {
 #if PANCAKE_MAX_ENABLE
             MaxSdk.SetSdkKey(Settings.MaxSettings.SdkKey);
+            if (Settings.AdSettings.EnableGDPR) MaxSdkCallbacks.OnSdkInitializedEvent += OnSdkInitializedEvent;
             MaxSdk.InitializeSdk();
             MaxSdk.SetIsAgeRestrictedUser(Settings.MaxSettings.EnableAgeRestrictedUser);
 #endif
@@ -128,6 +129,26 @@ namespace Snorlax.Ads
             isInitialized = true;
             _isBannerDestroyed = false;
         }
+
+#if PANCAKE_MAX_ENABLE
+        private void OnSdkInitializedEvent(MaxSdkBase.SdkConfiguration configuration)
+        {
+            if (configuration.ConsentDialogState == MaxSdkBase.ConsentDialogState.Applies)
+            {
+                // Show user consent dialog
+                if (AdsUtil.IsInEEA()) ShowConsentForm();
+            }
+            else if (configuration.ConsentDialogState == MaxSdkBase.ConsentDialogState.DoesNotApply)
+            {
+                // No need to show consent dialog, proceed with initialization
+            }
+            else
+            {
+                // Consent dialog state is unknown. Proceed with initialization, but check if the consent
+                // dialog should be shown on the next application initialization
+            }
+        }
+#endif
 
         protected override void InternalShowBannerAd()
         {
@@ -235,6 +256,23 @@ namespace Snorlax.Ads
             return MaxSdk.IsRewardedInterstitialAdReady(Settings.MaxSettings.RewardedInterstitialAdUnit.Id);
 #else
             return false;
+#endif
+        }
+
+        public override void ShowConsentForm()
+        {
+#if UNITY_ANDROID
+#if PANCAKE_MAX_ENABLE
+            if (AdsUtil.IsInEEA())
+            {
+                MaxSdk.UserService.ShowConsentDialog();
+            }
+#endif
+#elif UNITY_IOS
+            if (Unity.Advertisement.IosSupport.ATTrackingStatusBinding.GetAuthorizationTrackingStatus() == Unity.Advertisement.IosSupport.ATTrackingStatusBinding.AuthorizationTrackingStatus.NOT_DETERMINED)
+            {
+                Unity.Advertisement.IosSupport.ATTrackingStatusBinding.RequestAuthorizationTracking();
+            }
 #endif
         }
     }

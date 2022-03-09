@@ -358,6 +358,12 @@ namespace Snorlax.Ads
             client.ShowAppOpenAd();
         }
 
+        private static void ShowConsentForm(IAdClient client)
+        {
+            if (!Application.isMobilePlatform) return;
+            client.ShowConsentForm();
+        }
+
         public static void ShowBannerAd() { ShowBannerAd(GetClientAlreadySetup(currentNetwork)); }
 
         public static void HideBannerAd() { HideBannerAd(GetClientAlreadySetup(currentNetwork)); }
@@ -389,5 +395,7 @@ namespace Snorlax.Ads
         public static bool IsAppOpenAdReady() { return IsAppOpenAdReady(GetClientAlreadySetup(currentNetwork)); }
 
         public static void ShowAppOpenAd() { ShowAppOpenAd(GetClientAlreadySetup(currentNetwork)); }
+
+        public static void ShowConsentFrom() { ShowConsentForm(GetClientAlreadySetup(currentNetwork)); }
     }
 }

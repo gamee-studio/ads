@@ -59,5 +59,11 @@ namespace Snorlax.Ads
         void ShowAppOpenAd();
 
         #endregion
+
+        #region privacy
+
+        void ShowConsentForm();
+
+        #endregion
     }
 }

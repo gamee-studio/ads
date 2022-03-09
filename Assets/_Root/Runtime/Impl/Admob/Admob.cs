@@ -1,5 +1,6 @@
 #if PANCAKE_ADMOB_ENABLE
 using GoogleMobileAds.Api;
+using UnityEngine;
 
 namespace Snorlax.Ads
 {
@@ -13,10 +14,13 @@ namespace Snorlax.Ads
 
         internal static AdRequest CreateRequest()
         {
+            Debug.Log("Create request --------------------------------");
             var builder = new AdRequest.Builder();
             // targetting setting
             // extra options
             // consent
+            if (Settings.AdSettings.EnableGDPR) builder.AddExtra("npa", GDPRHelper.GetValueGDPR().ToString());
+
             return builder.Build();
         }
     }

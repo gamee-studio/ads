@@ -13,6 +13,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Network = Snorlax.Ads.Network;
 
+
 namespace Snorlax.AdsEditor
 {
     /// <summary>
@@ -40,6 +41,8 @@ namespace Snorlax.AdsEditor
         private static readonly string AdmobSdkAssetExportPath = Path.Combine("GoogleMobileAds", "GoogleMobileAds.dll");
         public static DownloadPluginProgressCallback downloadPluginProgressCallback;
         public static ImportPackageCompletedCallback importPackageCompletedCallback;
+
+        // ReSharper disable once CollectionNeverUpdated.Local
         private static readonly List<string> PluginPathsToIgnoreMoveWhenPluginOutsideAssetsDirectory = new List<string>();
 
         public static bool IsPluginOutsideAssetsDirectory => !PluginParentDirectory.StartsWith("Assets");
@@ -564,6 +567,10 @@ namespace Snorlax.AdsEditor
             {
                 ScriptingDefinition.AddDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_ADMOB);
             }
+            else
+            {
+                ScriptingDefinition.RemoveDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_ADMOB);
+            }
         }
 
         public static bool IsMaxSdkImported()
@@ -581,6 +588,10 @@ namespace Snorlax.AdsEditor
             if (IsMaxSdkImported())
             {
                 ScriptingDefinition.AddDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_APPLOVIN);
+            }
+            else
+            {
+                ScriptingDefinition.RemoveDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_APPLOVIN);
             }
         }
 

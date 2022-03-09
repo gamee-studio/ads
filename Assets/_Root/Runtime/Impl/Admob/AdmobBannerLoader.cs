@@ -79,7 +79,7 @@ namespace Snorlax.Ads
 
         internal float GetAdaptiveBannerHeight()
         {
-            return AdSize.GetCurrentOrientationAnchoredAdaptiveBannerAdSizeWithWidth(AdSize.FullWidth);
+            return AdSize.GetCurrentOrientationAnchoredAdaptiveBannerAdSizeWithWidth(AdSize.FullWidth).Height;
         }
 #endif
     }

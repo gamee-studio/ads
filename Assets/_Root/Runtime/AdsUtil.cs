@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Snorlax.Locale;
 using UnityEngine;
 
 namespace Snorlax.Ads
@@ -35,7 +36,7 @@ namespace Snorlax.Ads
             var versionABetaNumber = 0;
             if (isVersionABeta)
             {
-                var components = versionA.Split(new[] {"-beta"}, StringSplitOptions.None);
+                var components = versionA.Split(new[] { "-beta" }, StringSplitOptions.None);
                 versionA = components[0];
                 versionABetaNumber = int.TryParse(components[1], out piece) ? piece : 0;
             }
@@ -44,7 +45,7 @@ namespace Snorlax.Ads
             var versionBBetaNumber = 0;
             if (isVersionBBeta)
             {
-                var components = versionB.Split(new[] {"-beta"}, StringSplitOptions.None);
+                var components = versionB.Split(new[] { "-beta" }, StringSplitOptions.None);
                 versionB = components[0];
                 versionBBetaNumber = int.TryParse(components[1], out piece) ? piece : 0;
             }
@@ -86,6 +87,21 @@ namespace Snorlax.Ads
             }
 
             return EVersionComparisonResult.Equal;
+        }
+
+        public static bool IsInEEA()
+        {
+            string code = PreciseLocale.GetRegion();
+            if (code.Equals("AT") || code.Equals("BE") || code.Equals("BG") || code.Equals("HR") || code.Equals("CY") || code.Equals("CZ") || code.Equals("DK") ||
+                code.Equals("EE") || code.Equals("FI") || code.Equals("FR") || code.Equals("DE") || code.Equals("EL") || code.Equals("HU") || code.Equals("IE") ||
+                code.Equals("IT") || code.Equals("LV") || code.Equals("LT") || code.Equals("LU") || code.Equals("MT") || code.Equals("NL") || code.Equals("PL") ||
+                code.Equals("PT") || code.Equals("RO") || code.Equals("SK") || code.Equals("SI") || code.Equals("ES") || code.Equals("SE") || code.Equals("IS") ||
+                code.Equals("LI") || code.Equals("NO"))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }
