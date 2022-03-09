@@ -1,5 +1,7 @@
 // ReSharper disable AccessToStaticMemberViaDerivedType
 
+using UnityEngine;
+
 namespace Snorlax.Ads
 {
     public class ApplovinBannerLoader
@@ -21,10 +23,10 @@ namespace Snorlax.Ads
             MaxSdkCallbacks.Banner.OnAdCollapsedEvent += OnAdCollapsed;
             MaxSdkCallbacks.Banner.OnAdRevenuePaidEvent += OnAdRevenuePaid;
             MaxSdk.CreateBanner(Settings.ApplovinSettings.BannerAdUnit.Id, Settings.ApplovinSettings.BannerAdUnit.ConvertPosition());
-            // if (Settings.ApplovinSettings.BannerAdUnit.useAdaptiveBanner)
-            // {
-            //     MaxSdk.SetBannerExtraParameter(Settings.ApplovinSettings.BannerAdUnit.Id, "adaptive_banner", true);
-            // }
+            if (Settings.ApplovinSettings.BannerAdUnit.useAdaptiveBanner)
+            {
+                MaxSdk.SetBannerExtraParameter(Settings.ApplovinSettings.BannerAdUnit.Id, "adaptive_banner", "true");
+            }
         }
 
         private void OnAdRevenuePaid(string unit, MaxSdkBase.AdInfo info) { _client.InvokeBannerAdRevenuePaid(info); }
@@ -38,5 +40,7 @@ namespace Snorlax.Ads
         private void OnAdClicked(string unit, MaxSdkBase.AdInfo info) { _client.InvokeBannerAdClicked(); }
 
         private void OnAdLoaded(string unit, MaxSdkBase.AdInfo info) { _client.InvokeBannerAdLoaded(); }
+
+        internal float GetAdaptiveBannerHeight() { return MaxSdkUtils.GetAdaptiveBannerHeight(Screen.width); }
     }
 }

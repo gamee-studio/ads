@@ -352,6 +352,8 @@ namespace Snorlax.Ads
 
         public static void DestroyBannerAd() { DestroyBannerAd(GetClientAlreadySetup(currentNetwork)); }
 
+        public static float GetAdaptiveBannerHeight() { return GetClientAlreadySetup(currentNetwork).GetAdaptiveBannerHeight; }
+
         public static void LoadInsterstitialAd() { LoadInterstitialAd(GetClientAlreadySetup(currentNetwork)); }
 
         public static bool IsInterstitialAdReady() { return IsInterstitialAdReady(GetClientAlreadySetup(currentNetwork)); }

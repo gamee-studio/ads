@@ -11,6 +11,7 @@ namespace Snorlax.Ads
         private ApplovinRewardedLoader _rewarded;
         private ApplovinRewardedInterstitialLoader _rewardedInterstitial;
         private static ApplovinAdClient client;
+        private bool _isBannerDestroyed;
         public static ApplovinAdClient Instance => client ??= new ApplovinAdClient();
 
         public event Action OnBannerAdLoaded;
@@ -61,6 +62,8 @@ namespace Snorlax.Ads
 #endif
             }
         }
+
+        public override float GetAdaptiveBannerHeight => _banner.GetAdaptiveBannerHeight();
 
         protected override string NoSdkMessage => NO_SDK_MESSAGE;
 
@@ -113,11 +116,18 @@ namespace Snorlax.Ads
             LoadRewardedAd();
             LoadRewardedInterstitialAd();
             isInitialized = true;
+            _isBannerDestroyed = false;
         }
 
         protected override void InternalShowBannerAd()
         {
             if (string.IsNullOrEmpty(Settings.ApplovinSettings.BannerAdUnit.Id)) return;
+            if (_isBannerDestroyed)
+            {
+                MaxSdk.CreateBanner(Settings.ApplovinSettings.BannerAdUnit.Id, Settings.ApplovinSettings.BannerAdUnit.ConvertPosition());
+                _isBannerDestroyed = false;
+            }
+
             MaxSdk.ShowBanner(Settings.ApplovinSettings.BannerAdUnit.Id);
         }
 
@@ -130,6 +140,7 @@ namespace Snorlax.Ads
         protected override void InternalDestroyBannerAd()
         {
             if (string.IsNullOrEmpty(Settings.ApplovinSettings.BannerAdUnit.Id)) return;
+            _isBannerDestroyed = true;
             MaxSdk.DestroyBanner(Settings.ApplovinSettings.BannerAdUnit.Id);
         }
 

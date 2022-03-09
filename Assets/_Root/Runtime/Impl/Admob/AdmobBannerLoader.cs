@@ -76,6 +76,11 @@ namespace Snorlax.Ads
             yield return new WaitForSeconds(delay);
             Load();
         }
+
+        internal float GetAdaptiveBannerHeight()
+        {
+            return AdSize.GetCurrentOrientationAnchoredAdaptiveBannerAdSizeWithWidth(AdSize.FullWidth);
+        }
 #endif
     }
 }

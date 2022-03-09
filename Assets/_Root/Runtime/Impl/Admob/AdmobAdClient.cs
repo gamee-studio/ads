@@ -35,6 +35,10 @@ namespace Snorlax.Ads
             }
         }
 
+#if PANCAKE_ADMOB_ENABLE
+        public override float GetAdaptiveBannerHeight => _banner.GetAdaptiveBannerHeight();
+#endif
+
         protected override string NoSdkMessage => NO_SDK_MESSAGE;
 
         public AdmobBannerLoader Banner => _banner;

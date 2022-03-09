@@ -20,6 +20,7 @@ namespace Snorlax.Ads
         public abstract bool IsAppOpenAdSupport { get; }
         public abstract bool IsSdkAvaiable { get; }
         protected abstract string NoSdkMessage { get; }
+        public virtual float GetAdaptiveBannerHeight { get; }
         public virtual bool IsInitialized => isInitialized;
 
         public virtual void Initialize()
