@@ -26,6 +26,7 @@ namespace Snorlax.Ads
         private static float lastTimeLoadInterstitialAdTimestamp = DEFAULT_TIMESTAMP;
         private static float lastTimeLoadRewardedTimestamp = DEFAULT_TIMESTAMP;
         private static float lastTimeLoadRewardedInterstitialTimestamp = DEFAULT_TIMESTAMP;
+        private static float lastTimeLoadAppOpenTimestamp = DEFAULT_TIMESTAMP;
         private const string REMOVE_ADS_KEY = "remove_ads";
         private const float DEFAULT_TIMESTAMP = -1000;
 
@@ -152,6 +153,7 @@ namespace Snorlax.Ads
                 AutoLoadInterstitialAd();
                 AutoLoadRewardedAd();
                 AutoLoadRewardedInterstitialAd();
+                AutoLoadAppOpenAd();
                 yield return new WaitForSeconds(Settings.AdSettings.AdCheckingInterval);
             }
             // ReSharper disable once IteratorNeverReturns
@@ -186,6 +188,16 @@ namespace Snorlax.Ads
 
             LoadRewardedInterstitialAd();
             lastTimeLoadRewardedInterstitialTimestamp = Time.realtimeSinceStartup;
+        }
+
+        private static void AutoLoadAppOpenAd()
+        {
+            if (IsAppOpenAdReady()) return;
+
+            if (Time.realtimeSinceStartup - lastTimeLoadAppOpenTimestamp < Settings.AdSettings.AdLoadingInterval) return;
+
+            LoadAppOpenAd();
+            lastTimeLoadAppOpenTimestamp = Time.realtimeSinceStartup;
         }
 
         private static void OnInterstitialAdCompleted(IAdClient client) { InterstitialAdCompletedEvent?.Invoke((EInterstitialAdNetwork)client.Network); }
