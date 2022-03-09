@@ -12,6 +12,7 @@ namespace Snorlax.Ads
 
         private void Initialized()
         {
+#if PANCAKE_MAX_ENABLE
             MaxSdkCallbacks.Rewarded.OnAdClickedEvent += OnAdClicked;
             MaxSdkCallbacks.Rewarded.OnAdDisplayedEvent += OnAdDisplayed;
             MaxSdkCallbacks.Rewarded.OnAdHiddenEvent += OnAdHidden;
@@ -20,8 +21,10 @@ namespace Snorlax.Ads
             MaxSdkCallbacks.Rewarded.OnAdLoadFailedEvent += OnAdLoadFailed;
             MaxSdkCallbacks.Rewarded.OnAdRevenuePaidEvent += OnAdRevenuePaid;
             MaxSdkCallbacks.Rewarded.OnAdReceivedRewardEvent += OnAdReceivedReward;
+#endif
         }
 
+#if PANCAKE_MAX_ENABLE
         private void OnAdReceivedReward(string unit, MaxSdkBase.Reward reward, MaxSdkBase.AdInfo info) { _client.InvokeRewardedAdReceivedReward(reward); }
 
         private void OnAdRevenuePaid(string unit, MaxSdkBase.AdInfo info) { _client.InvokeRewardedAdRevenuePaid(info); }
@@ -37,5 +40,6 @@ namespace Snorlax.Ads
         private void OnAdDisplayed(string unit, MaxSdkBase.AdInfo info) { _client.InvokeRewardedAdDisplay(); }
 
         private void OnAdClicked(string unit, MaxSdkBase.AdInfo info) { _client.InvokeRewardedAdClicked(); }
+#endif
     }
 }

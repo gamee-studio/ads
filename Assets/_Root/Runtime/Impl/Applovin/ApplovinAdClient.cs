@@ -14,6 +14,7 @@ namespace Snorlax.Ads
         private bool _isBannerDestroyed;
         public static ApplovinAdClient Instance => client ??= new ApplovinAdClient();
 
+#if PANCAKE_MAX_ENABLE
         public event Action OnBannerAdLoaded;
         public event Action OnBannerAdFaildToLoad;
         public event Action OnBannerAdClicked;
@@ -43,6 +44,7 @@ namespace Snorlax.Ads
         public event Action OnRewardedInterstitialAdHidden;
         public event Action<MaxSdkBase.AdInfo> OnRewardedInterstitialAdRevenuePaid;
         public event Action<MaxSdkBase.Reward> OnRewardedInterstitialAdReceivedReward;
+#endif
 
         public override EAdNetwork Network => EAdNetwork.Applovin;
         public override bool IsBannerAdSupported => true;
@@ -63,12 +65,15 @@ namespace Snorlax.Ads
             }
         }
 
+#if PANCAKE_MAX_ENABLE
         public override float GetAdaptiveBannerHeight => _banner.GetAdaptiveBannerHeight();
+#endif
 
         protected override string NoSdkMessage => NO_SDK_MESSAGE;
 
         #region internal
 
+#if PANCAKE_MAX_ENABLE
         internal void InvokeBannerAdLoaded() { OnBannerAdLoaded?.Invoke(); }
         internal void InvokeBannerAdFaildToLoad() { OnBannerAdFaildToLoad?.Invoke(); }
         internal void InvokeBannerAdClicked() { OnBannerAdClicked?.Invoke(); }
@@ -98,14 +103,17 @@ namespace Snorlax.Ads
         internal void InvokeRewardedInterstitialAdHidden() { OnRewardedInterstitialAdHidden?.Invoke(); }
         internal void InvokeRewardedInterstitialAdRevenuePaid(MaxSdkBase.AdInfo info) { OnRewardedInterstitialAdRevenuePaid?.Invoke(info); }
         internal void InvokeRewardedInterstitialAdReceivedReward(MaxSdkBase.Reward reward) { OnRewardedInterstitialAdReceivedReward?.Invoke(reward); }
+#endif
 
         #endregion
 
         protected override void InternalInit()
         {
+#if PANCAKE_MAX_ENABLE
             MaxSdk.SetSdkKey(Settings.ApplovinSettings.SdkKey);
             MaxSdk.InitializeSdk();
             MaxSdk.SetIsAgeRestrictedUser(Settings.ApplovinSettings.EnableAgeRestrictedUser);
+#endif
 
             _banner = new ApplovinBannerLoader(this);
             _interstitial = new ApplovinInterstitialLoader(this);
@@ -121,6 +129,7 @@ namespace Snorlax.Ads
 
         protected override void InternalShowBannerAd()
         {
+#if PANCAKE_MAX_ENABLE
             if (string.IsNullOrEmpty(Settings.ApplovinSettings.BannerAdUnit.Id)) return;
             if (_isBannerDestroyed)
             {
@@ -129,73 +138,102 @@ namespace Snorlax.Ads
             }
 
             MaxSdk.ShowBanner(Settings.ApplovinSettings.BannerAdUnit.Id);
+#endif
         }
 
         protected override void InternalHideBannerAd()
         {
+#if PANCAKE_MAX_ENABLE
             if (string.IsNullOrEmpty(Settings.ApplovinSettings.BannerAdUnit.Id)) return;
             MaxSdk.HideBanner(Settings.ApplovinSettings.BannerAdUnit.Id);
+#endif
         }
 
         protected override void InternalDestroyBannerAd()
         {
+#if PANCAKE_MAX_ENABLE
             if (string.IsNullOrEmpty(Settings.ApplovinSettings.BannerAdUnit.Id)) return;
             _isBannerDestroyed = true;
             MaxSdk.DestroyBanner(Settings.ApplovinSettings.BannerAdUnit.Id);
+#endif
         }
 
         protected override void InternalLoadInterstitialAd()
         {
+#if PANCAKE_MAX_ENABLE
             if (string.IsNullOrEmpty(Settings.ApplovinSettings.InterstitialAdUnit.Id)) return;
             MaxSdk.LoadInterstitial(Settings.ApplovinSettings.InterstitialAdUnit.Id);
+#endif
         }
 
         protected override void InternalShowInterstitialAd()
         {
+#if PANCAKE_MAX_ENABLE
             if (string.IsNullOrEmpty(Settings.ApplovinSettings.InterstitialAdUnit.Id)) return;
             MaxSdk.ShowInterstitial(Settings.ApplovinSettings.InterstitialAdUnit.Id);
+#endif
         }
 
         protected override bool InternalIsInterstitialAdReady()
         {
+#if PANCAKE_MAX_ENABLE
             if (string.IsNullOrEmpty(Settings.ApplovinSettings.InterstitialAdUnit.Id)) return false;
             return MaxSdk.IsInterstitialReady(Settings.ApplovinSettings.InterstitialAdUnit.Id);
+#else
+            return false;
+#endif
         }
 
         protected override void InternalLoadRewardedAd()
         {
+#if PANCAKE_MAX_ENABLE
             if (string.IsNullOrEmpty(Settings.ApplovinSettings.RewardedAdUnit.Id)) return;
             MaxSdk.LoadRewardedAd(Settings.ApplovinSettings.RewardedAdUnit.Id);
+#endif
         }
 
         protected override void InternalShowRewardedAd()
         {
+#if PANCAKE_MAX_ENABLE
             if (string.IsNullOrEmpty(Settings.ApplovinSettings.RewardedAdUnit.Id)) return;
             MaxSdk.ShowRewardedAd(Settings.ApplovinSettings.RewardedAdUnit.Id);
+#endif
         }
 
         protected override bool InternalIsRewardedAdReady()
         {
+#if PANCAKE_MAX_ENABLE
             if (string.IsNullOrEmpty(Settings.ApplovinSettings.RewardedAdUnit.Id)) return false;
             return MaxSdk.IsRewardedAdReady(Settings.ApplovinSettings.RewardedAdUnit.Id);
+#else
+            return false;
+#endif
         }
 
         protected override void InternalLoadRewardedInterstitialAd()
         {
+#if PANCAKE_MAX_ENABLE
             if (string.IsNullOrEmpty(Settings.ApplovinSettings.RewardedInterstitialAdUnit.Id)) return;
             MaxSdk.LoadRewardedInterstitialAd(Settings.ApplovinSettings.RewardedInterstitialAdUnit.Id);
+#endif
         }
 
         protected override void InternalShowRewardedInterstitialAd()
         {
+#if PANCAKE_MAX_ENABLE
             if (string.IsNullOrEmpty(Settings.ApplovinSettings.RewardedInterstitialAdUnit.Id)) return;
             MaxSdk.ShowRewardedInterstitialAd(Settings.ApplovinSettings.RewardedInterstitialAdUnit.Id);
+#endif
         }
 
         protected override bool InternalIsRewardedInterstitialAdReady()
         {
+#if PANCAKE_MAX_ENABLE
             if (string.IsNullOrEmpty(Settings.ApplovinSettings.RewardedInterstitialAdUnit.Id)) return false;
             return MaxSdk.IsRewardedInterstitialAdReady(Settings.ApplovinSettings.RewardedInterstitialAdUnit.Id);
+#else
+            return false;
+#endif
         }
     }
 }

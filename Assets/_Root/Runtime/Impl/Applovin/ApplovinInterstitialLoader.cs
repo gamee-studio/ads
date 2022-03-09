@@ -12,6 +12,7 @@ namespace Snorlax.Ads
 
         private void Initialized()
         {
+#if PANCAKE_MAX_ENABLE
             MaxSdkCallbacks.Interstitial.OnAdClickedEvent += OnAdClicked;
             MaxSdkCallbacks.Interstitial.OnAdLoadedEvent += OnAdLoaded;
             MaxSdkCallbacks.Interstitial.OnAdLoadFailedEvent += OnAdLoadFailed;
@@ -19,8 +20,10 @@ namespace Snorlax.Ads
             MaxSdkCallbacks.Interstitial.OnAdDisplayedEvent += OnAdDisplayed;
             MaxSdkCallbacks.Interstitial.OnAdHiddenEvent += OnAdHidden;
             MaxSdkCallbacks.Interstitial.OnAdDisplayFailedEvent += OnAdDisplayFailed;
+#endif
         }
 
+#if PANCAKE_MAX_ENABLE
         private void OnAdDisplayFailed(string unit, MaxSdkBase.ErrorInfo error, MaxSdkBase.AdInfo info) { _client.InvokeInterstitialAdFaildToDisplay(); }
 
         private void OnAdHidden(string unit, MaxSdkBase.AdInfo info) { _client.InvokeInterstitialAdHidden(); }
@@ -34,5 +37,6 @@ namespace Snorlax.Ads
         private void OnAdLoaded(string unit, MaxSdkBase.AdInfo info) { _client.InvokeInterstitialAdLoaded(); }
 
         private void OnAdClicked(string unit, MaxSdkBase.AdInfo info) { _client.InvokeInterstitialAdClicked(); }
+#endif
     }
 }
