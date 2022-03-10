@@ -594,7 +594,7 @@ namespace Snorlax.AdsEditor
         private static readonly Dictionary<string, GUIStyle> CustomStyles = new Dictionary<string, GUIStyle>();
         private static GUISkin skin;
         private const string SKIN_PATH = "Assets/_Root/GUISkins/";
-        private const string UPM_SKIN_PATH = "Packages/com.snorlax.ads/GUISkins/";
+        private const string UPM_SKIN_PATH = "Packages/com.gamee.ads/GUISkins/";
         private static GUIStyle uppercaseSectionHeaderExpand;
         private static GUIStyle uppercaseSectionHeaderCollapse;
         private static Texture2D chevronUp;

@@ -25,7 +25,7 @@ namespace Snorlax.AdsEditor
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            Debug.Log("EM_Settings.asset was created at Assets/Resources/AdSettings.asset");
+            Debug.Log("Settings.asset was created at Assets/Resources/AdSettings.asset");
 
             return instance;
         }
