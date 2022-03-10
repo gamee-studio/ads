@@ -8,11 +8,11 @@
       "hash": "8479d378666d8af0e30fc0308df447196857659d"
     },
     "com.snorlax.locale": {
-      "version": "https://github.com/snorluxe/locale.git?path=Assets/_Root#1.0.0",
+      "version": "https://github.com/snorluxe/locale.git?path=Assets/_Root#1.0.2",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "fe9bf8c7fd2604e62815f3a009ff96a43f05b239"
+      "hash": "aeb9ad6f353f147cd91b46e877ae29ac1d7eabd9"
     },
     "com.unity.2d.sprite": {
       "version": "1.0.0",

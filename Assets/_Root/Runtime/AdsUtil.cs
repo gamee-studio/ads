@@ -1,7 +1,9 @@
 using System;
 using System.IO;
 using System.Linq;
+#if PANCAKE_LOCALE
 using Snorlax.Locale;
+#endif
 using UnityEditor;
 using UnityEngine;
 
@@ -96,6 +98,7 @@ namespace Snorlax.Ads
 
         public static bool IsInEEA()
         {
+#if PANCAKE_LOCALE
             string code = PreciseLocale.GetRegion();
             if (code.Equals("AT") || code.Equals("BE") || code.Equals("BG") || code.Equals("HR") || code.Equals("CY") || code.Equals("CZ") || code.Equals("DK") ||
                 code.Equals("EE") || code.Equals("FI") || code.Equals("FR") || code.Equals("DE") || code.Equals("EL") || code.Equals("HU") || code.Equals("IE") ||
@@ -105,6 +108,7 @@ namespace Snorlax.Ads
             {
                 return true;
             }
+#endif
 
             return false;
         }

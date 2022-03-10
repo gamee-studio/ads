@@ -653,21 +653,21 @@ PlayerSettings:
   webGLThreadsSupport: 0
   webGLDecompressionFallback: 0
   scriptingDefineSymbols:
-    1: 
-    4: 
+    1: PANCAKE_LOCALE
+    4: PANCAKE_LOCALE
     7: 
-    13: 
-    14: 
-    19: 
-    21: 
-    25: 
-    27: 
-    28: 
-    29: 
-    30: 
-    31: 
-    32: 
-    33: 
+    13: PANCAKE_LOCALE
+    14: PANCAKE_LOCALE
+    19: PANCAKE_LOCALE
+    21: PANCAKE_LOCALE
+    25: PANCAKE_LOCALE
+    27: PANCAKE_LOCALE
+    28: PANCAKE_LOCALE
+    29: PANCAKE_LOCALE
+    30: PANCAKE_LOCALE
+    31: PANCAKE_LOCALE
+    32: PANCAKE_LOCALE
+    33: PANCAKE_LOCALE
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend: {}
