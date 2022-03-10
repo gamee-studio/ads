@@ -4,7 +4,9 @@ using System.Linq;
 #if PANCAKE_LOCALE
 using Snorlax.Locale;
 #endif
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 
 namespace Snorlax.Ads
@@ -113,6 +115,7 @@ namespace Snorlax.Ads
             return false;
         }
 
+#if UNITY_EDITOR
         public static void CreateMainTemplateGradle()
         {
             if (File.Exists(MAINTEMPALTE_GRADLE_PATH)) return;
@@ -131,5 +134,6 @@ namespace Snorlax.Ads
             FileUtil.DeleteFileOrDirectory(MAINTEMPALTE_GRADLE_PATH + ".meta");
             AssetDatabase.Refresh();
         }
+#endif
     }
 }
