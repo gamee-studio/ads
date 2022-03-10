@@ -15,12 +15,16 @@ Add the following lines
 
 ```csharp
 "com.gamee.ads": "https://github.com/gamee-studio/ads.git?path=Assets/_Root",
+"com.snorlax.locale": "https://github.com/snorluxe/locale.git?path=Assets/_Root#1.0.0",
+"com.google.external-dependency-manager": "https://github.com/snorluxe/external-dependency-manager.git?path=Assets/_Root#1.2.169",
 ```
 
 - for excactly version
 
 ```csharp
 "com.gamee.ads": "https://github.com/gamee-studio/ads.git?path=Assets/_Root#1.0.0",
+"com.snorlax.locale": "https://github.com/snorluxe/locale.git?path=Assets/_Root#1.0.0",
+"com.google.external-dependency-manager": "https://github.com/snorluxe/external-dependency-manager.git?path=Assets/_Root#1.2.169",
 ```
 
 To `Packages/manifest.json`
