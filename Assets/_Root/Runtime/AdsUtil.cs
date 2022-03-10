@@ -21,6 +21,7 @@ namespace Snorlax.Ads
         public const string DEFAULT_FILTER_MAX_MAXSDK2 = @"l:al_max_export_path-MaxSdk\Scripts\MaxSdk.cs";
 
         private const string MAINTEMPALTE_GRADLE_PATH = "Assets/Plugins/Android/mainTemplate.gradle";
+        private const string GRADLETEMPALTE_PROPERTIES_PATH = "Assets/Plugins/Android/gradleTemplate.properties";
 
 
         /// <summary>
@@ -126,12 +127,31 @@ namespace Snorlax.Ads
             writer.Close();
             AssetDatabase.ImportAsset(MAINTEMPALTE_GRADLE_PATH);
         }
+        
+        public static void CreateGradleTemplateProperties()
+        {
+            if (File.Exists(GRADLETEMPALTE_PROPERTIES_PATH)) return;
+            var gradleTemplate = (TextAsset)Resources.Load("gradleTemplate", typeof(TextAsset));
+            string maintemplateData = gradleTemplate.text;
+            var writer = new StreamWriter(GRADLETEMPALTE_PROPERTIES_PATH, false);
+            writer.Write(maintemplateData);
+            writer.Close();
+            AssetDatabase.ImportAsset(GRADLETEMPALTE_PROPERTIES_PATH);
+        }
 
         public static void DeleteMainTemplateGradle()
         {
             if (!File.Exists(MAINTEMPALTE_GRADLE_PATH)) return;
             FileUtil.DeleteFileOrDirectory(MAINTEMPALTE_GRADLE_PATH);
             FileUtil.DeleteFileOrDirectory(MAINTEMPALTE_GRADLE_PATH + ".meta");
+            AssetDatabase.Refresh();
+        }
+        
+        public static void DeleteGradleTemplateProperties()
+        {
+            if (!File.Exists(GRADLETEMPALTE_PROPERTIES_PATH)) return;
+            FileUtil.DeleteFileOrDirectory(GRADLETEMPALTE_PROPERTIES_PATH);
+            FileUtil.DeleteFileOrDirectory(GRADLETEMPALTE_PROPERTIES_PATH + ".meta");
             AssetDatabase.Refresh();
         }
 #endif

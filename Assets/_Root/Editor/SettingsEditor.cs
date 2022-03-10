@@ -198,11 +198,17 @@ namespace Snorlax.AdsEditor
                     if (Settings.AdSettings.EnableMultipleDex)
                     {
                         AdsUtil.CreateMainTemplateGradle();
+#if UNITY_2020_3_OR_NEWER
+                        AdsUtil.CreateGradleTemplateProperties();
+#endif
                         ScriptingDefinition.AddDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_MULTIPLE_DEX);
                     }
                     else
                     {
                         AdsUtil.DeleteMainTemplateGradle();
+#if UNITY_2020_3_OR_NEWER
+                        AdsUtil.DeleteGradleTemplateProperties();
+#endif
                         ScriptingDefinition.RemoveDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_MULTIPLE_DEX);
                     }
                 });
