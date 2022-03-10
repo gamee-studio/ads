@@ -22,7 +22,6 @@ namespace Snorlax.Ads
         private static EAutoLoadingAd autoLoadingAdMode = EAutoLoadingAd.None;
         private static bool flagAutoLoadingModeChange;
         private static IEnumerator autoLoadAdCoroutine;
-        private static EAdNetwork currentNetwork = EAdNetwork.Admob;
         private static float lastTimeLoadInterstitialAdTimestamp = DEFAULT_TIMESTAMP;
         private static float lastTimeLoadRewardedTimestamp = DEFAULT_TIMESTAMP;
         private static float lastTimeLoadRewardedInterstitialTimestamp = DEFAULT_TIMESTAMP;
@@ -125,25 +124,35 @@ namespace Snorlax.Ads
             return true;
         }
 
+        /// <summary>
+        /// none
+        /// admob
+        /// applovin
+        /// </summary>
+        /// <param name="network"></param>
         public static void SetCurrentNetwork(string network)
         {
             switch (network.Trim().ToLower())
             {
                 case "none":
-                    currentNetwork = EAdNetwork.None;
+                    Settings.AdSettings.CurrentNetwork = EAdNetwork.None;
                     break;
                 case "admob":
-                    currentNetwork = EAdNetwork.Admob;
+                    Settings.AdSettings.CurrentNetwork = EAdNetwork.Admob;
                     break;
                 case "applovin":
-                    currentNetwork = EAdNetwork.Applovin;
+                    Settings.AdSettings.CurrentNetwork = EAdNetwork.Applovin;
                     break;
                 default:
-                    currentNetwork = EAdNetwork.Admob;
+                    Settings.AdSettings.CurrentNetwork = EAdNetwork.Admob;
                     break;
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="network"></param>
         public static void SetCurrentNetwork(EAdNetwork network) { SetCurrentNetwork(network.ToString()); }
 
         private static IEnumerator IeAutoLoadAll(float delay = 0)
@@ -366,38 +375,38 @@ namespace Snorlax.Ads
             client.ShowConsentForm();
         }
 
-        public static void ShowBannerAd() { ShowBannerAd(GetClientAlreadySetup(currentNetwork)); }
+        public static void ShowBannerAd() { ShowBannerAd(GetClientAlreadySetup(Settings.CurrentNetwork)); }
 
-        public static void HideBannerAd() { HideBannerAd(GetClientAlreadySetup(currentNetwork)); }
+        public static void HideBannerAd() { HideBannerAd(GetClientAlreadySetup(Settings.CurrentNetwork)); }
 
-        public static void DestroyBannerAd() { DestroyBannerAd(GetClientAlreadySetup(currentNetwork)); }
+        public static void DestroyBannerAd() { DestroyBannerAd(GetClientAlreadySetup(Settings.CurrentNetwork)); }
 
-        public static float GetAdaptiveBannerHeight() { return GetClientAlreadySetup(currentNetwork).GetAdaptiveBannerHeight; }
+        public static float GetAdaptiveBannerHeight() { return GetClientAlreadySetup(Settings.CurrentNetwork).GetAdaptiveBannerHeight; }
 
-        public static void LoadInsterstitialAd() { LoadInterstitialAd(GetClientAlreadySetup(currentNetwork)); }
+        public static void LoadInsterstitialAd() { LoadInterstitialAd(GetClientAlreadySetup(Settings.CurrentNetwork)); }
 
-        public static bool IsInterstitialAdReady() { return IsInterstitialAdReady(GetClientAlreadySetup(currentNetwork)); }
+        public static bool IsInterstitialAdReady() { return IsInterstitialAdReady(GetClientAlreadySetup(Settings.CurrentNetwork)); }
 
-        public static void ShowInterstitialAd() { ShowInterstitialAd(GetClientAlreadySetup(currentNetwork)); }
+        public static void ShowInterstitialAd() { ShowInterstitialAd(GetClientAlreadySetup(Settings.CurrentNetwork)); }
 
-        public static void LoadRewardedAd() { LoadRewardedAd(GetClientAlreadySetup(currentNetwork)); }
+        public static void LoadRewardedAd() { LoadRewardedAd(GetClientAlreadySetup(Settings.CurrentNetwork)); }
 
-        public static bool IsRewardedAdReady() { return IsRewardedAdReady(GetClientAlreadySetup(currentNetwork)); }
+        public static bool IsRewardedAdReady() { return IsRewardedAdReady(GetClientAlreadySetup(Settings.CurrentNetwork)); }
 
-        public static void ShowRewardedAd() { ShowRewardedAd(GetClientAlreadySetup(currentNetwork)); }
+        public static void ShowRewardedAd() { ShowRewardedAd(GetClientAlreadySetup(Settings.CurrentNetwork)); }
 
-        public static void LoadRewardedInterstitialAd() { LoadRewardedInterstitialAd(GetClientAlreadySetup(currentNetwork)); }
+        public static void LoadRewardedInterstitialAd() { LoadRewardedInterstitialAd(GetClientAlreadySetup(Settings.CurrentNetwork)); }
 
-        public static bool IsRewardedInterstitialAdReady() { return IsRewardedInterstitialAdReady(GetClientAlreadySetup(currentNetwork)); }
+        public static bool IsRewardedInterstitialAdReady() { return IsRewardedInterstitialAdReady(GetClientAlreadySetup(Settings.CurrentNetwork)); }
 
-        public static void ShowRewardedInterstitialAd() { ShowRewardedInterstitialAd(GetClientAlreadySetup(currentNetwork)); }
+        public static void ShowRewardedInterstitialAd() { ShowRewardedInterstitialAd(GetClientAlreadySetup(Settings.CurrentNetwork)); }
 
-        public static void LoadAppOpenAd() { LoadAppOpenAd(GetClientAlreadySetup(currentNetwork)); }
+        public static void LoadAppOpenAd() { LoadAppOpenAd(GetClientAlreadySetup(Settings.CurrentNetwork)); }
 
-        public static bool IsAppOpenAdReady() { return IsAppOpenAdReady(GetClientAlreadySetup(currentNetwork)); }
+        public static bool IsAppOpenAdReady() { return IsAppOpenAdReady(GetClientAlreadySetup(Settings.CurrentNetwork)); }
 
-        public static void ShowAppOpenAd() { ShowAppOpenAd(GetClientAlreadySetup(currentNetwork)); }
+        public static void ShowAppOpenAd() { ShowAppOpenAd(GetClientAlreadySetup(Settings.CurrentNetwork)); }
 
-        public static void ShowConsentFrom() { ShowConsentForm(GetClientAlreadySetup(currentNetwork)); }
+        public static void ShowConsentFrom() { ShowConsentForm(GetClientAlreadySetup(Settings.CurrentNetwork)); }
     }
 }

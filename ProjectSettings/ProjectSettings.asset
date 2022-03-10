@@ -655,7 +655,7 @@ PlayerSettings:
   scriptingDefineSymbols:
     1: PANCAKE_LOCALE
     4: PANCAKE_LOCALE
-    7: 
+    7: PANCAKE_LOCALE
     13: PANCAKE_LOCALE
     14: PANCAKE_LOCALE
     19: PANCAKE_LOCALE

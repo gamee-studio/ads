@@ -13,6 +13,7 @@ namespace Snorlax.Ads
         [SerializeField] private string privacyPolicyUrl;
         [SerializeField] private bool enableGDPR;
         [SerializeField] private bool enableMultipleDex;
+        [SerializeField] private EAdNetwork currentNetwork = EAdNetwork.Admob;
 
         public bool AutoInit { get => autoInit; set => autoInit = value; }
 
@@ -27,5 +28,7 @@ namespace Snorlax.Ads
         public bool EnableGDPR { get => enableGDPR; set => enableGDPR = value; }
 
         public bool EnableMultipleDex => enableMultipleDex;
+
+        public EAdNetwork CurrentNetwork { get => currentNetwork; set => currentNetwork = value; }
     }
 }

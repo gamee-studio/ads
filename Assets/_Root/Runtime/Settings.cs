@@ -45,6 +45,8 @@ namespace Snorlax.Ads
 
         public static MaxSettings MaxSettings => Instance.maxSettings;
 
+        public static EAdNetwork CurrentNetwork => Instance.adSettings.CurrentNetwork;
+
         #endregion
 
         #region api
