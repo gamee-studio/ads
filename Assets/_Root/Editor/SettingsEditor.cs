@@ -191,6 +191,8 @@ namespace Snorlax.AdsEditor
                     EditorGUILayout.PropertyField(AdProperties.enableMultipleDex.property, AdProperties.enableMultipleDex.content);
                     EditorGUILayout.PropertyField(AdProperties.privacyPolicyUrl.property, AdProperties.privacyPolicyUrl.content);
 
+                    if (Settings.AdSettings.EnableGDPR) EditorGUILayout.PropertyField(AdProperties.privacyPolicyUrl.property, AdProperties.privacyPolicyUrl.content);
+
                     if (Settings.AdSettings.EnableMultipleDex)
                     {
                         AdsUtil.CreateMainTemplateGradle();
