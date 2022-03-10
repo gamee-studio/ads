@@ -37,8 +37,8 @@ To `Packages/manifest.json`
 
 1. Auto Init :
     1. `true` if you want Adverstising to automatically initialize setting at `Start()`
-    2. `false` you need to call `Adverstising.Initialize()` manually where you want
-    3. `Adverstising.Initialize()` is required to use other Adverstising APIs
+    2. `false` you need to call `Advertising.Initialize()` manually where you want
+    3. `Advertising.Initialize()` is required to use other Adverstising APIs
 
 2. [GDPR](https://developers.google.com/admob/unity/eu-consent) : General Data Protection Regulation
     - Under the Google EU User Consent Policy, you must make certain disclosures to your users in the European Economic Area (EEA) and obtain their consent to use cookies or other
@@ -57,7 +57,7 @@ To `Packages/manifest.json`
     ```
 
 - Note:
-    - You can also call manually by calling through `Adverstising.ShowConsentForm()`
+    - You can also call manually by calling through `Advertising.ShowConsentForm()`
     - On android it will show consent form popup,
     - On ios it will show ATT popup
 
@@ -94,33 +94,33 @@ To `Packages/manifest.json`
 #### _Adverstising_
 
 ```c#
-Adverstising.ShowBannerAd()
-Adverstising.HideBannerAd()
-Adverstising.DestroyBannerAd()
-Adverstising.GetAdaptiveBannerHeight()
+Advertising.ShowBannerAd()
+Advertising.HideBannerAd()
+Advertising.DestroyBannerAd()
+Advertising.GetAdaptiveBannerHeight()
 
 
-Adverstising.LoadInsterstitialAd()
-Adverstising.IsInterstitialAdReady()
-Adverstising.ShowInterstitialAd()
+Advertising.LoadInsterstitialAd()
+Advertising.IsInterstitialAdReady()
+Advertising.ShowInterstitialAd()
 
 
-Adverstising.LoadRewardedAd()
-Adverstising.IsRewardedAdReady()
-Adverstising.ShowRewardedAd()
+Advertising.LoadRewardedAd()
+Advertising.IsRewardedAdReady()
+Advertising.ShowRewardedAd()
 
 
-Adverstising.LoadRewardedInterstitialAd()
-Adverstising.IsRewardedInterstitialAdReady()
-Adverstising.ShowRewardedInterstitialAd()
+Advertising.LoadRewardedInterstitialAd()
+Advertising.IsRewardedInterstitialAdReady()
+Advertising.ShowRewardedInterstitialAd()
 
 
-Adverstising.LoadAppOpenAd()
-Adverstising.IsAppOpenAdReady()
-Adverstising.ShowAppOpenAd()
+Advertising.LoadAppOpenAd()
+Advertising.IsAppOpenAdReady()
+Advertising.ShowAppOpenAd()
 
 
-Adverstising.ShowConsentFrom()
+Advertising.ShowConsentFrom()
 
 ```
 
@@ -140,3 +140,14 @@ Action<ERewardedInterstitialAdNetwork> RewardedInterstitialAdSkippedEvent; // ca
 
 Action<EAppOpenAdNetwork> AppOpenAdCompletedEvent; // call when user completed watch appOpenAd
 ```
+
+#### Update current use network
+- by default admob will be used to show ad, you can use the following syntax
+```c#
+Advertising.SetCurrentNetwork("name network");
+
+ex: Advertising.SetCurrentNetwork("applovin");
+```
+ 1. "admob"
+ 2. "applovin"
+
