@@ -15,6 +15,14 @@ namespace Snorlax.Ads
         {
         }
 
+        public AdmobBannerUnit()
+            : base("", "")
+        {
+            position = EBannerPosition.Bottom;
+            size = EBannerSize.Banner;
+        }
+
+
 #if PANCAKE_ADMOB_ENABLE
         public AdSize ConvertSize()
         {

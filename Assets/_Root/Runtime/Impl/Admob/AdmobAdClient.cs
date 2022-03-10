@@ -58,7 +58,7 @@ namespace Snorlax.Ads
                 RuntimeHelper.RunOnMainThread(() =>
                 {
                     if (Settings.AdmobSettings.EnableTestMode) Admob.SetupDeviceTest();
-
+                    if (Settings.AdSettings.EnableGDPR) ShowConsentForm();
                     isInitialized = true;
                 });
             });

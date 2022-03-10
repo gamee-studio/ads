@@ -1,6 +1,8 @@
 using System;
+using System.IO;
 using System.Linq;
 using Snorlax.Locale;
+using UnityEditor;
 using UnityEngine;
 
 namespace Snorlax.Ads
@@ -9,9 +11,12 @@ namespace Snorlax.Ads
     {
         public const string SCRIPTING_DEFINITION_ADMOB = "PANCAKE_ADMOB_ENABLE";
         public const string SCRIPTING_DEFINITION_APPLOVIN = "PANCAKE_MAX_ENABLE";
+        public const string SCRIPTING_DEFINITION_MULTIPLE_DEX = "PANCAKE_MULTIPLE_DEX";
         public const string DEFAULT_FILTER_ADMOB_DLL = "l:gvhp_exportpath-GoogleMobileAds/GoogleMobileAds.dll";
         public const string DEFAULT_FILTER_MAX_MAXSDK = "l:al_max_export_path-MaxSdk/Scripts/MaxSdk.cs";
         public const string DEFAULT_FILTER_MAX_MAXSDK2 = @"l:al_max_export_path-MaxSdk\Scripts\MaxSdk.cs";
+
+        private const string MAINTEMPALTE_GRADLE_PATH = "Assets/Plugins/Android/mainTemplate.gradle";
 
 
         /// <summary>
@@ -102,6 +107,25 @@ namespace Snorlax.Ads
             }
 
             return false;
+        }
+
+        public static void CreateMainTemplateGradle()
+        {
+            if (File.Exists(MAINTEMPALTE_GRADLE_PATH)) return;
+            var maintemplate = (TextAsset)Resources.Load("mainTemplate", typeof(TextAsset));
+            string maintemplateData = maintemplate.text;
+            var writer = new StreamWriter(MAINTEMPALTE_GRADLE_PATH, false);
+            writer.Write(maintemplateData);
+            writer.Close();
+            AssetDatabase.ImportAsset(MAINTEMPALTE_GRADLE_PATH);
+        }
+
+        public static void DeleteMainTemplateGradle()
+        {
+            if (!File.Exists(MAINTEMPALTE_GRADLE_PATH)) return;
+            FileUtil.DeleteFileOrDirectory(MAINTEMPALTE_GRADLE_PATH);
+            FileUtil.DeleteFileOrDirectory(MAINTEMPALTE_GRADLE_PATH + ".meta");
+            AssetDatabase.Refresh();
         }
     }
 }

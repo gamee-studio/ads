@@ -12,6 +12,7 @@ namespace Snorlax.Ads
         [Range(5, 100)] [SerializeField] private float adLoadingInterval = 15f;
         [SerializeField] private string privacyPolicyUrl;
         [SerializeField] private bool enableGDPR;
+        [SerializeField] private bool enableMultipleDex;
 
         public bool AutoInit { get => autoInit; set => autoInit = value; }
 
@@ -24,5 +25,7 @@ namespace Snorlax.Ads
         public string PrivacyPolicyUrl => privacyPolicyUrl;
 
         public bool EnableGDPR { get => enableGDPR; set => enableGDPR = value; }
+
+        public bool EnableMultipleDex => enableMultipleDex;
     }
 }

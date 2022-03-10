@@ -42,6 +42,8 @@ namespace Snorlax.AdsEditor
             public static Property enableGDPR = new Property(null,
                 new GUIContent("GDPR",
                     "General data protection regulation \nApp requires user consent before these events can be sent, you can delay app measurement until you explicitly initialize the Mobile Ads SDK or load an ad."));
+
+            public static Property enableMultipleDex = new Property(null, new GUIContent("Multiple Dex"));
         }
 
         private static class AdmobProperties
@@ -136,6 +138,7 @@ namespace Snorlax.AdsEditor
             AdProperties.adLoadingInterval.property = AdProperties.main.FindPropertyRelative("adLoadingInterval");
             AdProperties.enableGDPR.property = AdProperties.main.FindPropertyRelative("enableGDPR");
             AdProperties.privacyPolicyUrl.property = AdProperties.main.FindPropertyRelative("privacyPolicyUrl");
+            AdProperties.enableMultipleDex.property = AdProperties.main.FindPropertyRelative("enableMultipleDex");
 
             AdmobProperties.main = serializedObject.FindProperty("admobSettings");
             AdmobProperties.enable.property = AdmobProperties.main.FindPropertyRelative("enable");
@@ -185,7 +188,19 @@ namespace Snorlax.AdsEditor
                 {
                     EditorGUILayout.PropertyField(AdProperties.autoInit.property, AdProperties.autoInit.content);
                     EditorGUILayout.PropertyField(AdProperties.enableGDPR.property, AdProperties.enableGDPR.content);
+                    EditorGUILayout.PropertyField(AdProperties.enableMultipleDex.property, AdProperties.enableMultipleDex.content);
                     EditorGUILayout.PropertyField(AdProperties.privacyPolicyUrl.property, AdProperties.privacyPolicyUrl.content);
+
+                    if (Settings.AdSettings.EnableMultipleDex)
+                    {
+                        AdsUtil.CreateMainTemplateGradle();
+                        ScriptingDefinition.AddDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_MULTIPLE_DEX);
+                    }
+                    else
+                    {
+                        AdsUtil.DeleteMainTemplateGradle();
+                        ScriptingDefinition.RemoveDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_MULTIPLE_DEX);
+                    }
                 });
 
             EditorGUILayout.Space();
@@ -234,11 +249,6 @@ namespace Snorlax.AdsEditor
                             EditorGUILayout.PropertyField(AdmobProperties.rewardedInterstitialAdUnit.property, AdmobProperties.rewardedInterstitialAdUnit.content, true);
                             EditorGUILayout.PropertyField(AdmobProperties.appOpenAdUnit.property, AdmobProperties.appOpenAdUnit.content, true);
 
-                            if (Settings.AdmobSettings.BannerAdUnit.size == EBannerSize.SmartBanner)
-                            {
-                                EditorGUILayout.PropertyField(AdmobProperties.useAdaptiveBanner.property, AdmobProperties.useAdaptiveBanner.content);
-                            }
-
                             DrawUppercaseSection("ADMOB_MODULE_MEDIATION",
                                 "MEDIATION",
                                 () =>
@@ -251,6 +261,8 @@ namespace Snorlax.AdsEditor
                                 });
 
                             EditorGUILayout.Space();
+                            if (Settings.AdmobSettings.BannerAdUnit.size == EBannerSize.SmartBanner)
+                                EditorGUILayout.PropertyField(AdmobProperties.useAdaptiveBanner.property, AdmobProperties.useAdaptiveBanner.content);
                             EditorGUILayout.PropertyField(AdmobProperties.enableTestMode.property, AdmobProperties.enableTestMode.content);
                             if (Settings.AdmobSettings.EnableTestMode)
                             {

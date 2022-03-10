@@ -12,5 +12,11 @@ namespace Snorlax.Ads
             : base(iOSId, androidId)
         {
         }
+
+        public AdmobAppOpenUnit()
+            : base("", "")
+        {
+            orientation = ScreenOrientation.Portrait;
+        }
     }
 }

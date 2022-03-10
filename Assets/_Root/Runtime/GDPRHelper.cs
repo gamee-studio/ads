@@ -5,9 +5,9 @@ namespace Snorlax.Ads
     // ReSharper disable once InconsistentNaming
     public class GDPRHelper : MonoBehaviour
     {
-        public const string GDPR_STORE_KEY = "gdpr_store_key";
+        public const string GDPR_NPA_KEY = "gdpr_npa_key";
 
-        public static int GetValueGDPR() => StorageUtil.GetInt(GDPR_STORE_KEY, -1);
+        public static int GetValueGDPR() => StorageUtil.GetInt(GDPR_NPA_KEY, -1);
 
         public static bool CheckStatusGDPR()
         {
@@ -19,18 +19,18 @@ namespace Snorlax.Ads
             return true;
         }
 
-        public static void ClearStatusGDPR() { StorageUtil.SetInt(GDPR_STORE_KEY, -1); }
+        public static void ClearStatusGDPR() { StorageUtil.SetInt(GDPR_NPA_KEY, -1); }
 
         public void OnButtonAcceptPressed()
         {
-            StorageUtil.SetInt(GDPR_STORE_KEY, 0);
+            StorageUtil.SetInt(GDPR_NPA_KEY, 0);
             gameObject.SetActive(false);
             Time.timeScale = 1;
         }
 
         public void OnButtonClosePressed()
         {
-            StorageUtil.SetInt(GDPR_STORE_KEY, 1);
+            StorageUtil.SetInt(GDPR_NPA_KEY, 1);
             gameObject.SetActive(false);
             Time.timeScale = 1;
         }

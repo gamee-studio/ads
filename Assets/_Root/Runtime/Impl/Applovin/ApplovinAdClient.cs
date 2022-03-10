@@ -114,6 +114,7 @@ namespace Snorlax.Ads
 #if PANCAKE_MAX_ENABLE
             MaxSdk.SetSdkKey(Settings.MaxSettings.SdkKey);
             if (Settings.AdSettings.EnableGDPR) MaxSdkCallbacks.OnSdkInitializedEvent += OnSdkInitializedEvent;
+
             MaxSdk.InitializeSdk();
             MaxSdk.SetIsAgeRestrictedUser(Settings.MaxSettings.EnableAgeRestrictedUser);
 #endif
@@ -135,8 +136,7 @@ namespace Snorlax.Ads
         {
             if (configuration.ConsentDialogState == MaxSdkBase.ConsentDialogState.Applies)
             {
-                // Show user consent dialog
-                if (AdsUtil.IsInEEA()) ShowConsentForm();
+                ShowConsentForm();
             }
             else if (configuration.ConsentDialogState == MaxSdkBase.ConsentDialogState.DoesNotApply)
             {

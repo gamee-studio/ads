@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.google.external-dependency-manager": {
+      "version": "https://github.com/snorluxe/external-dependency-manager.git?path=Assets/_Root#1.2.169",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "8479d378666d8af0e30fc0308df447196857659d"
+    },
     "com.snorlax.locale": {
       "version": "https://github.com/snorluxe/locale.git?path=Assets/_Root#1.0.0",
       "depth": 0,
