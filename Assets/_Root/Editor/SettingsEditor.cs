@@ -339,6 +339,10 @@ namespace Snorlax.AdsEditor
                                 ImportPackage.ImportMax();
                             }
                         }
+
+#if PANCAKE_MAX_ENABLE
+                        if (GUI.changed) AppLovinSettings.Instance.SaveAsync();
+#endif
                     }
                 });
 
