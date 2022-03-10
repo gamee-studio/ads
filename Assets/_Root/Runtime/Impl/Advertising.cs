@@ -144,6 +144,8 @@ namespace Snorlax.Ads
             }
         }
 
+        public static void SetCurrentNetwork(EAdNetwork network) { SetCurrentNetwork(network.ToString()); }
+
         private static IEnumerator IeAutoLoadAll(float delay = 0)
         {
             if (delay > 0) yield return new WaitForSeconds(delay);
