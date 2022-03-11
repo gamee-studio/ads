@@ -41,6 +41,7 @@ namespace Snorlax.AdsEditor
         private static readonly string AdmobSdkAssetExportPath = Path.Combine("GoogleMobileAds", "GoogleMobileAds.dll");
         public static DownloadPluginProgressCallback downloadPluginProgressCallback;
         public static ImportPackageCompletedCallback importPackageCompletedCallback;
+        public static ImportPackageCompletedCallback importGmaCompletedCallback;
 
         // ReSharper disable once CollectionNeverUpdated.Local
         private static readonly List<string> PluginPathsToIgnoreMoveWhenPluginOutsideAssetsDirectory = new List<string>();
@@ -105,6 +106,40 @@ namespace Snorlax.AdsEditor
                 Debug.LogError(errorMessage);
                 Settings.AdmobSettings.importingNetwork = null;
             };
+
+
+            #region gma
+
+            AssetDatabase.importPackageCompleted += packageName =>
+            {
+                if (!IsImportingGMA(packageName)) return;
+
+                //var pluginParentDir = PluginParentDirectory;
+                //var isPluginOutsideAssetsDir = IsPluginOutsideAssetsDirectory;
+                //MovePluginFilesIfNeeded(pluginParentDir, isPluginOutsideAssetsDir);
+                //AddLabelsToAssetsIfNeeded(pluginParentDir, isPluginOutsideAssetsDir);
+                AssetDatabase.Refresh();
+
+                CallImportGmaCompletedCallback(Settings.AdmobSettings.gmaImportingNetwork);
+                Settings.AdmobSettings.gmaImportingNetwork = null;
+            };
+
+            AssetDatabase.importPackageCancelled += packageName =>
+            {
+                if (!IsImportingGMA(packageName)) return;
+
+                Settings.AdmobSettings.gmaImportingNetwork = null;
+            };
+
+            AssetDatabase.importPackageFailed += (packageName, errorMessage) =>
+            {
+                if (!IsImportingGMA(packageName)) return;
+
+                Debug.LogError(errorMessage);
+                Settings.AdmobSettings.gmaImportingNetwork = null;
+            };
+
+            #endregion
         }
 
         private static void CallImportPackageCompletedCallback(Network network)
@@ -112,6 +147,13 @@ namespace Snorlax.AdsEditor
             if (importPackageCompletedCallback == null) return;
 
             importPackageCompletedCallback(network);
+        }
+        
+        private static void CallImportGmaCompletedCallback(Network network)
+        {
+            if (importGmaCompletedCallback == null) return;
+
+            importGmaCompletedCallback(network);
         }
 
         /// <summary>
@@ -301,6 +343,8 @@ namespace Snorlax.AdsEditor
             return Settings.AdmobSettings.importingNetwork != null && GetPluginFileName(Settings.AdmobSettings.importingNetwork).Contains(packageName);
         }
 
+        private bool IsImportingGMA(string packageName) { return Settings.AdmobSettings.gmaImportingNetwork != null && packageName.Contains("GoogleMobileAds-v"); }
+
         private string GetPluginFileName(Network network) { return $"GoogleMobileAds{network.displayName}Mediation.unitypackage"; }
 
         public void Load()
@@ -359,6 +403,99 @@ namespace Snorlax.AdsEditor
             }
 
             webRequest = null;
+        }
+
+        public IEnumerator DownloadGMA(Network network)
+        {
+            string pathFile = Path.Combine(Application.temporaryCachePath, $"GoogleMobileAds-v{network.lastVersion.unity}.unitypackage");
+            string urlDownload = string.Format(network.path, network.lastVersion.unity);
+            var downloadHandler = new DownloadHandlerFile(pathFile);
+            webRequest = new UnityWebRequest(urlDownload) { method = UnityWebRequest.kHttpVerbGET, downloadHandler = downloadHandler };
+            var operation = webRequest.SendWebRequest();
+
+            static void CallDownloadPluginProgressCallback(string pluginName, float progress, bool isDone)
+            {
+                if (downloadPluginProgressCallback == null) return;
+
+                downloadPluginProgressCallback(pluginName, progress, isDone);
+            }
+
+            while (!operation.isDone)
+            {
+                yield return new WaitForSeconds(0.1f); // Just wait till webRequest is completed. Our coroutine is pretty rudimentary.
+                CallDownloadPluginProgressCallback(network.displayName, operation.progress, operation.isDone);
+            }
+
+#if UNITY_2020_1_OR_NEWER
+            if (webRequest.result != UnityWebRequest.Result.Success)
+#elif UNITY_2017_2_OR_NEWER
+            if (webRequest.isNetworkError || webRequest.isHttpError)
+#else
+            if (webRequest.isError)
+#endif
+            {
+                Debug.LogError(webRequest.error);
+            }
+            else
+            {
+                Settings.AdmobSettings.gmaImportingNetwork = network;
+                AssetDatabase.ImportPackage(Path.Combine(Application.temporaryCachePath, $"GoogleMobileAds-v{network.lastVersion.unity}.unitypackage"), true);
+            }
+
+            webRequest = null;
+        }
+
+        public void LoadGMA()
+        {
+            using var curl = new WebClient();
+            curl.Headers.Add(HttpRequestHeader.UserAgent, "request");
+            string json = curl.DownloadString("https://gist.githubusercontent.com/yenmoc/df91d875eb78556b8644a2c5a7dc8a03/raw");
+            Settings.AdmobSettings.gmaImportingNetwork = JsonConvert.DeserializeObject<Network>(json);
+
+            UpdateCurrentVersionGMA(Settings.AdmobSettings.gmaImportingNetwork);
+        }
+
+        public void UpdateCurrentVersionGMA(Network network)
+        {
+            var gmaFolder = Path.Combine(PluginParentDirectory, "GoogleMobileAds");
+            NetworkVersion currentVersion = new NetworkVersion();
+            if (Directory.Exists(gmaFolder))
+            {
+                var files = Directory.GetFiles(gmaFolder);
+                foreach (string s in files)
+                {
+                    if (s.Contains(network.dependenciesFilePath))
+                    {
+                        var fileName = Path.GetFileNameWithoutExtension(s);
+                        currentVersion.android = currentVersion.ios = currentVersion.unity = fileName.Split('-')[1].Split('_')[0];
+                        break;
+                    }
+                }
+            }
+
+            network.currentVersion = currentVersion;
+
+            var unityVersionComparison = AdsUtil.CompareVersions(network.currentVersion.unity, network.lastVersion.unity);
+            var androidVersionComparison = AdsUtil.CompareVersions(network.currentVersion.android, network.lastVersion.android);
+            var iosVersionComparison = AdsUtil.CompareVersions(network.currentVersion.ios, network.lastVersion.ios);
+
+            // Overall version is same if all the current and latest (from db) versions are same.
+            if (unityVersionComparison == EVersionComparisonResult.Equal && androidVersionComparison == EVersionComparisonResult.Equal &&
+                iosVersionComparison == EVersionComparisonResult.Equal)
+            {
+                network.CurrentToLatestVersionComparisonResult = EVersionComparisonResult.Equal;
+            }
+            // One of the installed versions is newer than the latest versions which means that the publisher is on a beta version.
+            else if (unityVersionComparison == EVersionComparisonResult.Greater || androidVersionComparison == EVersionComparisonResult.Greater ||
+                     iosVersionComparison == EVersionComparisonResult.Greater)
+            {
+                network.CurrentToLatestVersionComparisonResult = EVersionComparisonResult.Greater;
+            }
+            // We have a new version available if all Android, iOS and Unity has a newer version available in db.
+            else
+            {
+                network.CurrentToLatestVersionComparisonResult = EVersionComparisonResult.Lesser;
+            }
         }
 
         /// <summary>

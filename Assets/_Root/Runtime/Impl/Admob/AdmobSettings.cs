@@ -19,7 +19,16 @@ namespace Snorlax.Ads
 
 #if UNITY_EDITOR
         private List<Network> _mediationNetworks = new List<Network>();
+
+        /// <summary>
+        /// editor only
+        /// </summary>
         public Network importingNetwork;
+
+        /// <summary>
+        /// editor only
+        /// </summary>
+        public Network gmaImportingNetwork;
 #endif
 
         public bool Enable => enable;
@@ -33,6 +42,9 @@ namespace Snorlax.Ads
         public AdmobAppOpenUnit AppOpenAdUnit => appOpenAdUnit;
 
 #if UNITY_EDITOR
+        /// <summary>
+        /// editor only
+        /// </summary>
         public List<Network> MediationNetworks { get => _mediationNetworks; set => _mediationNetworks = value; }
 #endif
     }

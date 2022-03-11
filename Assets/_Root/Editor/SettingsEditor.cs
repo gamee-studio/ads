@@ -238,6 +238,16 @@ namespace Snorlax.AdsEditor
                         if (IsAdmobSdkAvaiable)
                         {
                             EditorGUILayout.HelpBox("Admob plugin was imported", MessageType.Info);
+                            if (Settings.AdmobSettings.gmaImportingNetwork != null &&
+                                !string.IsNullOrEmpty(Settings.AdmobSettings.gmaImportingNetwork.lastVersion.unity) &&
+                                Settings.AdmobSettings.gmaImportingNetwork.CurrentToLatestVersionComparisonResult == EVersionComparisonResult.Lesser)
+                            {
+                                if (GUILayout.Button("Update Admob Plugin", GUILayout.Height(EditorGUIUtility.singleLineHeight * 1.3f)))
+                                {
+                                    EditorCoroutine.StartCoroutine(SettingManager.Instance.DownloadGMA(Settings.AdmobSettings.gmaImportingNetwork));
+                                }
+                            }
+
                             if (Settings.AdSettings.EnableGDPR)
                             {
                                 EditorGUILayout.HelpBox("GDPR is enable so you should turn on Delay app measurement in GoogleMobileAds setting", MessageType.Info);
@@ -281,10 +291,17 @@ namespace Snorlax.AdsEditor
                         }
                         else
                         {
-                            EditorGUILayout.HelpBox("Admob plugin not found. Please download and import it to show ads from Admob", MessageType.Warning);
-                            if (GUILayout.Button("Download Admob Plugin", GUILayout.Height(EditorGUIUtility.singleLineHeight * 1.3f)))
+                            EditorGUILayout.HelpBox("Admob plugin not found. Please import it to show ads from Admob", MessageType.Warning);
+                            if (GUILayout.Button("Import Admob Plugin", GUILayout.Height(EditorGUIUtility.singleLineHeight * 1.3f)))
                             {
-                                Application.OpenURL("https://github.com/googleads/googleads-mobile-unity/releases");
+                                if (Settings.AdmobSettings.gmaImportingNetwork != null)
+                                {
+                                    EditorCoroutine.StartCoroutine(SettingManager.Instance.DownloadGMA(Settings.AdmobSettings.gmaImportingNetwork));
+                                }
+                                else
+                                {
+                                    Application.OpenURL("https://github.com/googleads/googleads-mobile-unity/releases");
+                                }
                             }
                         }
                     }

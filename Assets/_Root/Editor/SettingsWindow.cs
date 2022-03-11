@@ -1,3 +1,4 @@
+using System.Collections;
 using Snorlax.Ads;
 using UnityEditor;
 using UnityEngine;
@@ -61,10 +62,13 @@ namespace Snorlax.AdsEditor
             SettingManager.downloadPluginProgressCallback = OnDownloadPluginProgress;
             SettingManager.importPackageCompletedCallback = OnImportPackageCompleted;
 
+            SettingManager.importGmaCompletedCallback = OnImportGmaCompleted;
+
             MaxManager.downloadPluginProgressCallback = OnMaxDownloadPluginProgress;
             MaxManager.importPackageCompletedCallback = OnMaxImportPackageCompleted;
 
             SettingManager.Instance.Load();
+            SettingManager.Instance.LoadGMA();
             MaxManager.Instance.Load();
         }
 
@@ -84,6 +88,19 @@ namespace Snorlax.AdsEditor
             SettingManager.SetNetworkUnityVersion(network.name, network.lastVersion.unity);
             SettingManager.Instance.UpdateCurrentVersion(network);
             SettingManager.Instance.RemoveMediationExtras(network);
+        }
+
+        private static void OnImportGmaCompleted(Network network)
+        {
+            SettingManager.Instance.UpdateCurrentVersionGMA(network);
+
+            EditorCoroutine.StartCoroutine(DelayRefreshGma(1, network));
+        }
+
+        private static IEnumerator DelayRefreshGma(float delay, Network network)
+        {
+            yield return new WaitForSeconds(delay);
+            SettingManager.Instance.UpdateCurrentVersionGMA(network);
         }
 
         /// <summary>
