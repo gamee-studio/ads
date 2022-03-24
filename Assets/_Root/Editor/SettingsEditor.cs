@@ -86,8 +86,8 @@ namespace Snorlax.AdsEditor
         public static bool callFromEditorWindow = false;
 
         private const float ACTION_FIELD_WIDTH = 65f;
-        private const float NETWORK_FIELD_MIN_WIDTH = 150f;
-        private const float VERSION_FIELD_MIN_WIDTH = 150f;
+        private const float NETWORK_FIELD_MIN_WIDTH = 180f;
+        private const float VERSION_FIELD_MIN_WIDTH = 180f;
         private static readonly GUILayoutOption NetworkWidthOption = GUILayout.Width(NETWORK_FIELD_MIN_WIDTH);
         private static readonly GUILayoutOption VersionWidthOption = GUILayout.Width(VERSION_FIELD_MIN_WIDTH);
         private static readonly GUILayoutOption FieldWidth = GUILayout.Width(ACTION_FIELD_WIDTH);
