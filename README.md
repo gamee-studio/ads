@@ -6,6 +6,7 @@ Integration module for implementing in-game advertising for Unity 3d
 
 1. Admob mediation
 2. Applovin mediation (MAX)
+3. IronSource (WIP)
 
 ## How To Install
 
