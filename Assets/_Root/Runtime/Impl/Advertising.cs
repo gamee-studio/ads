@@ -154,6 +154,9 @@ namespace Snorlax.Ads
                 case "applovin":
                     Settings.AdSettings.CurrentNetwork = EAdNetwork.Applovin;
                     break;
+                case "ironsource":
+                    Settings.AdSettings.CurrentNetwork = EAdNetwork.IronSource;
+                    break;
                 default:
                     Settings.AdSettings.CurrentNetwork = EAdNetwork.Admob;
                     break;
