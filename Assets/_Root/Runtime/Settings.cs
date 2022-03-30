@@ -32,6 +32,7 @@ namespace Snorlax.Ads
         [SerializeField] private AdSettings adSettings = new AdSettings();
         [SerializeField] private AdmobSettings admobSettings = new AdmobSettings();
         [SerializeField] private MaxSettings maxSettings = new MaxSettings();
+        [SerializeField] private IronSourceSettings ironSourceSettings = new IronSourceSettings();
 
         #endregion
 
@@ -44,6 +45,7 @@ namespace Snorlax.Ads
         public static AdmobSettings AdmobSettings => Instance.admobSettings;
 
         public static MaxSettings MaxSettings => Instance.maxSettings;
+        public static IronSourceSettings IronSourceSettings => Instance.ironSourceSettings;
 
         public static EAdNetwork CurrentNetwork => Instance.adSettings.CurrentNetwork;
 

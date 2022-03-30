@@ -2,20 +2,21 @@
   "name": "com.gamee.ads",
   "displayName": "Monetization",
   "description": "Advertising for unity3d",
-  "version": "1.0.5",
-  "unity": "2019.1",
+  "version": "1.0.6",
+  "unity": "2020.1",
   "category": "gamee",
   "author": {
-    "name": "Gamee",
+    "name": "yenmoc",
     "email": "phongsoyenmoc.diep@gmail.com",
     "url": "https://github.com/yenmoc"
   },
   "license": "MIT",
   "keywords": [
     "ads",
-    "iap",
     "admob",
-    "applovin"
+    "applovin",
+    "ironsource",
+    "mediation"
   ],
   "dependencies": {
     "com.unity.nuget.newtonsoft-json": "2.0.2",

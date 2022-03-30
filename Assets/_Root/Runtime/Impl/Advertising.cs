@@ -18,6 +18,7 @@ namespace Snorlax.Ads
 
         private static AdmobAdClient admobAdClient;
         private static ApplovinAdClient applovinAdClient;
+        private static IronSourceAdClient ironSourceAdClient;
         private static bool isInitialized;
         private static EAutoLoadingAd autoLoadingAdMode = EAutoLoadingAd.None;
         private static bool flagAutoLoadingModeChange;
@@ -77,6 +78,16 @@ namespace Snorlax.Ads
                 if (!InitializeCheck()) return null;
                 if (applovinAdClient == null) applovinAdClient = SetupClient(EAdNetwork.Applovin) as ApplovinAdClient;
                 return applovinAdClient;
+            }
+        }
+
+        public static IronSourceAdClient IronSourceAdClient
+        {
+            get
+            {
+                if (!InitializeCheck()) return null;
+                if (ironSourceAdClient == null) ironSourceAdClient = SetupClient(EAdNetwork.IronSource) as IronSourceAdClient;
+                return ironSourceAdClient;
             }
         }
 
@@ -211,23 +222,23 @@ namespace Snorlax.Ads
             lastTimeLoadAppOpenTimestamp = Time.realtimeSinceStartup;
         }
 
-        private static void OnInterstitialAdCompleted(IAdClient client) { InterstitialAdCompletedEvent?.Invoke((EInterstitialAdNetwork)client.Network); }
+        private static void OnInterstitialAdCompleted(IAdClient client) { InterstitialAdCompletedEvent?.Invoke((EInterstitialAdNetwork) client.Network); }
 
-        private static void OnRewardedAdCompleted(IAdClient client) { RewardedAdCompletedEvent?.Invoke((ERewardedAdNetwork)client.Network); }
+        private static void OnRewardedAdCompleted(IAdClient client) { RewardedAdCompletedEvent?.Invoke((ERewardedAdNetwork) client.Network); }
 
-        private static void OnRewardedAdSkipped(IAdClient client) { RewardedAdSkippedEvent?.Invoke((ERewardedAdNetwork)client.Network); }
+        private static void OnRewardedAdSkipped(IAdClient client) { RewardedAdSkippedEvent?.Invoke((ERewardedAdNetwork) client.Network); }
 
         private static void OnRewardedInterstitialAdCompleted(IAdClient client)
         {
-            RewardedInterstitialAdCompletedEvent?.Invoke((ERewardedInterstitialAdNetwork)client.Network);
+            RewardedInterstitialAdCompletedEvent?.Invoke((ERewardedInterstitialAdNetwork) client.Network);
         }
 
         private static void OnRewardedInterstitialAdSkipped(IAdClient client)
         {
-            RewardedInterstitialAdSkippedEvent?.Invoke((ERewardedInterstitialAdNetwork)client.Network);
+            RewardedInterstitialAdSkippedEvent?.Invoke((ERewardedInterstitialAdNetwork) client.Network);
         }
 
-        private static void OnAppOpenAdCompleted(IAdClient client) { AppOpenAdCompletedEvent?.Invoke((EAppOpenAdNetwork)client.Network); }
+        private static void OnAppOpenAdCompleted(IAdClient client) { AppOpenAdCompletedEvent?.Invoke((EAppOpenAdNetwork) client.Network); }
 
         private static AdClient GetClient(EAdNetwork network)
         {
@@ -236,6 +247,7 @@ namespace Snorlax.Ads
                 case EAdNetwork.None: return NoneAdClient.Instance;
                 case EAdNetwork.Admob: return AdmobAdClient.Instance;
                 case EAdNetwork.Applovin: return ApplovinAdClient.Instance;
+                case EAdNetwork.IronSource: return IronSourceAdClient.Instance;
                 default: return null;
             }
         }
@@ -248,6 +260,7 @@ namespace Snorlax.Ads
                 case EAdNetwork.None: return NoneAdClient.Instance;
                 case EAdNetwork.Admob: return AdmobAdClient;
                 case EAdNetwork.Applovin: return ApplovinAdClient;
+                case EAdNetwork.IronSource: return IronSourceAdClient;
                 default: return null;
             }
         }

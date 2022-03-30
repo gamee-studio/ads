@@ -14,6 +14,7 @@ namespace Snorlax.Ads
         private ApplovinRewardedInterstitialLoader _rewardedInterstitial;
         private static ApplovinAdClient client;
         private bool _isBannerDestroyed;
+        private bool _isRewardedCompleted;
         public static ApplovinAdClient Instance => client ??= new ApplovinAdClient();
 
 #if PANCAKE_MAX_ENABLE
@@ -87,16 +88,41 @@ namespace Snorlax.Ads
         internal void InvokeInterstitialAdFaildToDisplay() { OnInterstitialAdFaildToDisplay?.Invoke(); }
         internal void InvokeInterstitialAdClicked() { OnInterstitialAdClicked?.Invoke(); }
         internal void InvokeInterstitialAdDisplay() { OnInterstitialAdDisplay?.Invoke(); }
-        internal void InvokeInterstitialAdHidden() { OnInterstitialAdHidden?.Invoke(); }
+
+        internal void InvokeInterstitialAdHidden()
+        {
+            OnInterstitialAdHidden?.Invoke();
+            InvokeInterstitialAdCompleted();
+        }
+
         internal void InvokeInterstitialAdRevenuePaid(MaxSdkBase.AdInfo info) { OnInterstitialAdRevenuePaid?.Invoke(info); }
         internal void InvokeRewardedAdLoaded() { OnRewardedAdLoaded?.Invoke(); }
         internal void InvokeRewardedAdFaildToLoad() { OnRewardedAdFaildToLoad?.Invoke(); }
         internal void InvokeRewardedAdFaildToDisplay() { OnRewardedAdFaildToDisplay?.Invoke(); }
         internal void InvokeRewardedAdClicked() { OnRewardedAdClicked?.Invoke(); }
         internal void InvokeRewardedAdDisplay() { OnRewardedAdDisplay?.Invoke(); }
-        internal void InvokeRewardedAdHidden() { OnRewardedAdHidden?.Invoke(); }
+
+        internal void InvokeRewardedAdHidden()
+        {
+            OnRewardedAdHidden?.Invoke();
+
+            if (_isRewardedCompleted)
+            {
+                InvokeRewardedAdCompleted();
+                return;
+            }
+
+            InvokeRewardedAdSkipped();
+        }
+
         internal void InvokeRewardedAdRevenuePaid(MaxSdkBase.AdInfo info) { OnRewardedAdRevenuePaid?.Invoke(info); }
-        internal void InvokeRewardedAdReceivedReward(MaxSdkBase.Reward reward) { OnRewardedAdReceivedReward?.Invoke(reward); }
+
+        internal void InvokeRewardedAdReceivedReward(MaxSdkBase.Reward reward)
+        {
+            OnRewardedAdReceivedReward?.Invoke(reward);
+            _isRewardedCompleted = true;
+        }
+
         internal void InvokeRewardedInterstitialAdLoaded() { OnRewardedInterstitialAdLoaded?.Invoke(); }
         internal void InvokeRewardedInterstitialAdFaildToLoad() { OnRewardedInterstitialAdFaildToLoad?.Invoke(); }
         internal void InvokeRewardedInterstitialAdFaildToDisplay() { OnRewardedInterstitialAdFaildToDisplay?.Invoke(); }
@@ -219,6 +245,7 @@ namespace Snorlax.Ads
         {
 #if PANCAKE_MAX_ENABLE
             if (string.IsNullOrEmpty(Settings.MaxSettings.RewardedAdUnit.Id)) return;
+            _isRewardedCompleted = false;
             MaxSdk.ShowRewardedAd(Settings.MaxSettings.RewardedAdUnit.Id);
 #endif
         }

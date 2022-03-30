@@ -4,28 +4,32 @@ namespace Snorlax.Ads
     {
         None = 0,
         Admob = 1,
-        Applovin = 2
+        Applovin = 2,
+        IronSource = 3
     }
 
     public enum EBannerAdNetwork
     {
         None = EAdNetwork.None,
         Admob = EAdNetwork.Admob,
-        Applovin = EAdNetwork.Applovin
+        Applovin = EAdNetwork.Applovin,
+        IronSource = EAdNetwork.IronSource
     }
 
     public enum EInterstitialAdNetwork
     {
         None = EAdNetwork.None,
         Admob = EAdNetwork.Admob,
-        Applovin = EAdNetwork.Applovin
+        Applovin = EAdNetwork.Applovin,
+        IronSource = EAdNetwork.IronSource
     }
 
     public enum ERewardedAdNetwork
     {
         None = EAdNetwork.None,
         Admob = EAdNetwork.Admob,
-        Applovin = EAdNetwork.Applovin
+        Applovin = EAdNetwork.Applovin,
+        IronSource = EAdNetwork.IronSource
     }
 
     public enum ERewardedInterstitialAdNetwork
