@@ -10,8 +10,6 @@ namespace Snorlax.Ads
         [SerializeField] private AppUnit appKey;
         [SerializeField] private bool useAdaptiveBanner;
         [SerializeField] private IronSourceBannerUnit bannerAdUnit;
-        [SerializeField] private IronSourceInterstitialUnit interstitialAdUnit;
-        [SerializeField] private IronSourceRewardedUnit rewardedAdUnit;
 
 
 #if UNITY_EDITOR
@@ -31,10 +29,6 @@ namespace Snorlax.Ads
         public bool Enable => enable;
 
         public IronSourceBannerUnit BannerAdUnit => bannerAdUnit;
-
-        public IronSourceInterstitialUnit InterstitialAdUnit => interstitialAdUnit;
-
-        public IronSourceRewardedUnit RewardedAdUnit => rewardedAdUnit;
 
         public AppUnit AppKey => appKey;
 

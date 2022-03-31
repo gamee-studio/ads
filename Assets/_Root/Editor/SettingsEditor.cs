@@ -84,7 +84,10 @@ namespace Snorlax.AdsEditor
             public static SerializedProperty main;
             public static Property enable = new Property(null, new GUIContent("Enable", "Enable using ironSource ad"));
             public static Property appKey = new Property(null, new GUIContent("Sdk Key", "Sdk of ironSource"));
-            public static Property useAdaptiveBanner = new Property(null, new GUIContent("Use Adaptive Banner", "Use adaptive banner ad when use smart banner affect for admob ad of ironsouce mediation"));
+            public static Property bannerAdUnit = new Property(null, new GUIContent("Banner Ad"));
+
+            public static Property useAdaptiveBanner = new Property(null,
+                new GUIContent("Use Adaptive Banner", "Use adaptive banner ad when use smart banner affect for admob ad of ironsouce mediation"));
         }
 
         #region properties
@@ -187,6 +190,7 @@ namespace Snorlax.AdsEditor
             IronSourceProperties.main = serializedObject.FindProperty("ironSourceSettings");
             IronSourceProperties.enable.property = IronSourceProperties.main.FindPropertyRelative("enable");
             IronSourceProperties.appKey.property = IronSourceProperties.main.FindPropertyRelative("appKey");
+            IronSourceProperties.bannerAdUnit.property = IronSourceProperties.main.FindPropertyRelative("bannerAdUnit");
             IronSourceProperties.useAdaptiveBanner.property = IronSourceProperties.main.FindPropertyRelative("useAdaptiveBanner");
         }
 
@@ -263,8 +267,7 @@ namespace Snorlax.AdsEditor
                         if (IsAdmobSdkAvaiable)
                         {
                             EditorGUILayout.HelpBox("Admob plugin was imported", MessageType.Info);
-                            if (Settings.AdmobSettings.importingSdk != null &&
-                                !string.IsNullOrEmpty(Settings.AdmobSettings.importingSdk.lastVersion.unity) &&
+                            if (Settings.AdmobSettings.importingSdk != null && !string.IsNullOrEmpty(Settings.AdmobSettings.importingSdk.lastVersion.unity) &&
                                 Settings.AdmobSettings.importingSdk.CurrentToLatestVersionComparisonResult == EVersionComparisonResult.Lesser)
                             {
                                 if (GUILayout.Button("Update Admob Plugin", GUILayout.Height(EditorGUIUtility.singleLineHeight * 1.3f)))
@@ -387,8 +390,8 @@ namespace Snorlax.AdsEditor
 #endif
                     }
                 });
-            
-            
+
+
             EditorGUILayout.Space();
             DrawUppercaseSection("IRONSOURCE_MODULE",
                 "IRONSOURCE",
@@ -403,6 +406,7 @@ namespace Snorlax.AdsEditor
                             EditorGUILayout.HelpBox("IronSource plugin was imported", MessageType.Info);
                             EditorGUILayout.Space();
                             EditorGUILayout.PropertyField(IronSourceProperties.appKey.property, IronSourceProperties.appKey.content);
+                            EditorGUILayout.PropertyField(IronSourceProperties.bannerAdUnit.property, IronSourceProperties.bannerAdUnit.content);
                             EditorGUILayout.PropertyField(IronSourceProperties.useAdaptiveBanner.property, IronSourceProperties.useAdaptiveBanner.content);
                             EditorGUILayout.Space();
 

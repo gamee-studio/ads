@@ -3,17 +3,12 @@ using System;
 namespace Snorlax.Ads
 {
     [Serializable]
-    public class IronSourceBannerUnit : BannerAdUnit
+    public class IronSourceBannerUnit
     {
-        public EBannerSize size = EBannerSize.Banner;
-
-        public IronSourceBannerUnit(string iOSId, string androidId)
-            : base(iOSId, androidId)
-        {
-        }
+        public EBannerSize size;
+        public EBannerPosition position;
 
         public IronSourceBannerUnit()
-            : base("", "")
         {
             position = EBannerPosition.Bottom;
             size = EBannerSize.Banner;
