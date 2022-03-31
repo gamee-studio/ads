@@ -96,6 +96,9 @@ namespace Snorlax.Ads
             // ReSharper disable once AccessToStaticMemberViaDerivedType
             GameObject.DontDestroyOnLoad(go);
             go.AddComponent<Advertising>();
+#if PANCAKE_IRONSOURCE_ENABLE
+            go.AddComponent<IronSourceStateHandler>();
+#endif
         }
 
         #endregion
