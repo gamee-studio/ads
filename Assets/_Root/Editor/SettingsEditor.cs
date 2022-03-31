@@ -79,6 +79,14 @@ namespace Snorlax.AdsEditor
             public static Property enableMaxAdReview = new Property(null, new GUIContent("Enable MAX Ad Review"));
         }
 
+        private static class IronSourceProperties
+        {
+            public static SerializedProperty main;
+            public static Property enable = new Property(null, new GUIContent("Enable", "Enable using ironSource ad"));
+            public static Property appKey = new Property(null, new GUIContent("Sdk Key", "Sdk of ironSource"));
+            public static Property useAdaptiveBanner = new Property(null, new GUIContent("Use Adaptive Banner", "Use adaptive banner ad when use smart banner affect for admob ad of ironsouce mediation"));
+        }
+
         #region properties
 
         //Runtime auto initialization
@@ -113,6 +121,18 @@ namespace Snorlax.AdsEditor
             get
             {
 #if PANCAKE_MAX_ENABLE
+                return true;
+#else
+                return false;
+#endif
+            }
+        }
+
+        private bool IsIronSourceSdkAvaiable
+        {
+            get
+            {
+#if PANCAKE_IRONSOURCE_ENABLE
                 return true;
 #else
                 return false;
@@ -163,6 +183,11 @@ namespace Snorlax.AdsEditor
             ApplovinProperties.enableAgeRestrictedUser.property = ApplovinProperties.main.FindPropertyRelative("enableAgeRestrictedUser");
             ApplovinProperties.enableRequestAdAfterHidden.property = ApplovinProperties.main.FindPropertyRelative("enableRequestAdAfterHidden");
             ApplovinProperties.enableMaxAdReview.property = ApplovinProperties.main.FindPropertyRelative("enableMaxAdReview");
+
+            IronSourceProperties.main = serializedObject.FindProperty("ironSourceSettings");
+            IronSourceProperties.enable.property = IronSourceProperties.main.FindPropertyRelative("enable");
+            IronSourceProperties.appKey.property = IronSourceProperties.main.FindPropertyRelative("appKey");
+            IronSourceProperties.useAdaptiveBanner.property = IronSourceProperties.main.FindPropertyRelative("useAdaptiveBanner");
         }
 
         public override void OnInspectorGUI()
@@ -238,13 +263,13 @@ namespace Snorlax.AdsEditor
                         if (IsAdmobSdkAvaiable)
                         {
                             EditorGUILayout.HelpBox("Admob plugin was imported", MessageType.Info);
-                            if (Settings.AdmobSettings.gmaImportingNetwork != null &&
-                                !string.IsNullOrEmpty(Settings.AdmobSettings.gmaImportingNetwork.lastVersion.unity) &&
-                                Settings.AdmobSettings.gmaImportingNetwork.CurrentToLatestVersionComparisonResult == EVersionComparisonResult.Lesser)
+                            if (Settings.AdmobSettings.importingSdk != null &&
+                                !string.IsNullOrEmpty(Settings.AdmobSettings.importingSdk.lastVersion.unity) &&
+                                Settings.AdmobSettings.importingSdk.CurrentToLatestVersionComparisonResult == EVersionComparisonResult.Lesser)
                             {
                                 if (GUILayout.Button("Update Admob Plugin", GUILayout.Height(EditorGUIUtility.singleLineHeight * 1.3f)))
                                 {
-                                    EditorCoroutine.StartCoroutine(SettingManager.Instance.DownloadGMA(Settings.AdmobSettings.gmaImportingNetwork));
+                                    EditorCoroutine.StartCoroutine(SettingManager.Instance.DownloadGMA(Settings.AdmobSettings.importingSdk));
                                 }
                             }
 
@@ -294,9 +319,9 @@ namespace Snorlax.AdsEditor
                             EditorGUILayout.HelpBox("Admob plugin not found. Please import it to show ads from Admob", MessageType.Warning);
                             if (GUILayout.Button("Import Admob Plugin", GUILayout.Height(EditorGUIUtility.singleLineHeight * 1.3f)))
                             {
-                                if (Settings.AdmobSettings.gmaImportingNetwork != null)
+                                if (Settings.AdmobSettings.importingSdk != null)
                                 {
-                                    EditorCoroutine.StartCoroutine(SettingManager.Instance.DownloadGMA(Settings.AdmobSettings.gmaImportingNetwork));
+                                    EditorCoroutine.StartCoroutine(SettingManager.Instance.DownloadGMA(Settings.AdmobSettings.importingSdk));
                                 }
                                 else
                                 {
@@ -360,6 +385,54 @@ namespace Snorlax.AdsEditor
 #if PANCAKE_MAX_ENABLE
                         if (GUI.changed) AppLovinSettings.Instance.SaveAsync();
 #endif
+                    }
+                });
+            
+            
+            EditorGUILayout.Space();
+            DrawUppercaseSection("IRONSOURCE_MODULE",
+                "IRONSOURCE",
+                () =>
+                {
+                    EditorGUILayout.PropertyField(IronSourceProperties.enable.property, IronSourceProperties.enable.content);
+                    if (Settings.IronSourceSettings.Enable)
+                    {
+                        SettingManager.ValidateIronSourceSdkImported();
+                        if (IsIronSourceSdkAvaiable)
+                        {
+                            EditorGUILayout.HelpBox("IronSource plugin was imported", MessageType.Info);
+                            EditorGUILayout.Space();
+                            EditorGUILayout.PropertyField(IronSourceProperties.appKey.property, IronSourceProperties.appKey.content);
+                            EditorGUILayout.PropertyField(IronSourceProperties.useAdaptiveBanner.property, IronSourceProperties.useAdaptiveBanner.content);
+                            EditorGUILayout.Space();
+
+                            // DrawUppercaseSection("IRONSOURCE_MODULE_MEDIATION",
+                            //     "MEDIATION",
+                            //     () =>
+                            //     {
+                            //         DrawHeaderMaxMediation();
+                            //         foreach (var network in Settings.MaxSettings.MediationNetworks)
+                            //         {
+                            //             DrawApplovinNetworkDetailRow(network);
+                            //         }
+                            //     });
+                            // EditorGUILayout.Space();
+                        }
+                        else
+                        {
+                            EditorGUILayout.HelpBox("IronSource plugin not found. Please import it to show ads from IronSource", MessageType.Warning);
+                            if (GUILayout.Button("Import IronSource Plugin", GUILayout.Height(EditorGUIUtility.singleLineHeight * 1.3f)))
+                            {
+                                if (Settings.IronSourceSettings.importingSdk != null)
+                                {
+                                    EditorCoroutine.StartCoroutine(IronSourceManager.Instance.DownloadPlugin(Settings.IronSourceSettings.importingSdk));
+                                }
+                                else
+                                {
+                                    Application.OpenURL("https://developers.is.com/ironsource-mobile/unity/unity-plugin/");
+                                }
+                            }
+                        }
                     }
                 });
 

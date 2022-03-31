@@ -61,7 +61,6 @@ namespace Snorlax.AdsEditor
         public static ImportPackageCompletedCallback importPackageCompletedCallback;
 
         private UnityWebRequest webRequest;
-        private MaxNetwork importingNetwork;
 
         /// <summary>
         /// An Instance of the Integration manager.
@@ -159,22 +158,22 @@ namespace Snorlax.AdsEditor
                 AddLabelsToAssetsIfNeeded(pluginParentDir, isPluginOutsideAssetsDir);
                 AssetDatabase.Refresh();
 
-                CallImportPackageCompletedCallback(importingNetwork);
-                importingNetwork = null;
+                CallImportPackageCompletedCallback(Settings.MaxSettings.importingMediationNetwork);
+                Settings.MaxSettings.importingMediationNetwork = null;
             };
 
             AssetDatabase.importPackageCancelled += packageName =>
             {
                 if (!IsImportingNetwork(packageName)) return;
 
-                importingNetwork = null;
+                Settings.MaxSettings.importingMediationNetwork = null;
             };
 
             AssetDatabase.importPackageFailed += (packageName, errorMessage) =>
             {
                 if (!IsImportingNetwork(packageName)) return;
 
-                importingNetwork = null;
+                Settings.MaxSettings.importingMediationNetwork = null;
             };
         }
 
@@ -347,7 +346,7 @@ namespace Snorlax.AdsEditor
             }
             else
             {
-                importingNetwork = network;
+                Settings.MaxSettings.importingMediationNetwork = network;
                 AssetDatabase.ImportPackage(path, true);
             }
 
@@ -477,7 +476,7 @@ namespace Snorlax.AdsEditor
         private bool IsImportingNetwork(string packageName)
         {
             // Note: The pluginName doesn't have the '.unitypacakge' extension included in its name but the pluginFileName does. So using Contains instead of Equals.
-            return importingNetwork != null && GetPluginFileName(importingNetwork).Contains(packageName);
+            return Settings.MaxSettings.importingMediationNetwork != null && GetPluginFileName(Settings.MaxSettings.importingMediationNetwork).Contains(packageName);
         }
 
 #if PANCAKE_MAX_ENABLE

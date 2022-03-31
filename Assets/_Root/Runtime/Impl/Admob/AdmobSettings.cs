@@ -23,12 +23,12 @@ namespace Snorlax.Ads
         /// <summary>
         /// editor only
         /// </summary>
-        public Network importingNetwork;
+        public Network importingMediationNetwork;
 
         /// <summary>
         /// editor only
         /// </summary>
-        public Network gmaImportingNetwork;
+        public Network importingSdk;
 #endif
 
         public bool Enable => enable;

@@ -35,7 +35,7 @@ namespace Snorlax.AdsEditor
         // ReSharper disable once InconsistentNaming
         private static readonly SettingManager instance = new SettingManager();
         public static SettingManager Instance => instance;
-        public static UnityWebRequest webRequest;
+        public UnityWebRequest webRequest;
         public static readonly string DefaultPluginExportPath = Path.Combine("Assets", "GoogleMobileAds");
         public const string DEFAULT_ADMOB_SDK_ASSET_EXPORT_PATH = @"GoogleMobileAds\GoogleMobileAds.dll";
         private static readonly string AdmobSdkAssetExportPath = Path.Combine("GoogleMobileAds", "GoogleMobileAds.dll");
@@ -88,15 +88,15 @@ namespace Snorlax.AdsEditor
                 AddLabelsToAssetsIfNeeded(pluginParentDir, isPluginOutsideAssetsDir);
                 AssetDatabase.Refresh();
 
-                CallImportPackageCompletedCallback(Settings.AdmobSettings.importingNetwork);
-                Settings.AdmobSettings.importingNetwork = null;
+                CallImportPackageCompletedCallback(Settings.AdmobSettings.importingMediationNetwork);
+                Settings.AdmobSettings.importingMediationNetwork = null;
             };
 
             AssetDatabase.importPackageCancelled += packageName =>
             {
                 if (!IsImportingNetwork(packageName)) return;
 
-                Settings.AdmobSettings.importingNetwork = null;
+                Settings.AdmobSettings.importingMediationNetwork = null;
             };
 
             AssetDatabase.importPackageFailed += (packageName, errorMessage) =>
@@ -104,7 +104,7 @@ namespace Snorlax.AdsEditor
                 if (!IsImportingNetwork(packageName)) return;
 
                 Debug.LogError(errorMessage);
-                Settings.AdmobSettings.importingNetwork = null;
+                Settings.AdmobSettings.importingMediationNetwork = null;
             };
 
 
@@ -120,15 +120,15 @@ namespace Snorlax.AdsEditor
                 //AddLabelsToAssetsIfNeeded(pluginParentDir, isPluginOutsideAssetsDir);
                 AssetDatabase.Refresh();
 
-                CallImportGmaCompletedCallback(Settings.AdmobSettings.gmaImportingNetwork);
-                Settings.AdmobSettings.gmaImportingNetwork = null;
+                CallImportGmaCompletedCallback(Settings.AdmobSettings.importingSdk);
+                Settings.AdmobSettings.importingSdk = null;
             };
 
             AssetDatabase.importPackageCancelled += packageName =>
             {
                 if (!IsImportingGMA(packageName)) return;
 
-                Settings.AdmobSettings.gmaImportingNetwork = null;
+                Settings.AdmobSettings.importingSdk = null;
             };
 
             AssetDatabase.importPackageFailed += (packageName, errorMessage) =>
@@ -136,7 +136,7 @@ namespace Snorlax.AdsEditor
                 if (!IsImportingGMA(packageName)) return;
 
                 Debug.LogError(errorMessage);
-                Settings.AdmobSettings.gmaImportingNetwork = null;
+                Settings.AdmobSettings.importingSdk = null;
             };
 
             #endregion
@@ -340,10 +340,10 @@ namespace Snorlax.AdsEditor
         private bool IsImportingNetwork(string packageName)
         {
             // Note: The pluginName doesn't have the '.unitypacakge' extension included in its name but the pluginFileName does. So using Contains instead of Equals.
-            return Settings.AdmobSettings.importingNetwork != null && GetPluginFileName(Settings.AdmobSettings.importingNetwork).Contains(packageName);
+            return Settings.AdmobSettings.importingMediationNetwork != null && GetPluginFileName(Settings.AdmobSettings.importingMediationNetwork).Contains(packageName);
         }
 
-        private bool IsImportingGMA(string packageName) { return Settings.AdmobSettings.gmaImportingNetwork != null && packageName.Contains("GoogleMobileAds-v"); }
+        private bool IsImportingGMA(string packageName) { return Settings.AdmobSettings.importingSdk != null && packageName.Contains("GoogleMobileAds-v"); }
 
         private string GetPluginFileName(Network network) { return $"GoogleMobileAds{network.displayName}Mediation.unitypackage"; }
 
@@ -393,7 +393,7 @@ namespace Snorlax.AdsEditor
             }
             else
             {
-                Settings.AdmobSettings.importingNetwork = network;
+                Settings.AdmobSettings.importingMediationNetwork = network;
 
                 string folderUnZip = Path.Combine(Application.temporaryCachePath, "UnZip");
                 UnZip(folderUnZip, File.ReadAllBytes(pathFile));
@@ -438,7 +438,7 @@ namespace Snorlax.AdsEditor
             }
             else
             {
-                Settings.AdmobSettings.gmaImportingNetwork = network;
+                Settings.AdmobSettings.importingSdk = network;
                 AssetDatabase.ImportPackage(Path.Combine(Application.temporaryCachePath, $"GoogleMobileAds-v{network.lastVersion.unity}.unitypackage"), true);
             }
 
@@ -450,9 +450,9 @@ namespace Snorlax.AdsEditor
             using var curl = new WebClient();
             curl.Headers.Add(HttpRequestHeader.UserAgent, "request");
             string json = curl.DownloadString("https://gist.githubusercontent.com/yenmoc/df91d875eb78556b8644a2c5a7dc8a03/raw");
-            Settings.AdmobSettings.gmaImportingNetwork = JsonConvert.DeserializeObject<Network>(json);
+            Settings.AdmobSettings.importingSdk = JsonConvert.DeserializeObject<Network>(json);
 
-            UpdateCurrentVersionGMA(Settings.AdmobSettings.gmaImportingNetwork);
+            UpdateCurrentVersionGMA(Settings.AdmobSettings.importingSdk);
         }
 
         public void UpdateCurrentVersionGMA(Network network)
@@ -712,7 +712,7 @@ namespace Snorlax.AdsEditor
 
         public static bool IsMaxSdkImported()
         {
-            if (AssetDatabase.FindAssets(AdsUtil.DEFAULT_FILTER_MAX_MAXSDK).Length >= 1 || AssetDatabase.FindAssets(AdsUtil.DEFAULT_FILTER_MAX_MAXSDK2).Length >= 1)
+            if (AssetDatabase.FindAssets(AdsUtil.DEFAULT_FILTER_MAX_MAXSDK).Length >= 1 || AssetDatabase.FindAssets(AdsUtil.DEFAULT_FILTER_MAX_MAXSDK.Replace("/", "\\")).Length >= 1)
             {
                 return true;
             }
@@ -729,6 +729,23 @@ namespace Snorlax.AdsEditor
             else
             {
                 ScriptingDefinition.RemoveDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_APPLOVIN);
+            }
+        }
+
+        public static bool IsIronSourceSdkImported()
+        {
+            return AssetDatabase.FindAssets(AdsUtil.DEFAULT_FILTER_IRONSOURCE_SDK).Length >= 1 || AssetDatabase.FindAssets(AdsUtil.DEFAULT_FILTER_IRONSOURCE_SDK.Replace("/", "\\")).Length >= 1;
+        }
+
+        public static void ValidateIronSourceSdkImported()
+        {
+            if (IsIronSourceSdkImported())
+            {
+                ScriptingDefinition.AddDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_IRONSOURCE);
+            }
+            else
+            {
+                ScriptingDefinition.RemoveDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_IRONSOURCE);
             }
         }
 

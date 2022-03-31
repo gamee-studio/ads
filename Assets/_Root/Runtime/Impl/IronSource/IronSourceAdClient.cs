@@ -145,7 +145,7 @@ namespace Snorlax.Ads
         protected override void InternalInit()
         {
 #if PANCAKE_IRONSOURCE_ENABLE
-            IronSource.Agent.init(Settings.IronSourceSettings.SDKKey.Id,
+            IronSource.Agent.init(Settings.IronSourceSettings.AppKey.Id,
                 IronSourceAdUnits.REWARDED_VIDEO,
                 IronSourceAdUnits.INTERSTITIAL,
                 IronSourceAdUnits.OFFERWALL,

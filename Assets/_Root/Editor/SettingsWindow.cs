@@ -66,15 +66,21 @@ namespace Snorlax.AdsEditor
 
             MaxManager.downloadPluginProgressCallback = OnMaxDownloadPluginProgress;
             MaxManager.importPackageCompletedCallback = OnMaxImportPackageCompleted;
+            
+            IronSourceManager.downloadPluginProgressCallback = OnDownloadIronSourcePluginProgress;
+            IronSourceManager.importPackageCompletedCallback = OnImportIronSourceCompleted;
 
             SettingManager.Instance.Load();
             SettingManager.Instance.LoadGMA();
+            IronSourceManager.Instance.Load();
             MaxManager.Instance.Load();
         }
 
         private void OnDisable()
         {
-            SettingManager.webRequest?.Abort();
+            SettingManager.Instance.webRequest?.Abort();
+            IronSourceManager.Instance.webRequest?.Abort();
+            IronSourceManager.Instance.webRequest?.Abort();
             EditorUtility.ClearProgressBar();
             AssetDatabase.SaveAssets();
         }
@@ -90,6 +96,10 @@ namespace Snorlax.AdsEditor
             SettingManager.Instance.RemoveMediationExtras(network);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="network"></param>
         private static void OnImportGmaCompleted(Network network)
         {
             SettingManager.Instance.UpdateCurrentVersionGMA(network);
@@ -97,6 +107,12 @@ namespace Snorlax.AdsEditor
             EditorCoroutine.StartCoroutine(DelayRefreshGma(1, network));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="delay"></param>
+        /// <param name="network"></param>
+        /// <returns></returns>
         private static IEnumerator DelayRefreshGma(float delay, Network network)
         {
             yield return new WaitForSeconds(delay);
@@ -106,7 +122,7 @@ namespace Snorlax.AdsEditor
         /// <summary>
         /// Callback method that will be called with progress updates when the plugin is being downloaded.
         /// </summary>
-        public static void OnDownloadPluginProgress(string pluginName, float progress, bool done)
+        private static void OnDownloadPluginProgress(string pluginName, float progress, bool done)
         {
             // Download is complete. Clear progress bar.
             if (done)
@@ -118,7 +134,7 @@ namespace Snorlax.AdsEditor
             {
                 if (EditorUtility.DisplayCancelableProgressBar("Ads", string.Format("Downloading {0} plugin...", pluginName), progress))
                 {
-                    SettingManager.webRequest?.Abort();
+                    SettingManager.Instance.webRequest?.Abort();
                     EditorUtility.ClearProgressBar();
                 }
             }
@@ -137,7 +153,7 @@ namespace Snorlax.AdsEditor
         /// <summary>
         /// Callback method that will be called with progress updates when the plugin is being downloaded.
         /// </summary>
-        public static void OnMaxDownloadPluginProgress(string pluginName, float progress, bool done)
+        private static void OnMaxDownloadPluginProgress(string pluginName, float progress, bool done)
         {
             // Download is complete. Clear progress bar.
             if (done)
@@ -153,6 +169,50 @@ namespace Snorlax.AdsEditor
                     EditorUtility.ClearProgressBar();
                 }
             }
+        }
+
+        /// <summary>
+        /// Callback method that will be called with progress updates when the plugin is being downloaded.
+        /// </summary>
+        private static void OnDownloadIronSourcePluginProgress(string pluginName, float progress, bool done)
+        {
+            // Download is complete. Clear progress bar.
+            if (done)
+            {
+                EditorUtility.ClearProgressBar();
+            }
+            // Download is in progress, update progress bar.
+            else
+            {
+                if (EditorUtility.DisplayCancelableProgressBar("Ads", string.Format("Downloading {0} plugin...", pluginName), progress))
+                {
+                    IronSourceManager.Instance.webRequest?.Abort();
+                    EditorUtility.ClearProgressBar();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="network"></param>
+        private static void OnImportIronSourceCompleted(Network network)
+        {
+            IronSourceManager.Instance.UpdateCurrentVersion(network);
+
+            EditorCoroutine.StartCoroutine(DelayRefreshIronSource(1, network));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="delay"></param>
+        /// <param name="network"></param>
+        /// <returns></returns>
+        private static IEnumerator DelayRefreshIronSource(float delay, Network network)
+        {
+            yield return new WaitForSeconds(delay);
+            IronSourceManager.Instance.UpdateCurrentVersion(network);
         }
     }
 }

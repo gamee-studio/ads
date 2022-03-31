@@ -20,7 +20,7 @@ namespace Snorlax.Ads
 
 #if UNITY_EDITOR
         private List<MaxNetwork> _mediationNetworks = new List<MaxNetwork>();
-        public MaxNetwork importingNetwork;
+        public MaxNetwork importingMediationNetwork;
 #endif
 
         public bool Enable => enable;
