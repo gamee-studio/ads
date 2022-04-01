@@ -6,7 +6,7 @@ Integration module for implementing in-game advertising for Unity 3d
 
 1. Admob mediation
 2. Applovin mediation (MAX)
-3. IronSource (WIP)
+3. IronSource
 
 ## How To Install
 
@@ -23,7 +23,7 @@ Add the following lines
 - for excactly version
 
 ```csharp
-"com.gamee.ads": "https://github.com/gamee-studio/ads.git?path=Assets/_Root#1.0.5",
+"com.gamee.ads": "https://github.com/gamee-studio/ads.git?path=Assets/_Root#1.0.6",
 "com.snorlax.locale": "https://github.com/snorluxe/locale.git?path=Assets/_Root#1.0.2",
 "com.google.external-dependency-manager": "https://github.com/snorluxe/external-dependency-manager.git?path=Assets/_Root#1.2.169",
 ```
