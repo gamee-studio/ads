@@ -13,7 +13,7 @@ namespace Snorlax.Ads
 
 
 #if UNITY_EDITOR
-        private System.Collections.Generic.List<Network> _mediationNetworks = new System.Collections.Generic.List<Network>();
+        private System.Collections.Generic.List<AdapterMediationIronSource> _mediationNetworks = new System.Collections.Generic.List<AdapterMediationIronSource>();
 
         /// <summary>
         /// editor only
@@ -23,7 +23,7 @@ namespace Snorlax.Ads
         /// <summary>
         /// editor only
         /// </summary>
-        public Network importingMediationNetwork;
+        public AdapterMediationIronSource importingMediationNetwork;
 #endif
 
         public bool Enable => enable;
@@ -38,7 +38,7 @@ namespace Snorlax.Ads
         /// <summary>
         /// editor only
         /// </summary>
-        public System.Collections.Generic.List<Network> MediationNetworks { get => _mediationNetworks; set => _mediationNetworks = value; }
+        public System.Collections.Generic.List<AdapterMediationIronSource> MediationNetworks { get => _mediationNetworks; set => _mediationNetworks = value; }
 #endif
     }
 }

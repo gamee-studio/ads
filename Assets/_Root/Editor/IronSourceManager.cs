@@ -1,14 +1,17 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Snorlax.Ads;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 using Network = Snorlax.Ads.Network;
+using Object = UnityEngine.Object;
 
 namespace Snorlax.AdsEditor
 {
@@ -115,8 +118,7 @@ namespace Snorlax.AdsEditor
         private bool IsImportingMedationNetwork(string packageName)
         {
             // Note: The pluginName doesn't have the '.unitypacakge' extension included in its name but the pluginFileName does. So using Contains instead of Equals.
-            return Settings.IronSourceSettings.importingMediationNetwork != null &&
-                   GetPluginFileName(Settings.IronSourceSettings.importingMediationNetwork).Contains(packageName);
+            return Settings.IronSourceSettings.importingMediationNetwork != null && packageName.Contains("Dependencies");
         }
 
         private bool IsImportingSdk(string packageName)
@@ -303,6 +305,8 @@ namespace Snorlax.AdsEditor
             Settings.IronSourceSettings.importingSdk = JsonConvert.DeserializeObject<Network>(json);
 
             UpdateCurrentVersion(Settings.IronSourceSettings.importingSdk);
+
+            EditorCoroutine.StartCoroutine(GetVersions());
         }
 
         public void UpdateCurrentVersion(Network network)
@@ -387,6 +391,116 @@ namespace Snorlax.AdsEditor
             }
 
             webRequest = null;
+        }
+
+        public IEnumerator GetVersions()
+        {
+            var www = UnityWebRequest.Get("http://ssa.public.s3.amazonaws.com/Ironsource-Integration-Manager/IronSourceSDKInfo.json");
+#if UNITY_2017_2_OR_NEWER
+            var operation = www.SendWebRequest();
+#else
+            var operation = www.Send();
+#endif
+
+            while (!operation.isDone)
+            {
+                yield return new WaitForSeconds(0.1f);
+            }
+
+#if UNITY_2020_1_OR_NEWER
+            if (www.result != UnityWebRequest.Result.Success)
+#elif UNITY_2017_2_OR_NEWER
+            if (www.isNetworkError || www.isHttpError)
+#else
+            if (www.isError)
+#endif
+            {
+                // nothing
+            }
+            else
+            {
+                string json = www.downloadHandler.text;
+                Settings.IronSourceSettings.MediationNetworks.Clear();
+                Settings.IronSourceSettings.importingMediationNetwork = new AdapterMediationIronSource();
+                if (Json.Deserialize(json) is Dictionary<string, object> dic && dic.Count != 0)
+                {
+                    if (dic.TryGetValue("SDKSInfo", out object adapterJson))
+                    {
+                        if (adapterJson == null) yield break;
+                        foreach (var item in (Dictionary<string, object>)adapterJson)
+                        {
+                            var key = item.Key.ToLower();
+                            var info = new AdapterMediationIronSource();
+                            if (info.GetFromJson(item.Key, item.Value as Dictionary<string, object>))
+                            {
+                                if (key.Contains("ironsource")) Settings.IronSourceSettings.importingMediationNetwork = info;
+                                else
+                                {
+                                    if (key.Equals("hyprmx") || key.Equals("liftoff") || key.Equals("maio") || key.Equals("mytarget") || key.Equals("smaato") ||
+                                        key.Equals("snap") || key.Equals("tapjoy") || key.Equals("yahoo") || key.Equals("tencent"))
+                                    {
+                                        continue;
+                                    }
+
+                                    Settings.IronSourceSettings.MediationNetworks.Add(info);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void CancelAdapterDownload()
+        {
+            webRequest?.Abort();
+            webRequest = null;
+        }
+
+        public IEnumerator DownloadFileDependency(string url)
+        {
+            int fileNameIndex = url.LastIndexOf("/", StringComparison.Ordinal) + 1;
+            string downloadFileName = url.Substring(fileNameIndex);
+            string genericFileName = Regex.Replace(downloadFileName, @"_v+(\d\.\d\.\d\.\d|\d\.\d\.\d)", "");
+            string path = Path.Combine("Assets", "IronSource", "Editor", genericFileName);
+            bool isCancelled = false;
+            webRequest = new UnityWebRequest(url);
+            webRequest.downloadHandler = new DownloadHandlerFile(path);
+            webRequest.SendWebRequest();
+#if UNITY_2017_2_OR_NEWER
+            var operation = webRequest.SendWebRequest();
+#else
+            var operation = webRequest.Send();
+#endif
+
+            if (webRequest.result != UnityWebRequest.Result.ConnectionError)
+            {
+                while (!operation.isDone)
+                {
+                    yield return new WaitForSeconds(0.1f);
+
+                    if (EditorUtility.DisplayCancelableProgressBar("Download Manager", $"Downloading {downloadFileName}", webRequest.downloadProgress))
+                    {
+                        if (webRequest.error != null) Debug.LogError(webRequest.error);
+
+                        CancelAdapterDownload();
+                        isCancelled = true;
+                    }
+                }
+            }
+            else
+            {
+                Debug.LogError("Error Downloading " + genericFileName + " : " + webRequest.error);
+            }
+
+            EditorUtility.ClearProgressBar();
+
+            if (isCancelled && File.Exists(Path.Combine("Assets/IronSource/Editor", genericFileName)))
+            {
+                File.Delete(Path.Combine("Assets/IronSource/Editor", genericFileName));
+            }
+
+            EditorCoroutine.StartCoroutine(GetVersions());
         }
     }
 }

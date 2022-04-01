@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Snorlax.Ads;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using Network = Snorlax.Ads.Network;
 
@@ -368,7 +369,7 @@ namespace Snorlax.AdsEditor
                                 "MEDIATION",
                                 () =>
                                 {
-                                    DrawHeaderMaxMediation();
+                                    DrawHeaderMediation();
                                     foreach (var network in Settings.MaxSettings.MediationNetworks)
                                     {
                                         DrawApplovinNetworkDetailRow(network);
@@ -410,17 +411,17 @@ namespace Snorlax.AdsEditor
                             EditorGUILayout.PropertyField(IronSourceProperties.useAdaptiveBanner.property, IronSourceProperties.useAdaptiveBanner.content);
                             EditorGUILayout.Space();
 
-                            // DrawUppercaseSection("IRONSOURCE_MODULE_MEDIATION",
-                            //     "MEDIATION",
-                            //     () =>
-                            //     {
-                            //         DrawHeaderMaxMediation();
-                            //         foreach (var network in Settings.MaxSettings.MediationNetworks)
-                            //         {
-                            //             DrawApplovinNetworkDetailRow(network);
-                            //         }
-                            //     });
-                            // EditorGUILayout.Space();
+                            DrawUppercaseSection("IRONSOURCE_MODULE_MEDIATION",
+                                "MEDIATION",
+                                () =>
+                                {
+                                    DrawHeaderMediation();
+                                    foreach (var network in Settings.IronSourceSettings.MediationNetworks)
+                                    {
+                                        DrawIronSourceNetworkDetailRow(network);
+                                    }
+                                });
+                            EditorGUILayout.Space();
                         }
                         else
                         {
@@ -447,22 +448,6 @@ namespace Snorlax.AdsEditor
         }
 
         private void DrawHeaderMediation()
-        {
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                GUILayout.Space(5);
-                EditorGUILayout.LabelField("Network", _headerLabelStyle, NetworkWidthOption);
-                EditorGUILayout.LabelField("Current Version", _headerLabelStyle, VersionWidthOption);
-                GUILayout.Space(3);
-                EditorGUILayout.LabelField("Latest Version", _headerLabelStyle, VersionWidthOption);
-                GUILayout.Space(3);
-                GUILayout.FlexibleSpace();
-                GUILayout.Button("Actions", _headerLabelStyle, FieldWidth);
-                GUILayout.Space(5);
-            }
-        }
-
-        private void DrawHeaderMaxMediation()
         {
             using (new EditorGUILayout.HorizontalScope())
             {
@@ -688,6 +673,87 @@ namespace Snorlax.AdsEditor
                         GUILayout.EndHorizontal();
                     }
 #endif
+                }
+            }
+        }
+
+        private void DrawIronSourceNetworkDetailRow(AdapterMediationIronSource network)
+        {
+            if (!network.Equals(default(AdapterMediationIronSource)))
+            {
+                string action;
+                string currentVersion = network.currentUnityVersion;
+                string latestVersion = network.latestUnityVersion;
+                bool isActionEnabled;
+                bool isInstalled;
+                if (string.IsNullOrEmpty(currentVersion))
+                {
+                    action = "Install";
+                    currentVersion = "Not Installed";
+                    isActionEnabled = true;
+                    isInstalled = false;
+                }
+                else
+                {
+                    isInstalled = true;
+                    switch (network.currentStatus)
+                    {
+                        // A newer version is available
+                        case EAdapterStatus.Upgrade:
+                            action = "Upgrade";
+                            isActionEnabled = true;
+                            break;
+                        // Current installed version is newer than latest version from DB (beta version)
+                        case EAdapterStatus.Installed:
+                            action = "Installed";
+                            isActionEnabled = false;
+                            break;
+                        // Already on the latest version
+                        default:
+                            action = "Installed";
+                            isActionEnabled = false;
+                            break;
+                    }
+                }
+
+                GUILayout.Space(4);
+                using (new EditorGUILayout.HorizontalScope(GUILayout.ExpandHeight(false)))
+                {
+                    GUILayout.Space(5);
+                    string displayName = network.displayAdapterName;
+                    if (displayName.Equals("Google (AdMob and Ad Manager)")) displayName = "Admob";
+                    EditorGUILayout.LabelField(new GUIContent(displayName), NetworkWidthOption);
+                    EditorGUILayout.LabelField(new GUIContent(currentVersion), VersionWidthOption);
+                    GUILayout.Space(3);
+                    EditorGUILayout.LabelField(new GUIContent(latestVersion), VersionWidthOption);
+                    GUILayout.Space(3);
+                    GUILayout.FlexibleSpace();
+
+                    GUI.enabled = isActionEnabled && !EditorApplication.isCompiling;
+                    if (GUILayout.Button(new GUIContent(action), FieldWidth))
+                    {
+                        // Download the plugin.
+                        EditorCoroutine.StartCoroutine(IronSourceManager.Instance.DownloadFileDependency(network.downloadUrl));
+                    }
+
+                    GUI.enabled = !EditorApplication.isCompiling;
+                    GUILayout.Space(2);
+
+                    GUI.enabled = isInstalled && !EditorApplication.isCompiling;
+                    if (GUILayout.Button(_iconUnintall))
+                    {
+                        EditorUtility.DisplayProgressBar("Ads", "Deleting " + network.displayAdapterName + "...", 0.5f);
+                        string pluginRoot = SettingManager.MediationSpecificPluginParentDirectory;
+                        FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, "IronSource", "Editor", network.fileName));
+                        FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, "IronSource", "Editor", network.fileName + ".meta"));
+
+                        // Refresh UI
+                        AssetDatabase.Refresh();
+                        EditorUtility.ClearProgressBar();
+                    }
+
+                    GUI.enabled = !EditorApplication.isCompiling;
+                    GUILayout.Space(5);
                 }
             }
         }
