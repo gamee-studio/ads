@@ -462,7 +462,7 @@ namespace Snorlax.AdsEditor
             int fileNameIndex = url.LastIndexOf("/", StringComparison.Ordinal) + 1;
             string downloadFileName = url.Substring(fileNameIndex);
             string genericFileName = Regex.Replace(downloadFileName, @"_v+(\d\.\d\.\d\.\d|\d\.\d\.\d)", "");
-            string path = Path.Combine("Assets", "IronSource", "Editor", genericFileName);
+            string path = Path.Combine(AdapterMediationIronSource.AdapterInstallPath, genericFileName);
             bool isCancelled = false;
             webRequest = new UnityWebRequest(url);
             webRequest.downloadHandler = new DownloadHandlerFile(path);
@@ -500,6 +500,16 @@ namespace Snorlax.AdsEditor
             }
 
             EditorCoroutine.StartCoroutine(GetVersions());
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+        }
+
+        public static void RefreshAllCurrentVersionAdapter()
+        {
+            foreach (var source in Settings.IronSourceSettings.MediationNetworks)
+            {
+                source.RefreshCurrentUnityVersion();
+            }
         }
     }
 }

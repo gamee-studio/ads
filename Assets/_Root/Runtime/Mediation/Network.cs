@@ -110,6 +110,7 @@ namespace Snorlax.Ads
 
     public class AdapterMediationIronSource
     {
+        public const string AdapterInstallPath = "Assets/IronSource/Editor";
         public EAdapterStatus currentStatus;
         public string adapterName;
         public string currentUnityVersion;
@@ -177,12 +178,16 @@ namespace Snorlax.Ads
                 }
             }
 
-            currentUnityVersion = GetVersionFromXML(fileName);
-
-            if (string.IsNullOrEmpty(currentUnityVersion)) currentStatus = EAdapterStatus.NotInstall;
-            else currentStatus = IsNewerVersion(currentUnityVersion, latestUnityVersion) ? EAdapterStatus.Installed : EAdapterStatus.Upgrade;
+            RefreshCurrentUnityVersion();
 
             return true;
+        }
+
+        public void RefreshCurrentUnityVersion()
+        {
+            currentUnityVersion = GetVersionFromXML(fileName);
+            if (string.IsNullOrEmpty(currentUnityVersion)) currentStatus = EAdapterStatus.NotInstall;
+            else currentStatus = IsNewerVersion(currentUnityVersion, latestUnityVersion) ? EAdapterStatus.Upgrade : EAdapterStatus.Installed;
         }
 
         private static bool IsNewerVersion(string current, string latest)
@@ -216,7 +221,7 @@ namespace Snorlax.Ads
             const string version = "";
             try
             {
-                xmlDoc.LoadXml(File.ReadAllText(Path.Combine(Application.temporaryCachePath, fileName)));
+                xmlDoc.LoadXml(File.ReadAllText(Path.Combine(AdapterInstallPath, fileName)));
             }
             catch (Exception)
             {
@@ -229,7 +234,7 @@ namespace Snorlax.Ads
                 return unityVersion.InnerText;
             }
 
-            File.Delete(Path.Combine(Application.temporaryCachePath, fileName));
+            File.Delete(Path.Combine(Path.Combine(AdapterInstallPath, fileName)));
             return version;
         }
     }

@@ -747,6 +747,7 @@ namespace Snorlax.AdsEditor
                         FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, "IronSource", "Editor", network.fileName));
                         FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, "IronSource", "Editor", network.fileName + ".meta"));
 
+                        IronSourceManager.RefreshAllCurrentVersionAdapter();
                         // Refresh UI
                         AssetDatabase.Refresh();
                         EditorUtility.ClearProgressBar();
