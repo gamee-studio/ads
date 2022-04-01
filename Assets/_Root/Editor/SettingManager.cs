@@ -148,7 +148,7 @@ namespace Snorlax.AdsEditor
 
             importPackageCompletedCallback(network);
         }
-        
+
         private static void CallImportGmaCompletedCallback(Network network)
         {
             if (importGmaCompletedCallback == null) return;
@@ -712,7 +712,8 @@ namespace Snorlax.AdsEditor
 
         public static bool IsMaxSdkImported()
         {
-            if (AssetDatabase.FindAssets(AdsUtil.DEFAULT_FILTER_MAX_MAXSDK).Length >= 1 || AssetDatabase.FindAssets(AdsUtil.DEFAULT_FILTER_MAX_MAXSDK.Replace("/", "\\")).Length >= 1)
+            if (AssetDatabase.FindAssets(AdsUtil.DEFAULT_FILTER_MAX_MAXSDK).Length >= 1 ||
+                AssetDatabase.FindAssets(AdsUtil.DEFAULT_FILTER_MAX_MAXSDK.Replace("/", "\\")).Length >= 1)
             {
                 return true;
             }
@@ -734,7 +735,8 @@ namespace Snorlax.AdsEditor
 
         public static bool IsIronSourceSdkImported()
         {
-            return AssetDatabase.FindAssets(AdsUtil.DEFAULT_FILTER_IRONSOURCE_SDK).Length >= 1 || AssetDatabase.FindAssets(AdsUtil.DEFAULT_FILTER_IRONSOURCE_SDK.Replace("/", "\\")).Length >= 1;
+            return AssetDatabase.FindAssets(AdsUtil.DEFAULT_FILTER_IRONSOURCE_SDK).Length >= 1 ||
+                   AssetDatabase.FindAssets(AdsUtil.DEFAULT_FILTER_IRONSOURCE_SDK.Replace("/", "\\")).Length >= 1;
         }
 
         public static void ValidateIronSourceSdkImported()
