@@ -466,7 +466,6 @@ namespace Snorlax.AdsEditor
             bool isCancelled = false;
             webRequest = new UnityWebRequest(url);
             webRequest.downloadHandler = new DownloadHandlerFile(path);
-            webRequest.SendWebRequest();
 #if UNITY_2017_2_OR_NEWER
             var operation = webRequest.SendWebRequest();
 #else
