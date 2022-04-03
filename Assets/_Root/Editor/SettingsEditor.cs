@@ -401,6 +401,15 @@ namespace Snorlax.AdsEditor
                     EditorGUILayout.PropertyField(IronSourceProperties.enable.property, IronSourceProperties.enable.content);
                     if (Settings.IronSourceSettings.Enable)
                     {
+                        if (!EditorApplication.isCompiling)
+                        {
+                            if (EditorPrefs.GetBool(Application.identifier + IronSourceManager.KEY_STORE_STATE_IMPORT_SDK, false))
+                            {
+                                EditorPrefs.SetBool(Application.identifier + IronSourceManager.KEY_STORE_STATE_IMPORT_SDK, false);
+                                AdsUtil.CreateFileRefreshScript();
+                            }
+                        }
+
                         SettingManager.ValidateIronSourceSdkImported();
                         if (IsIronSourceSdkAvaiable)
                         {

@@ -199,7 +199,6 @@ namespace Snorlax.AdsEditor
         private static void OnImportIronSourceCompleted(Network network)
         {
             IronSourceManager.Instance.UpdateCurrentVersion(network);
-
             EditorCoroutine.StartCoroutine(DelayRefreshIronSource(1, network));
         }
 

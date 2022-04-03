@@ -5,6 +5,7 @@ using System.Linq;
 using Snorlax.Locale;
 #endif
 #if UNITY_EDITOR
+using System.Collections;
 using UnityEditor;
 #endif
 using UnityEngine;
@@ -20,9 +21,6 @@ namespace Snorlax.Ads
         public const string DEFAULT_FILTER_ADMOB_DLL = "l:gvhp_exportpath-GoogleMobileAds/GoogleMobileAds.dll";
         public const string DEFAULT_FILTER_MAX_MAXSDK = "l:al_max_export_path-MaxSdk/Scripts/MaxSdk.cs";
         public const string DEFAULT_FILTER_IRONSOURCE_SDK = "l:pancake_ironsource_export_path-IronSource/Scripts/IronSource.cs";
-
-        private const string MAINTEMPALTE_GRADLE_PATH = "Assets/Plugins/Android/mainTemplate.gradle";
-        private const string GRADLETEMPALTE_PROPERTIES_PATH = "Assets/Plugins/Android/gradleTemplate.properties";
 
 
         /// <summary>
@@ -118,6 +116,11 @@ namespace Snorlax.Ads
         }
 
 #if UNITY_EDITOR
+        private const string MAINTEMPALTE_GRADLE_PATH = "Assets/Plugins/Android/mainTemplate.gradle";
+        private const string GRADLETEMPALTE_PROPERTIES_PATH = "Assets/Plugins/Android/gradleTemplate.properties";
+
+        private const string FILE_REFRESH_SCRIPT_PATH = "Assets/pancake_empty.cs";
+
         public static void CreateMainTemplateGradle()
         {
             if (File.Exists(MAINTEMPALTE_GRADLE_PATH)) return;
@@ -153,6 +156,28 @@ namespace Snorlax.Ads
             if (!File.Exists(GRADLETEMPALTE_PROPERTIES_PATH)) return;
             FileUtil.DeleteFileOrDirectory(GRADLETEMPALTE_PROPERTIES_PATH);
             FileUtil.DeleteFileOrDirectory(GRADLETEMPALTE_PROPERTIES_PATH + ".meta");
+            AssetDatabase.Refresh();
+        }
+
+        public static void CreateFileRefreshScript()
+        {
+            if (File.Exists(FILE_REFRESH_SCRIPT_PATH))
+            {
+                DeleteFileRefreshScript();
+                return;
+            }
+            
+            var writer = new StreamWriter(FILE_REFRESH_SCRIPT_PATH, false);
+            writer.Write("public class TEMPCLASS_TEMPLATE_PANCAKE : UnityEngine.MonoBehaviour { void Start(){}}");
+            writer.Close();
+            AssetDatabase.ImportAsset(FILE_REFRESH_SCRIPT_PATH);
+        }
+
+        public static void DeleteFileRefreshScript()
+        {
+            if (!File.Exists(FILE_REFRESH_SCRIPT_PATH)) return;
+            FileUtil.DeleteFileOrDirectory(FILE_REFRESH_SCRIPT_PATH);
+            FileUtil.DeleteFileOrDirectory(FILE_REFRESH_SCRIPT_PATH + ".meta");
             AssetDatabase.Refresh();
         }
 #endif

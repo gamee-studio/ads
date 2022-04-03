@@ -28,6 +28,8 @@ namespace Snorlax.AdsEditor
         private static readonly string IronSourceSdkAssetExportPath = Path.Combine("IronSource", "Scripts/IronSource.cs");
         public static DownloadPluginProgressCallback downloadPluginProgressCallback;
         public static ImportPackageCompletedCallback importPackageCompletedCallback;
+        public const string KEY_STORE_STATE_IMPORT_SDK = "_key_store_state_import_sdk";
+        private EditorCoroutine _editorCoroutine;
 
         public UnityWebRequest webRequest;
 
@@ -97,6 +99,7 @@ namespace Snorlax.AdsEditor
 
                 InvokeImportPackageCompletedCallback(Settings.IronSourceSettings.importingSdk);
                 Settings.IronSourceSettings.importingSdk = null;
+                EditorPrefs.SetBool(Application.identifier + KEY_STORE_STATE_IMPORT_SDK, true);
             };
 
             AssetDatabase.importPackageCancelled += packageName =>
@@ -511,5 +514,16 @@ namespace Snorlax.AdsEditor
                 source.RefreshCurrentUnityVersion();
             }
         }
+
+        // internal class PostProcessIronSource : UnityEditor.AssetModificationProcessor
+        // {
+        //     private static void OnWillCreateAsset(string assetName)
+        //     {
+        //         if (assetName.Contains("pancake_empty.cs") || assetName.Equals("Assets/pancake_empty.cs.meta"))
+        //         {
+        //             EditorPrefs.SetBool(Application.identifier + KEY_STORE_STATE_IMPORT_SDK, false);
+        //         }
+        //     }
+        // }
     }
 }
