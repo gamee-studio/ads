@@ -14,7 +14,6 @@ namespace Snorlax.Ads
 
         internal static AdRequest CreateRequest()
         {
-            Debug.Log("Create request --------------------------------");
             var builder = new AdRequest.Builder();
             // targetting setting
             // extra options
