@@ -136,9 +136,11 @@ namespace Snorlax.AdsEditor
         {
             get
             {
-                string currentSymbol = PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone);
-                var symbols = new List<string>(currentSymbol.Split(';'));
-                return symbols.Contains(AdsEditorUtil.SCRIPTING_DEFINITION_IRONSOURCE);
+#if PANCAKE_IRONSOURCE_ENABLE
+                return true;
+#else
+                return false;
+#endif
             }
         }
 
