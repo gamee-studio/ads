@@ -5,8 +5,8 @@ namespace Snorlax.AdsEditor
 {
     public class ImportPackage
     {
-        private const string MAX_PACKAGE_PATH = "Assets/_Root/Packages/applovin-max-v5.3.0.unitypackage";
-        private const string MAX_PACKAGE_UPM_PATH = "Packages/com.gamee.ads/Packages/applovin-max-v5.3.0.unitypackage";
+        private const string MAX_PACKAGE_PATH = "Assets/_Root/Packages/applovin-max-v5.3.1.unitypackage";
+        private const string MAX_PACKAGE_UPM_PATH = "Packages/com.gamee.ads/Packages/applovin-max-v5.3.1.unitypackage";
 
         public static void ImportMax()
         {
