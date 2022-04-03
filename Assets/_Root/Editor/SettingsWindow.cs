@@ -51,9 +51,7 @@ namespace Snorlax.AdsEditor
                 Debug.LogError("Coundn't open the ads settings window.");
                 return;
             }
-
-            window.minSize = new Vector2(635, 0);
-
+            window.minSize = new Vector2(275, 0);
             window.Show();
         }
 
