@@ -689,7 +689,7 @@ namespace Snorlax.AdsEditor
 
         public static bool IsAdmobSdkImported()
         {
-            if (AssetDatabase.FindAssets(AdsUtil.DEFAULT_FILTER_ADMOB_DLL).Length >= 1 ||
+            if (AssetDatabase.FindAssets(AdsEditorUtil.DEFAULT_FILTER_ADMOB_DLL).Length >= 1 ||
                 AssetDatabase.FindAssets(@"l:pancake_exportpath-" + PluginParentDirectory).Length >= 1)
             {
                 return true;
@@ -702,18 +702,18 @@ namespace Snorlax.AdsEditor
         {
             if (IsAdmobSdkImported())
             {
-                ScriptingDefinition.AddDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_ADMOB);
+                ScriptingDefinition.AddDefineSymbolOnAllPlatforms(AdsEditorUtil.SCRIPTING_DEFINITION_ADMOB);
             }
             else
             {
-                ScriptingDefinition.RemoveDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_ADMOB);
+                ScriptingDefinition.RemoveDefineSymbolOnAllPlatforms(AdsEditorUtil.SCRIPTING_DEFINITION_ADMOB);
             }
         }
 
         public static bool IsMaxSdkImported()
         {
-            if (AssetDatabase.FindAssets(AdsUtil.DEFAULT_FILTER_MAX_MAXSDK).Length >= 1 ||
-                AssetDatabase.FindAssets(AdsUtil.DEFAULT_FILTER_MAX_MAXSDK.Replace("/", "\\")).Length >= 1)
+            if (AssetDatabase.FindAssets(AdsEditorUtil.DEFAULT_FILTER_MAX_MAXSDK).Length >= 1 ||
+                AssetDatabase.FindAssets(AdsEditorUtil.DEFAULT_FILTER_MAX_MAXSDK.Replace("/", "\\")).Length >= 1)
             {
                 return true;
             }
@@ -725,29 +725,29 @@ namespace Snorlax.AdsEditor
         {
             if (IsMaxSdkImported())
             {
-                ScriptingDefinition.AddDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_APPLOVIN);
+                ScriptingDefinition.AddDefineSymbolOnAllPlatforms(AdsEditorUtil.SCRIPTING_DEFINITION_APPLOVIN);
             }
             else
             {
-                ScriptingDefinition.RemoveDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_APPLOVIN);
+                ScriptingDefinition.RemoveDefineSymbolOnAllPlatforms(AdsEditorUtil.SCRIPTING_DEFINITION_APPLOVIN);
             }
         }
 
         public static bool IsIronSourceSdkImported()
         {
-            return AssetDatabase.FindAssets(AdsUtil.DEFAULT_FILTER_IRONSOURCE_SDK).Length >= 1 ||
-                   AssetDatabase.FindAssets(AdsUtil.DEFAULT_FILTER_IRONSOURCE_SDK.Replace("/", "\\")).Length >= 1;
+            return AssetDatabase.FindAssets(AdsEditorUtil.DEFAULT_FILTER_IRONSOURCE_SDK).Length >= 1 ||
+                   AssetDatabase.FindAssets(AdsEditorUtil.DEFAULT_FILTER_IRONSOURCE_SDK.Replace("/", "\\")).Length >= 1;
         }
 
         public static void ValidateIronSourceSdkImported()
         {
             if (IsIronSourceSdkImported())
             {
-                ScriptingDefinition.AddDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_IRONSOURCE);
+                ScriptingDefinition.AddDefineSymbolOnAllPlatforms(AdsEditorUtil.SCRIPTING_DEFINITION_IRONSOURCE);
             }
             else
             {
-                ScriptingDefinition.RemoveDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_IRONSOURCE);
+                ScriptingDefinition.RemoveDefineSymbolOnAllPlatforms(AdsEditorUtil.SCRIPTING_DEFINITION_IRONSOURCE);
             }
         }
 

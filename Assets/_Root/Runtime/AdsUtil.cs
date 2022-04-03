@@ -1,12 +1,7 @@
 using System;
-using System.IO;
 using System.Linq;
 #if PANCAKE_LOCALE
 using Snorlax.Locale;
-#endif
-#if UNITY_EDITOR
-using System.Collections;
-using UnityEditor;
 #endif
 using UnityEngine;
 
@@ -14,15 +9,6 @@ namespace Snorlax.Ads
 {
     public class AdsUtil
     {
-        public const string SCRIPTING_DEFINITION_ADMOB = "PANCAKE_ADMOB_ENABLE";
-        public const string SCRIPTING_DEFINITION_APPLOVIN = "PANCAKE_MAX_ENABLE";
-        public const string SCRIPTING_DEFINITION_IRONSOURCE = "PANCAKE_IRONSOURCE_ENABLE";
-        public const string SCRIPTING_DEFINITION_MULTIPLE_DEX = "PANCAKE_MULTIPLE_DEX";
-        public const string DEFAULT_FILTER_ADMOB_DLL = "l:gvhp_exportpath-GoogleMobileAds/GoogleMobileAds.dll";
-        public const string DEFAULT_FILTER_MAX_MAXSDK = "l:al_max_export_path-MaxSdk/Scripts/MaxSdk.cs";
-        public const string DEFAULT_FILTER_IRONSOURCE_SDK = "l:pancake_ironsource_export_path-IronSource/Scripts/IronSource.cs";
-
-
         /// <summary>
         /// Compares its two arguments for order.  Returns <see cref="EVersionComparisonResult.Lesser"/>, <see cref="EVersionComparisonResult.Equal"/>,
         /// or <see cref="EVersionComparisonResult.Greater"/> as the first version is less than, equal to, or greater than the second.
@@ -45,7 +31,7 @@ namespace Snorlax.Ads
             var versionABetaNumber = 0;
             if (isVersionABeta)
             {
-                var components = versionA.Split(new[] { "-beta" }, StringSplitOptions.None);
+                var components = versionA.Split(new[] {"-beta"}, StringSplitOptions.None);
                 versionA = components[0];
                 versionABetaNumber = int.TryParse(components[1], out piece) ? piece : 0;
             }
@@ -54,7 +40,7 @@ namespace Snorlax.Ads
             var versionBBetaNumber = 0;
             if (isVersionBBeta)
             {
-                var components = versionB.Split(new[] { "-beta" }, StringSplitOptions.None);
+                var components = versionB.Split(new[] {"-beta"}, StringSplitOptions.None);
                 versionB = components[0];
                 versionBBetaNumber = int.TryParse(components[1], out piece) ? piece : 0;
             }
@@ -114,72 +100,5 @@ namespace Snorlax.Ads
 
             return false;
         }
-
-#if UNITY_EDITOR
-        private const string MAINTEMPALTE_GRADLE_PATH = "Assets/Plugins/Android/mainTemplate.gradle";
-        private const string GRADLETEMPALTE_PROPERTIES_PATH = "Assets/Plugins/Android/gradleTemplate.properties";
-
-        private const string FILE_REFRESH_SCRIPT_PATH = "Assets/pancake_empty.cs";
-
-        public static void CreateMainTemplateGradle()
-        {
-            if (File.Exists(MAINTEMPALTE_GRADLE_PATH)) return;
-            var maintemplate = (TextAsset)Resources.Load("mainTemplate", typeof(TextAsset));
-            string maintemplateData = maintemplate.text;
-            var writer = new StreamWriter(MAINTEMPALTE_GRADLE_PATH, false);
-            writer.Write(maintemplateData);
-            writer.Close();
-            AssetDatabase.ImportAsset(MAINTEMPALTE_GRADLE_PATH);
-        }
-
-        public static void CreateGradleTemplateProperties()
-        {
-            if (File.Exists(GRADLETEMPALTE_PROPERTIES_PATH)) return;
-            var gradleTemplate = (TextAsset)Resources.Load("gradleTemplate", typeof(TextAsset));
-            string maintemplateData = gradleTemplate.text;
-            var writer = new StreamWriter(GRADLETEMPALTE_PROPERTIES_PATH, false);
-            writer.Write(maintemplateData);
-            writer.Close();
-            AssetDatabase.ImportAsset(GRADLETEMPALTE_PROPERTIES_PATH);
-        }
-
-        public static void DeleteMainTemplateGradle()
-        {
-            if (!File.Exists(MAINTEMPALTE_GRADLE_PATH)) return;
-            FileUtil.DeleteFileOrDirectory(MAINTEMPALTE_GRADLE_PATH);
-            FileUtil.DeleteFileOrDirectory(MAINTEMPALTE_GRADLE_PATH + ".meta");
-            AssetDatabase.Refresh();
-        }
-
-        public static void DeleteGradleTemplateProperties()
-        {
-            if (!File.Exists(GRADLETEMPALTE_PROPERTIES_PATH)) return;
-            FileUtil.DeleteFileOrDirectory(GRADLETEMPALTE_PROPERTIES_PATH);
-            FileUtil.DeleteFileOrDirectory(GRADLETEMPALTE_PROPERTIES_PATH + ".meta");
-            AssetDatabase.Refresh();
-        }
-
-        public static void CreateFileRefreshScript()
-        {
-            if (File.Exists(FILE_REFRESH_SCRIPT_PATH))
-            {
-                DeleteFileRefreshScript();
-                return;
-            }
-            
-            var writer = new StreamWriter(FILE_REFRESH_SCRIPT_PATH, false);
-            writer.Write("public class TEMPCLASS_TEMPLATE_PANCAKE : UnityEngine.MonoBehaviour { void Start(){}}");
-            writer.Close();
-            AssetDatabase.ImportAsset(FILE_REFRESH_SCRIPT_PATH);
-        }
-
-        public static void DeleteFileRefreshScript()
-        {
-            if (!File.Exists(FILE_REFRESH_SCRIPT_PATH)) return;
-            FileUtil.DeleteFileOrDirectory(FILE_REFRESH_SCRIPT_PATH);
-            FileUtil.DeleteFileOrDirectory(FILE_REFRESH_SCRIPT_PATH + ".meta");
-            AssetDatabase.Refresh();
-        }
-#endif
     }
 }

@@ -28,7 +28,6 @@ namespace Snorlax.AdsEditor
         private static readonly string IronSourceSdkAssetExportPath = Path.Combine("IronSource", "Scripts/IronSource.cs");
         public static DownloadPluginProgressCallback downloadPluginProgressCallback;
         public static ImportPackageCompletedCallback importPackageCompletedCallback;
-        public const string KEY_STORE_STATE_IMPORT_SDK = "_key_store_state_import_sdk";
         private EditorCoroutine _editorCoroutine;
 
         public UnityWebRequest webRequest;
@@ -99,7 +98,6 @@ namespace Snorlax.AdsEditor
 
                 InvokeImportPackageCompletedCallback(Settings.IronSourceSettings.importingSdk);
                 Settings.IronSourceSettings.importingSdk = null;
-                EditorPrefs.SetBool(Application.identifier + KEY_STORE_STATE_IMPORT_SDK, true);
             };
 
             AssetDatabase.importPackageCancelled += packageName =>
@@ -360,7 +358,7 @@ namespace Snorlax.AdsEditor
             string pathFile = Path.Combine(Application.temporaryCachePath, $"IronSource_IntegrationManager_v{network.lastVersion.unity}.unitypackage");
             string urlDownload = string.Format(network.path, network.lastVersion.unity);
             var downloadHandler = new DownloadHandlerFile(pathFile);
-            webRequest = new UnityWebRequest(urlDownload) { method = UnityWebRequest.kHttpVerbGET, downloadHandler = downloadHandler };
+            webRequest = new UnityWebRequest(urlDownload) {method = UnityWebRequest.kHttpVerbGET, downloadHandler = downloadHandler};
             var operation = webRequest.SendWebRequest();
 
             static void CallDownloadPluginProgressCallback(string pluginName, float progress, bool isDone)
@@ -430,7 +428,7 @@ namespace Snorlax.AdsEditor
                     if (dic.TryGetValue("SDKSInfo", out object adapterJson))
                     {
                         if (adapterJson == null) yield break;
-                        foreach (var item in (Dictionary<string, object>)adapterJson)
+                        foreach (var item in (Dictionary<string, object>) adapterJson)
                         {
                             var key = item.Key.ToLower();
                             var info = new AdapterMediationIronSource();

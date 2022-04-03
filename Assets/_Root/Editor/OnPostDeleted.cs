@@ -9,12 +9,12 @@ namespace Snorlax.AdsEditor
         {
             if (!SettingManager.IsAdmobSdkImported())
             {
-                ScriptingDefinition.RemoveDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_ADMOB);
+                ScriptingDefinition.RemoveDefineSymbolOnAllPlatforms(AdsEditorUtil.SCRIPTING_DEFINITION_ADMOB);
             }
 
             if (!SettingManager.IsMaxSdkImported())
             {
-                ScriptingDefinition.RemoveDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_APPLOVIN);
+                ScriptingDefinition.RemoveDefineSymbolOnAllPlatforms(AdsEditorUtil.SCRIPTING_DEFINITION_APPLOVIN);
             }
 
             return AssetDeleteResult.DidNotDelete;

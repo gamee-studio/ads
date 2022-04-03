@@ -136,11 +136,9 @@ namespace Snorlax.AdsEditor
         {
             get
             {
-#if PANCAKE_IRONSOURCE_ENABLE
-                return true;
-#else
-                return false;
-#endif
+                string currentSymbol = PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone);
+                var symbols = new List<string>(currentSymbol.Split(';'));
+                return symbols.Contains(AdsEditorUtil.SCRIPTING_DEFINITION_IRONSOURCE);
             }
         }
 
@@ -152,7 +150,7 @@ namespace Snorlax.AdsEditor
         {
             _warningIcon = IconContent("console.warnicon.sml", "Adapter not compatible, please update to the latest version.");
             _iconUnintall = IconContent("d_TreeEditor.Trash", "Uninstall");
-            _headerLabelStyle = new GUIStyle(EditorStyles.label) { fontSize = 12, fontStyle = FontStyle.Bold, fixedHeight = 18 };
+            _headerLabelStyle = new GUIStyle(EditorStyles.label) {fontSize = 12, fontStyle = FontStyle.Bold, fixedHeight = 18};
 
             _autoInitializeProperty = serializedObject.FindProperty("runtimeAutoInitialize");
 
@@ -227,19 +225,19 @@ namespace Snorlax.AdsEditor
 
                     if (Settings.AdSettings.EnableMultipleDex)
                     {
-                        AdsUtil.CreateMainTemplateGradle();
+                        AdsEditorUtil.CreateMainTemplateGradle();
 #if UNITY_2020_3_OR_NEWER
-                        AdsUtil.CreateGradleTemplateProperties();
+                        AdsEditorUtil.CreateGradleTemplateProperties();
 #endif
-                        ScriptingDefinition.AddDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_MULTIPLE_DEX);
+                        ScriptingDefinition.AddDefineSymbolOnAllPlatforms(AdsEditorUtil.SCRIPTING_DEFINITION_MULTIPLE_DEX);
                     }
                     else
                     {
-                        AdsUtil.DeleteMainTemplateGradle();
+                        AdsEditorUtil.DeleteMainTemplateGradle();
 #if UNITY_2020_3_OR_NEWER
-                        AdsUtil.DeleteGradleTemplateProperties();
+                        AdsEditorUtil.DeleteGradleTemplateProperties();
 #endif
-                        ScriptingDefinition.RemoveDefineSymbolOnAllPlatforms(AdsUtil.SCRIPTING_DEFINITION_MULTIPLE_DEX);
+                        ScriptingDefinition.RemoveDefineSymbolOnAllPlatforms(AdsEditorUtil.SCRIPTING_DEFINITION_MULTIPLE_DEX);
                     }
                 });
 
@@ -401,15 +399,6 @@ namespace Snorlax.AdsEditor
                     EditorGUILayout.PropertyField(IronSourceProperties.enable.property, IronSourceProperties.enable.content);
                     if (Settings.IronSourceSettings.Enable)
                     {
-                        if (!EditorApplication.isCompiling)
-                        {
-                            if (EditorPrefs.GetBool(Application.identifier + IronSourceManager.KEY_STORE_STATE_IMPORT_SDK, false))
-                            {
-                                EditorPrefs.SetBool(Application.identifier + IronSourceManager.KEY_STORE_STATE_IMPORT_SDK, false);
-                                AdsUtil.CreateFileRefreshScript();
-                            }
-                        }
-
                         SettingManager.ValidateIronSourceSdkImported();
                         if (IsIronSourceSdkAvaiable)
                         {
@@ -788,7 +777,7 @@ namespace Snorlax.AdsEditor
 
         public static GUIStyle UppercaseSectionHeaderCollapse
         {
-            get { return uppercaseSectionHeaderCollapse ??= new GUIStyle(GetCustomStyle("Uppercase Section Header")) { normal = new GUIStyleState() }; }
+            get { return uppercaseSectionHeaderCollapse ??= new GUIStyle(GetCustomStyle("Uppercase Section Header")) {normal = new GUIStyleState()}; }
         }
 
         public static GUIStyle GetCustomStyle(string styleName)
