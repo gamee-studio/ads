@@ -32,7 +32,7 @@ To `Packages/manifest.json`
 
 ## Usage
 
-![1](https://user-images.githubusercontent.com/44673303/157580975-6b5cd124-4196-49f5-9a48-b620bb203f63.png)
+![1](https://user-images.githubusercontent.com/44673303/161428593-fce3bccd-e05c-435f-b482-7f3a3a68b2ef.png)
 
 #### _BASIC_
 
@@ -62,7 +62,13 @@ To `Packages/manifest.json`
     - On android it will show consent form popup,
     - On ios it will show ATT popup
 
-3. Privacy & Policy :
+3. Multi Dex:
+   - enable multi dex to fix build gradle error
+   
+4. Current Network:
+   - the ad network currently used to display ads
+
+6. Privacy & Policy : displayed to edit when GDPR enabled
     - the link to the website containing your privacy policy information
 
 #### _AUTO AD-LOADING_
@@ -125,8 +131,8 @@ Advertising.ShowConsentFrom()
 
 ```
 
+- you can attach your custom event callback by
 
-- you can attach your custom event callback by 
 ```c#
 Action<EInterstitialAdNetwork> InterstitialAdCompletedEvent; // call when user completed watch interstitialAd
 
@@ -143,12 +149,35 @@ Action<EAppOpenAdNetwork> AppOpenAdCompletedEvent; // call when user completed w
 ```
 
 #### Update current use network
+
 - by default admob will be used to show ad, you can use the following syntax
+
 ```c#
 Advertising.SetCurrentNetwork("name network");
 
 ex: Advertising.SetCurrentNetwork("applovin");
+or: Advertising.SetCurrentNetwork(EAdNetwork.AppLovin);
 ```
- 1. "admob"
- 2. "applovin"
 
+1. "admob"
+2. "applovin"
+3. "ironsource"
+
+#### Notes
+
+1. [Setting scripting symbols for Editor script compilation](https://docs.unity3d.com/Manual/CustomScriptingSymbols.html)
+
+```text
+If you need to define scripting symbols via scripts in the Editor so that your Editor scripts are affected by the change, you must use PlayerSettings.SetScriptingDefineSymbolsForGroup. However, there are some important details to note about how this operates.
+
+Important: this method does not take immediate effect. Calling this method from script does not immediately apply and recompile your scripts. For your directives to take effect based on a change in scripting symbols, you must allow control to be returned to the Editor, where it then asynchronously reloads the scripts and recompiles them based on your new symbols and the directives which act on them.
+
+So, for example, if you use this method in an Editor script, then immediately call BuildPipeline.BuildPlayer on the following line in the same script, at that point Unity is still running your Editor scripts with the old set of scripting symbols, because they have not yet been recompiled with the new symbols. This means if you have Editor scripts which run as part of your BuildPlayer execution, they run with the old scripting symbols and your player might not build as you expected.
+```
+
+2. IronSource SDK
+   - In case you have successfully imported ironSOurce but Unity Editor still says plugin not found `IronSource plugin not found. Please import it to show ads from IronSource`
+     ![image](https://user-images.githubusercontent.com/44673303/161428343-19750d61-b75e-4f37-a532-2a01a3e379e7.png)
+   
+     Open ProjectSetting and navigate to Scripting Definition Symbol then remove the line PANCAKE_IRONSOURCE_ENABLE -> wait editor complie and add symbol again
+     ![Screenshot_1](https://user-images.githubusercontent.com/44673303/161428348-2e330f02-ca78-4b6d-8f4c-25d539c771b4.png)
