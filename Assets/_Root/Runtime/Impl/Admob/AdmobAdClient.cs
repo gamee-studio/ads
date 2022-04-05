@@ -15,7 +15,8 @@ namespace Snorlax.Ads
         private AdmobRewardedInterstitialLoader _rewardedInterstitial = new AdmobRewardedInterstitialLoader();
         private AdmobAppOpenLoader _appOpen = new AdmobAppOpenLoader();
         private static AdmobAdClient client;
-        public static AdmobAdClient Instance => client ??= new AdmobAdClient();
+        public static AdmobAdClient Instance => client ?? (client = new AdmobAdClient());
+
         public override EAdNetwork Network => EAdNetwork.Admob;
         public override bool IsBannerAdSupported => true;
         public override bool IsInsterstitialAdSupport => true;

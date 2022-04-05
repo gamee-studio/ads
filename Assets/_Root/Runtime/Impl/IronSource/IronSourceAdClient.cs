@@ -12,7 +12,7 @@ namespace Snorlax.Ads
         private bool _isBannerLoaded;
         private bool _isRewardedCompleted;
 
-        public static IronSourceAdClient Instance => client ??= new IronSourceAdClient();
+        public static IronSourceAdClient Instance => client ?? (client = new IronSourceAdClient());
 
         public override EAdNetwork Network => EAdNetwork.IronSource;
         public override bool IsBannerAdSupported => true;

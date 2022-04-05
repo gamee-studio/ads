@@ -12,7 +12,8 @@ namespace Snorlax.Ads
         protected override string NoSdkMessage => "";
 
         private static NoneAdClient client;
-        public static NoneAdClient Instance => client ??= new NoneAdClient();
+        public static NoneAdClient Instance => client ?? (client = new NoneAdClient());
+
         protected override void InternalInit() { }
 
         protected override void InternalShowBannerAd() { }

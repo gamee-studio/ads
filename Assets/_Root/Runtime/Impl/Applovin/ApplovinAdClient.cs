@@ -15,7 +15,7 @@ namespace Snorlax.Ads
         private static ApplovinAdClient client;
         private bool _isBannerDestroyed;
         private bool _isRewardedCompleted;
-        public static ApplovinAdClient Instance => client ??= new ApplovinAdClient();
+        public static ApplovinAdClient Instance => client ?? (client = new ApplovinAdClient());
 
 #if PANCAKE_MAX_ENABLE
         public event Action OnBannerAdLoaded;
