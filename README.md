@@ -182,7 +182,7 @@ So, for example, if you use this method in an Editor script, then immediately ca
      Open ProjectSetting and navigate to Scripting Definition Symbol then remove the line PANCAKE_IRONSOURCE_ENABLE -> wait editor complie and add symbol again
      ![Screenshot_1](https://user-images.githubusercontent.com/44673303/161428348-2e330f02-ca78-4b6d-8f4c-25d539c771b4.png)
 
-3. AppLovin SDK
+3. AppLovin SDK (fixed in version 8.4.1.1)
     - Mediation adapter Chartboost 8.4.1 is crashing and not building on Unity after they updated to Java 11
     ![image (1)](https://user-images.githubusercontent.com/44673303/161477158-1deae20f-ce7c-436a-8e8c-d4c5fe196ed7.png)
     - so you need use old version of Chartboot (8.2.1.0)
