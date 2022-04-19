@@ -1,0 +1,32 @@
+{
+    "uppercaseSectionsFoldoutStates": [
+        {
+            "key": "AUTO_INITIALIZE_FOLDOUT_KEY",
+            "state": false
+        },
+        {
+            "key": "AUTO_AD_LOADING_CONFIG_FOLDOUT_KEY",
+            "state": false
+        },
+        {
+            "key": "ADMOB_MODULE",
+            "state": true
+        },
+        {
+            "key": "MAX_MODULE",
+            "state": false
+        },
+        {
+            "key": "IRONSOURCE_MODULE",
+            "state": false
+        },
+        {
+            "key": "APPLOVIN_MODULE_MEDIATION",
+            "state": true
+        },
+        {
+            "key": "ADMOB_MODULE_MEDIATION",
+            "state": true
+        }
+    ]
+}

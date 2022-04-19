@@ -1,4 +1,5 @@
 using System.Collections;
+using Pancake.Editor;
 using Snorlax.Ads;
 using UnityEditor;
 using UnityEngine;
@@ -51,6 +52,7 @@ namespace Snorlax.AdsEditor
                 Debug.LogError("Coundn't open the ads settings window.");
                 return;
             }
+
             window.minSize = new Vector2(275, 0);
             window.Show();
         }
@@ -64,7 +66,7 @@ namespace Snorlax.AdsEditor
 
             MaxManager.downloadPluginProgressCallback = OnMaxDownloadPluginProgress;
             MaxManager.importPackageCompletedCallback = OnMaxImportPackageCompleted;
-            
+
             IronSourceManager.downloadPluginProgressCallback = OnDownloadIronSourcePluginProgress;
             IronSourceManager.importPackageCompletedCallback = OnImportIronSourceCompleted;
 
@@ -72,6 +74,7 @@ namespace Snorlax.AdsEditor
             SettingManager.Instance.LoadGMA();
             IronSourceManager.Instance.Load();
             MaxManager.Instance.Load();
+            Uniform.FoldoutSettings.LoadSetting();
         }
 
         private void OnDisable()
@@ -80,6 +83,7 @@ namespace Snorlax.AdsEditor
             IronSourceManager.Instance.webRequest?.Abort();
             IronSourceManager.Instance.webRequest?.Abort();
             EditorUtility.ClearProgressBar();
+            Uniform.FoldoutSettings.SaveSetting();
             AssetDatabase.SaveAssets();
         }
 

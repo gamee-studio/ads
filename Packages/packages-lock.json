@@ -7,6 +7,13 @@
       "dependencies": {},
       "hash": "8479d378666d8af0e30fc0308df447196857659d"
     },
+    "com.pancake.common": {
+      "version": "https://github.com/pancake-llc/common.git?path=Assets/_Root#1.1.5",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "ea6794660f43f11690018fa4f38a4526430a356e"
+    },
     "com.snorlax.locale": {
       "version": "https://github.com/snorluxe/locale.git?path=Assets/_Root#1.0.2",
       "depth": 0,
