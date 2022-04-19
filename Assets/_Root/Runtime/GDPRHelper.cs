@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Snorlax.Ads
+namespace Pancake.Monetization
 {
     // ReSharper disable once InconsistentNaming
     public class GDPRHelper : MonoBehaviour

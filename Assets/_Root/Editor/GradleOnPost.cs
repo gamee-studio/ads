@@ -7,7 +7,7 @@ using UnityEngine;
 
 #if UNITY_ANDROID
 
-namespace Snorlax.AdsEditor
+namespace Pancake.Editor
 {
     public class GradleOnPost : IPostGenerateGradleAndroidProject
     {

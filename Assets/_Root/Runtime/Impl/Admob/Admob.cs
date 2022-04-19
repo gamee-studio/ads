@@ -2,7 +2,7 @@
 using GoogleMobileAds.Api;
 using UnityEngine;
 
-namespace Snorlax.Ads
+namespace Pancake.Monetization
 {
     public static class Admob
     {

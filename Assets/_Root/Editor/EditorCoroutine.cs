@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEditor;
 
-namespace Snorlax.AdsEditor
+namespace Pancake.Editor
 {
     /// <summary>
     /// A coroutine that can update based on editor application update.

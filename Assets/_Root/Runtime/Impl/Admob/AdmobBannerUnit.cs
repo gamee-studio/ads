@@ -3,7 +3,7 @@ using System;
 using GoogleMobileAds.Api;
 #endif
 
-namespace Snorlax.Ads
+namespace Pancake.Monetization
 {
     [Serializable]
     public class AdmobBannerUnit : BannerAdUnit

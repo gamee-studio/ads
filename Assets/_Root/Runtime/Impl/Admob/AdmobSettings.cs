@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Snorlax.Ads
+namespace Pancake.Monetization
 {
     [Serializable]
     public class AdmobSettings

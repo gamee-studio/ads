@@ -1,7 +1,7 @@
 
 
 // ReSharper disable AccessToStaticMemberViaDerivedType
-namespace Snorlax.Ads
+namespace Pancake.Monetization
 {
     public class ApplovinBannerLoader
     {

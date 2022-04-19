@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Snorlax.Ads
+namespace Pancake.Monetization
 {
     public abstract class AdClient : IAdClient
     {

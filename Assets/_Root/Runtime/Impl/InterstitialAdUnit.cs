@@ -1,6 +1,6 @@
 using System;
 
-namespace Snorlax.Ads
+namespace Pancake.Monetization
 {
     [Serializable]
     public class InterstitialAdUnit : AdUnit

@@ -1,6 +1,6 @@
 using System;
 
-namespace Snorlax.Ads
+namespace Pancake.Monetization
 {
     public interface IAdClient
     {

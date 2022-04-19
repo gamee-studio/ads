@@ -5,7 +5,7 @@ using GoogleMobileAds.Api;
 using UnityEngine;
 #endif
 
-namespace Snorlax.Ads
+namespace Pancake.Monetization
 {
     public class AdmobBannerLoader : AdLoader<AdUnit>
     {

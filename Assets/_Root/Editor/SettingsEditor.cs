@@ -1,16 +1,13 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
-using Pancake.Editor;
-using Snorlax.Ads;
+using Pancake.Monetization;
 using UnityEditor;
 using UnityEngine;
-using Network = Snorlax.Ads.Network;
+using Network = Pancake.Monetization.Network;
 
-namespace Snorlax.AdsEditor
+namespace Pancake.Editor
 {
     [CustomEditor(typeof(Settings))]
-    internal class SettingsEditor : Editor
+    internal class SettingsEditor : UnityEditor.Editor
     {
         private class Property
         {

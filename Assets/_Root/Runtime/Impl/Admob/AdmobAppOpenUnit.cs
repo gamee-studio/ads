@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Snorlax.Ads
+namespace Pancake.Monetization
 {
     [Serializable]
     public class AdmobAppOpenUnit : AppOpenAdUnit

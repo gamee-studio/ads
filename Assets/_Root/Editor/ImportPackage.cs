@@ -1,7 +1,7 @@
 using System.IO;
 using UnityEditor;
 
-namespace Snorlax.AdsEditor
+namespace Pancake.Editor
 {
     public class ImportPackage
     {

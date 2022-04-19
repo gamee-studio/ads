@@ -1,9 +1,9 @@
 using System.IO;
-using Snorlax.Ads;
+using Pancake.Monetization;
 using UnityEditor;
 using UnityEngine;
 
-namespace Snorlax.AdsEditor
+namespace Pancake.Editor
 {
     internal class SettingCreator
     {

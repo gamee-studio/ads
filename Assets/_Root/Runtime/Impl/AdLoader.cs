@@ -1,4 +1,4 @@
-namespace Snorlax.Ads
+namespace Pancake.Monetization
 {
     public class AdLoader<T> where T : AdUnit
     {

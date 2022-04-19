@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Snorlax.Ads
+namespace Pancake.Monetization
 {
     public class Settings : ScriptableObject
     {

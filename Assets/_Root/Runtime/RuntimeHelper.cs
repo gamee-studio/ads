@@ -6,7 +6,7 @@ using UnityEngine;
 // ReSharper disable FieldCanBeMadeReadOnly.Local
 // ReSharper disable InconsistentNaming
 // ReSharper disable ArrangeTypeMemberModifiers
-namespace Snorlax.Ads
+namespace Pancake.Monetization
 {
     /// <summary>
     /// This class contains helper methods for use in runtime. Once initialized, this

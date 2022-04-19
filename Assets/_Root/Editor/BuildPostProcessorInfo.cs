@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEditor.iOS.Xcode;
 
-namespace Snorlax.AdsEditor
+namespace Pancake.Editor
 {
     public class BuildPostProcessorInfo
     {

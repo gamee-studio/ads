@@ -3,10 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
-using UnityEngine;
 
 // ReSharper disable InconsistentNaming
-namespace Snorlax.Ads
+namespace Pancake.Monetization
 {
     [Serializable]
     public class Network

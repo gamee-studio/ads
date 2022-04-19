@@ -6,14 +6,14 @@ using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
-using Snorlax.Ads;
+using Pancake.Monetization;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
-using Network = Snorlax.Ads.Network;
+using Network = Pancake.Monetization.Network;
 using Object = UnityEngine.Object;
 
-namespace Snorlax.AdsEditor
+namespace Pancake.Editor
 {
     /// <summary>
     /// A manager class for IronSource integration manager window.

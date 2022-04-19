@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEditor;
 
-namespace Snorlax.AdsEditor
+namespace Pancake.Editor
 {
     public class ScriptingDefinition
     {

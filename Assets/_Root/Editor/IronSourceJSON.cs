@@ -5,7 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 
-namespace Snorlax.AdsEditor
+namespace Pancake.Editor
 {
     public static class Json
     {

@@ -1,7 +1,7 @@
-using Snorlax.Ads;
+using Pancake.Monetization;
 using UnityEditor;
 
-namespace Snorlax.AdsEditor
+namespace Pancake.Editor
 {
     public static class MenuManager
     {

@@ -5,7 +5,7 @@ using Snorlax.Locale;
 #endif
 using UnityEngine;
 
-namespace Snorlax.Ads
+namespace Pancake.Monetization
 {
     public class AdsUtil
     {

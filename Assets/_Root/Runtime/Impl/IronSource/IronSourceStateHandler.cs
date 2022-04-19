@@ -1,7 +1,7 @@
 #if PANCAKE_IRONSOURCE_ENABLE
 using UnityEngine;
 
-namespace Snorlax.Ads
+namespace Pancake.Monetization
 {
     public class IronSourceStateHandler : MonoBehaviour
     {

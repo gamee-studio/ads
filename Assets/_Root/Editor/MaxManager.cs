@@ -4,15 +4,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using Pancake.Monetization;
 #if PANCAKE_MAX_ENABLE
 using AppLovinMax.Scripts.IntegrationManager.Editor;
 #endif
-using Snorlax.Ads;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace Snorlax.AdsEditor
+namespace Pancake.Editor
 {
     /// <summary>
     /// A manager class for MAX integration manager window.

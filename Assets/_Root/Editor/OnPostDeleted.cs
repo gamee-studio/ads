@@ -1,7 +1,6 @@
-using Snorlax.Ads;
 using UnityEditor;
 
-namespace Snorlax.AdsEditor
+namespace Pancake.Editor
 {
     public class OnPostDeleted : UnityEditor.AssetModificationProcessor
     {

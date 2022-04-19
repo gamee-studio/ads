@@ -2,7 +2,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace Snorlax.AdsEditor
+namespace Pancake.Editor
 {
     public class AdsEditorUtil
     {

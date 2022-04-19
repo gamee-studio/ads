@@ -1,20 +1,19 @@
 using System.Collections;
-using Pancake.Editor;
-using Snorlax.Ads;
+using Pancake.Monetization;
 using UnityEditor;
 using UnityEngine;
-using Network = Snorlax.Ads.Network;
+using Network = Pancake.Monetization.Network;
 
-namespace Snorlax.AdsEditor
+namespace Pancake.Editor
 {
     public class SettingsWindow : EditorWindow
     {
         private Vector2 _scrollPosition;
-        private Editor _editor;
+        private UnityEditor.Editor _editor;
 
         private void OnGUI()
         {
-            if (_editor == null) _editor = Editor.CreateEditor(Settings.Instance);
+            if (_editor == null) _editor = UnityEditor.Editor.CreateEditor(Settings.Instance);
 
             if (_editor == null)
             {
@@ -35,10 +34,7 @@ namespace Snorlax.AdsEditor
 
         private static SettingsWindow GetWindow()
         {
-            // Get the window and make sure it will be opened in the same panel with inspector window.
-            var editorAsm = typeof(Editor).Assembly;
-            var inspWndType = editorAsm.GetType("UnityEditor.InspectorWindow");
-            var window = GetWindow<SettingsWindow>(inspWndType);
+            var window = GetWindow<SettingsWindow>(UtilEditor.InspectorWindow);
             window.titleContent = new GUIContent("Ads");
 
             return window;

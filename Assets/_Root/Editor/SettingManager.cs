@@ -7,14 +7,14 @@ using System.Net;
 using System.Xml.Linq;
 using ICSharpCode.SharpZipLib.Zip;
 using Newtonsoft.Json;
-using Snorlax.Ads;
+using Pancake.Monetization;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
-using Network = Snorlax.Ads.Network;
+using Network = Pancake.Monetization.Network;
 
 
-namespace Snorlax.AdsEditor
+namespace Pancake.Editor
 {
     /// <summary>
     /// Delegate to be called when downloading a plugin with the progress percentage. 

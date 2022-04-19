@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Snorlax.Ads
+namespace Pancake.Monetization
 {
     public static class RuntimeManager
     {
