@@ -19,8 +19,9 @@ namespace Pancake.Monetization
         [SerializeField] private bool enableMaxAdReview;
 
 #if UNITY_EDITOR
-        private List<MaxNetwork> _mediationNetworks = new List<MaxNetwork>();
-        public MaxNetwork importingMediationNetwork;
+        public List<MaxNetwork> editorListNetwork = new List<MaxNetwork>();
+        public MaxNetwork editorImportingNetwork;
+        public List<MaxNetwork> editorImportingListNetwork = new List<MaxNetwork>();
 #endif
 
         public bool Enable => enable;
@@ -36,8 +37,5 @@ namespace Pancake.Monetization
         public bool EnableRequestAdAfterHidden => enableRequestAdAfterHidden;
 
         public bool EnableMaxAdReview => enableMaxAdReview;
-#if UNITY_EDITOR
-        public List<MaxNetwork> MediationNetworks { get => _mediationNetworks; set => _mediationNetworks = value; }
-#endif
     }
 }

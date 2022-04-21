@@ -163,22 +163,22 @@ namespace Pancake.Editor
                 AddLabelsToAssetsIfNeeded(pluginParentDir, isPluginOutsideAssetsDir);
                 AssetDatabase.Refresh();
 
-                CallImportPackageCompletedCallback(Settings.MaxSettings.importingMediationNetwork);
-                Settings.MaxSettings.importingMediationNetwork = null;
+                CallImportPackageCompletedCallback(Settings.MaxSettings.editorImportingNetwork);
+                Settings.MaxSettings.editorImportingNetwork = null;
             };
 
             AssetDatabase.importPackageCancelled += packageName =>
             {
                 if (!IsImportingNetwork(packageName)) return;
 
-                Settings.MaxSettings.importingMediationNetwork = null;
+                Settings.MaxSettings.editorImportingNetwork = null;
             };
 
             AssetDatabase.importPackageFailed += (packageName, errorMessage) =>
             {
                 if (!IsImportingNetwork(packageName)) return;
 
-                Settings.MaxSettings.importingMediationNetwork = null;
+                Settings.MaxSettings.editorImportingNetwork = null;
             };
         }
 
@@ -371,7 +371,7 @@ namespace Pancake.Editor
             }
             else
             {
-                Settings.MaxSettings.importingMediationNetwork = network;
+                Settings.MaxSettings.editorImportingNetwork = network;
                 AssetDatabase.ImportPackage(path, true);
             }
 
@@ -420,7 +420,7 @@ namespace Pancake.Editor
             }
             else
             {
-                Settings.MaxSettings.importingMediationNetwork = network;
+                Settings.MaxSettings.editorImportingNetwork = network;
                 AssetDatabase.ImportPackage(path, interactive);
             }
 
@@ -554,7 +554,7 @@ namespace Pancake.Editor
         private bool IsImportingNetwork(string packageName)
         {
             // Note: The pluginName doesn't have the '.unitypacakge' extension included in its name but the pluginFileName does. So using Contains instead of Equals.
-            return Settings.MaxSettings.importingMediationNetwork != null && GetPluginFileName(Settings.MaxSettings.importingMediationNetwork).Contains(packageName);
+            return Settings.MaxSettings.editorImportingNetwork != null && GetPluginFileName(Settings.MaxSettings.editorImportingNetwork).Contains(packageName);
         }
 
 #if PANCAKE_MAX_ENABLE
@@ -770,8 +770,8 @@ namespace Pancake.Editor
 #if PANCAKE_MAX_ENABLE
             EditorCoroutine.StartCoroutine(Instance.LoadPluginData(_ =>
             {
-                Settings.MaxSettings.MediationNetworks = _.MediatedNetworks;
-                foreach (var mediationNetwork in Settings.MaxSettings.MediationNetworks.ToList())
+                Settings.MaxSettings.editorListNetwork = _.MediatedNetworks;
+                foreach (var mediationNetwork in Settings.MaxSettings.editorListNetwork.ToList())
                 {
                     if (mediationNetwork.Name.Equals("CRITEO_NETWORK") || mediationNetwork.Name.Equals("GOOGLE_AD_MANAGER_NETWORK") ||
                         mediationNetwork.Name.Equals("HYPRMX_NETWORK") || mediationNetwork.Name.Equals("LINE_NETWORK") || mediationNetwork.Name.Equals("MAIO_NETWORK") ||
@@ -781,11 +781,11 @@ namespace Pancake.Editor
                         mediationNetwork.Name.Equals("TENCENT_NETWORK") || mediationNetwork.Name.Equals("VERIZON_NETWORK") ||
                         mediationNetwork.Name.Equals("VERVE_NETWORK") || mediationNetwork.Name.Equals("YANDEX_NETWORK"))
                     {
-                        Settings.MaxSettings.MediationNetworks.Remove(mediationNetwork);
+                        Settings.MaxSettings.editorListNetwork.Remove(mediationNetwork);
                     }
                 }
 
-                LoadPluginDataExtend(_ => { Settings.MaxSettings.MediationNetworks.AddRange(_); });
+                LoadPluginDataExtend(_ => { Settings.MaxSettings.editorListNetwork.AddRange(_); });
             }));
 #endif
         }

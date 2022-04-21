@@ -369,7 +369,7 @@ namespace Pancake.Editor
                                 () =>
                                 {
                                     DrawHeaderMediation();
-                                    foreach (var network in Settings.MaxSettings.MediationNetworks)
+                                    foreach (var network in Settings.MaxSettings.editorListNetwork)
                                     {
                                         DrawApplovinNetworkDetailRow(network);
                                     }
@@ -774,9 +774,9 @@ namespace Pancake.Editor
         {
             var showInstallAll = false;
             var showUninstallAll = false;
-            for (int i = 0; i < Settings.MaxSettings.MediationNetworks.Count; i++)
+            for (int i = 0; i < Settings.MaxSettings.editorListNetwork.Count; i++)
             {
-                var network = Settings.MaxSettings.MediationNetworks[i];
+                var network = Settings.MaxSettings.editorListNetwork[i];
                 var status = "";
                 string currentVersion = network.CurrentVersions != null ? network.CurrentVersions.Unity : "";
                 var isActionEnabled = false;
@@ -805,7 +805,7 @@ namespace Pancake.Editor
                 GUI.enabled = showInstallAll && !EditorApplication.isCompiling;
                 if (GUILayout.Button(new GUIContent("Install All"), FieldWidth))
                 {
-                    MaxManager.Instance.DownloadAllPlugin(Settings.MaxSettings.MediationNetworks);
+                    MaxManager.Instance.DownloadAllPlugin(Settings.MaxSettings.editorListNetwork);
                 }
 
                 GUI.enabled = !EditorApplication.isCompiling;
@@ -817,7 +817,7 @@ namespace Pancake.Editor
                     EditorUtility.DisplayProgressBar("Ads", "Deleting All Network...", 0.5f);
                     var pluginRoot = SettingManager.MediationSpecificPluginParentDirectory;
 
-                    foreach (var network in Settings.MaxSettings.MediationNetworks)
+                    foreach (var network in Settings.MaxSettings.editorListNetwork)
                     {
                         var status = "";
                         var isActionEnabled = false;
