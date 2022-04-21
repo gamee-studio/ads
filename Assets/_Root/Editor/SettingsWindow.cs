@@ -2,6 +2,7 @@ using System.Collections;
 using Pancake.Monetization;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Networking;
 using Network = Pancake.Monetization.Network;
 
 namespace Pancake.Editor
@@ -151,7 +152,7 @@ namespace Pancake.Editor
         /// <summary>
         /// Callback method that will be called with progress updates when the plugin is being downloaded.
         /// </summary>
-        private static void OnMaxDownloadPluginProgress(string pluginName, float progress, bool done)
+        private static void OnMaxDownloadPluginProgress(string pluginName, float progress, bool done, UnityWebRequest webRequest)
         {
             // Download is complete. Clear progress bar.
             if (done)
@@ -163,7 +164,7 @@ namespace Pancake.Editor
             {
                 if (EditorUtility.DisplayCancelableProgressBar("Ads", string.Format("Downloading {0} plugin...", pluginName), progress))
                 {
-                    MaxManager.Instance.CancelDownload();
+                    webRequest?.Abort(); // Cancels the plugin download if one is in progress.
                     EditorUtility.ClearProgressBar();
                 }
             }

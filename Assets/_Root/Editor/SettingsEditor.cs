@@ -149,7 +149,7 @@ namespace Pancake.Editor
         {
             _warningIcon = Uniform.IconContent("console.warnicon.sml", "Adapter not compatible, please update to the latest version.");
             _iconUnintall = Uniform.IconContent("d_TreeEditor.Trash", "Uninstall");
-            _headerLabelStyle = new GUIStyle(EditorStyles.label) { fontSize = 12, fontStyle = FontStyle.Bold, fixedHeight = 18 };
+            _headerLabelStyle = new GUIStyle(EditorStyles.label) {fontSize = 12, fontStyle = FontStyle.Bold, fixedHeight = 18};
 
             _autoInitializeProperty = serializedObject.FindProperty("runtimeAutoInitialize");
 
@@ -565,42 +565,16 @@ namespace Pancake.Editor
 
         private void DrawApplovinNetworkDetailRow(MaxNetwork network)
         {
-            string action;
             string currentVersion = network.CurrentVersions != null ? network.CurrentVersions.Unity : "";
             string latestVersion = network.LatestVersions.Unity;
-            bool isActionEnabled;
-            bool isInstalled;
-            if (string.IsNullOrEmpty(currentVersion))
-            {
-                action = "Install";
-                currentVersion = "Not Installed";
-                isActionEnabled = true;
-                isInstalled = false;
-            }
-            else
-            {
-                isInstalled = true;
-
-                var comparison = network.CurrentToLatestVersionComparisonResult;
-                // A newer version is available
-                if (comparison == EVersionComparisonResult.Lesser)
-                {
-                    action = "Upgrade";
-                    isActionEnabled = true;
-                }
-                // Current installed version is newer than latest version from DB (beta version)
-                else if (comparison == EVersionComparisonResult.Greater)
-                {
-                    action = "Installed";
-                    isActionEnabled = false;
-                }
-                // Already on the latest version
-                else
-                {
-                    action = "Installed";
-                    isActionEnabled = false;
-                }
-            }
+            var status = "";
+            var isActionEnabled = false;
+            var isInstalled = false;
+            ValidateVersion(network.CurrentToLatestVersionComparisonResult,
+                ref currentVersion,
+                ref status,
+                ref isActionEnabled,
+                ref isInstalled);
 
             GUILayout.Space(4);
             using (new EditorGUILayout.HorizontalScope(GUILayout.ExpandHeight(false)))
@@ -619,7 +593,7 @@ namespace Pancake.Editor
                 }
 
                 GUI.enabled = isActionEnabled && !EditorApplication.isCompiling;
-                if (GUILayout.Button(new GUIContent(action), FieldWidth))
+                if (GUILayout.Button(new GUIContent(status), FieldWidth))
                 {
                     // Download the plugin.
                     EditorCoroutine.StartCoroutine(MaxManager.Instance.DownloadPlugin(network));
@@ -656,8 +630,8 @@ namespace Pancake.Editor
                 {
 #if PANCAKE_MAX_ENABLE
                     // ReSharper disable once PossibleNullReferenceException
-                    if ((int)MaxSdkUtils.CompareUnityMediationVersions(network.CurrentVersions.Unity, "android_19.0.1.0_ios_7.57.0.0") ==
-                        (int)EVersionComparisonResult.Greater)
+                    if ((int) MaxSdkUtils.CompareUnityMediationVersions(network.CurrentVersions.Unity, "android_19.0.1.0_ios_7.57.0.0") ==
+                        (int) EVersionComparisonResult.Greater)
                     {
                         GUILayout.BeginHorizontal();
                         GUILayout.Space(20);
@@ -685,6 +659,7 @@ namespace Pancake.Editor
                 string latestVersion = network.latestUnityVersion;
                 bool isActionEnabled;
                 bool isInstalled;
+
                 if (string.IsNullOrEmpty(currentVersion))
                 {
                     action = "Install";
@@ -757,12 +732,28 @@ namespace Pancake.Editor
                 }
             }
         }
-        
+
         private void DrawApplovinInstallAllNetwork()
         {
-            bool isActionEnabled = false;
-            bool isInstalled = false;
-            string action = "Install All";
+            var showInstallAll = false;
+            var showUninstallAll = false;
+            for (int i = 0; i < Settings.MaxSettings.MediationNetworks.Count; i++)
+            {
+                var network = Settings.MaxSettings.MediationNetworks[i];
+                var status = "";
+                string currentVersion = network.CurrentVersions != null ? network.CurrentVersions.Unity : "";
+                var isActionEnabled = false;
+                var isInstalled = false;
+                ValidateVersion(network.CurrentToLatestVersionComparisonResult,
+                    ref currentVersion,
+                    ref status,
+                    ref isActionEnabled,
+                    ref isInstalled);
+
+                if (isActionEnabled) showInstallAll = true;
+                if (isInstalled) showUninstallAll = true;
+            }
+
             GUILayout.Space(4);
             using (new EditorGUILayout.HorizontalScope(GUILayout.ExpandHeight(false)))
             {
@@ -774,30 +765,43 @@ namespace Pancake.Editor
                 GUILayout.Space(3);
                 GUILayout.FlexibleSpace();
 
-                GUI.enabled = isActionEnabled && !EditorApplication.isCompiling;
-                if (GUILayout.Button(new GUIContent(action), FieldWidth))
+                GUI.enabled = showInstallAll && !EditorApplication.isCompiling;
+                if (GUILayout.Button(new GUIContent("Install All"), FieldWidth))
                 {
-                    
-                    
-                    // Download the plugin.
-                   // EditorCoroutine.StartCoroutine(MaxManager.Instance.DownloadPlugin(network));
+                    MaxManager.Instance.DownloadAllPlugin(Settings.MaxSettings.MediationNetworks);
                 }
 
                 GUI.enabled = !EditorApplication.isCompiling;
                 GUILayout.Space(2);
 
-                GUI.enabled = isInstalled && !EditorApplication.isCompiling;
+                GUI.enabled = showUninstallAll && !EditorApplication.isCompiling;
                 if (GUILayout.Button(new GUIContent("Unistall All"), GUILayout.Width(ACTION_FIELD_WIDTH + 10)))
                 {
-                    //EditorUtility.DisplayProgressBar("Ads", "Deleting " + network.DisplayName + "...", 0.5f);
+                    EditorUtility.DisplayProgressBar("Ads", "Deleting All Network...", 0.5f);
                     var pluginRoot = SettingManager.MediationSpecificPluginParentDirectory;
-                    // foreach (var pluginFilePath in network.PluginFilePaths)
-                    // {
-                    //     FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, pluginFilePath));
-                    //     FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, pluginFilePath + ".meta"));
-                    // }
-                    //
-                    // MaxManager.UpdateCurrentVersions(network, pluginRoot);
+
+                    foreach (var network in Settings.MaxSettings.MediationNetworks)
+                    {
+                        var status = "";
+                        var isActionEnabled = false;
+                        var isInstalled = false;
+                        string currentVersion = network.CurrentVersions != null ? network.CurrentVersions.Unity : "";
+
+                        if (!ValidateVersion(network.CurrentToLatestVersionComparisonResult,
+                                ref currentVersion,
+                                ref status,
+                                ref isActionEnabled,
+                                ref isInstalled))
+                        {
+                            foreach (var pluginFilePath in network.PluginFilePaths)
+                            {
+                                FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, pluginFilePath));
+                                FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, pluginFilePath + ".meta"));
+                            }
+
+                            MaxManager.UpdateCurrentVersions(network, pluginRoot);
+                        }
+                    }
 
                     // Refresh UI
                     AssetDatabase.Refresh();
@@ -807,6 +811,50 @@ namespace Pancake.Editor
                 GUI.enabled = !EditorApplication.isCompiling;
                 GUILayout.Space(5);
             }
+        }
+
+        private bool ValidateVersion(
+            EVersionComparisonResult comparisonResult,
+            ref string currentVersion,
+            // ReSharper disable once RedundantAssignment
+            ref string status,
+            // ReSharper disable once RedundantAssignment
+            ref bool isActionEnabled,
+            // ReSharper disable once RedundantAssignment
+            ref bool isInstalled)
+        {
+            if (string.IsNullOrEmpty(currentVersion))
+            {
+                status = "Install";
+                currentVersion = "Not Installed";
+                isActionEnabled = true;
+                isInstalled = false;
+            }
+            else
+            {
+                isInstalled = true;
+
+                // A newer version is available
+                if (comparisonResult == EVersionComparisonResult.Lesser)
+                {
+                    status = "Upgrade";
+                    isActionEnabled = true;
+                }
+                // Current installed version is newer than latest version from DB (beta version)
+                else if (comparisonResult == EVersionComparisonResult.Greater)
+                {
+                    status = "Installed";
+                    isActionEnabled = false;
+                }
+                // Already on the latest version
+                else
+                {
+                    status = "Installed";
+                    isActionEnabled = false;
+                }
+            }
+
+            return isActionEnabled;
         }
 
         #endregion

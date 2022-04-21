@@ -29,6 +29,8 @@ namespace Pancake.Editor
         /// <param name="done">Whether or not the download is complete.</param>
         public delegate void DownloadPluginProgressCallback(string pluginName, float progress, bool done);
 
+        public delegate void DownloadPluginProgressCallbackWeb(string pluginName, float progress, bool done, UnityWebRequest webRequest);
+
         /// <summary>
         /// Delegate to be called when a plugin package is imported.
         /// </summary>
@@ -61,10 +63,11 @@ namespace Pancake.Editor
 
         private static string externalDependencyManagerVersion;
 
-        public static DownloadPluginProgressCallback downloadPluginProgressCallback;
+        public static DownloadPluginProgressCallbackWeb downloadPluginProgressCallback;
         public static ImportPackageCompletedCallback importPackageCompletedCallback;
-
-        private UnityWebRequest webRequest;
+        private UnityWebRequest _webRequest;
+        private UnityWebRequest[] _branWidthRequest;
+        private readonly WaitForSeconds _wait = new WaitForSeconds(0.1f);
 
         /// <summary>
         /// An Instance of the Integration manager.
@@ -184,6 +187,10 @@ namespace Pancake.Editor
         static MaxManager() { }
 
 #if PANCAKE_MAX_ENABLE
+        public static void SetUnityWebRequest(UnityWebRequest value) { Instance._webRequest = value; }
+
+        public static UnityWebRequest GetUnityWebRequest() { return Instance._webRequest; }
+
         /// <summary>
         /// Loads the plugin data to be display by integration manager window.
         /// </summary>
@@ -334,57 +341,107 @@ namespace Pancake.Editor
         /// Downloads the plugin file for a given network.
         /// </summary>
         /// <param name="network">Network for which to download the current version.</param>
+        /// <param name="interactive"></param>
         /// <returns></returns>
-        public IEnumerator DownloadPlugin(MaxNetwork network)
+        public IEnumerator DownloadPlugin(MaxNetwork network, bool interactive = true)
         {
-            var path = Path.Combine(Application.temporaryCachePath, GetPluginFileName(network)); // TODO: Maybe delete plugin file after finishing import.
+            string path = Path.Combine(Application.temporaryCachePath, GetPluginFileName(network)); // TODO: Maybe delete plugin file after finishing import.
+
 #if UNITY_2017_2_OR_NEWER
             var downloadHandler = new DownloadHandlerFile(path);
 #else
             var downloadHandler = new AppLovinDownloadHandler(path);
 #endif
-            webRequest = new UnityWebRequest(network.DownloadUrl) {method = UnityWebRequest.kHttpVerbGET, downloadHandler = downloadHandler};
+            _webRequest = new UnityWebRequest(network.DownloadUrl) {method = UnityWebRequest.kHttpVerbGET, downloadHandler = downloadHandler};
 
 #if UNITY_2017_2_OR_NEWER
-            var operation = webRequest.SendWebRequest();
+            var operation = _webRequest.SendWebRequest();
 #else
-        var operation = webRequest.Send();
+            var operation = _webRequest.Send();
 #endif
 
             while (!operation.isDone)
             {
-                yield return new WaitForSeconds(0.1f); // Just wait till webRequest is completed. Our coroutine is pretty rudimentary.
-                CallDownloadPluginProgressCallback(network.DisplayName, operation.progress, operation.isDone);
+                yield return _wait; // Just wait till webRequest is completed. Our coroutine is pretty rudimentary.
+                CallDownloadPluginProgressCallback(network.DisplayName, operation.progress, operation.isDone, _webRequest);
             }
 
-
 #if UNITY_2020_1_OR_NEWER
-            if (webRequest.result != UnityWebRequest.Result.Success)
+            if (_webRequest.result != UnityWebRequest.Result.Success)
 #elif UNITY_2017_2_OR_NEWER
-            if (webRequest.isNetworkError || webRequest.isHttpError)
+            if (_webRequest.isNetworkError || _webRequest.isHttpError)
 #else
-            if (webRequest.isError)
+            if (_webRequest.isError)
 #endif
             {
-                Debug.LogError(webRequest.error);
+                Debug.LogError(_webRequest.error);
             }
             else
             {
                 Settings.MaxSettings.importingMediationNetwork = network;
-                AssetDatabase.ImportPackage(path, true);
+                AssetDatabase.ImportPackage(path, interactive);
             }
 
-            webRequest = null;
+            _webRequest = null;
         }
 
         /// <summary>
-        /// Cancels the plugin download if one is in progress.
+        /// Downloads the plugin file for a given network.
         /// </summary>
-        public void CancelDownload()
+        /// <param name="network">Network for which to download the current version.</param>
+        /// <param name="index"></param>
+        /// <param name="interactive"></param>
+        /// <returns></returns>
+        public IEnumerator DownloadPlugin(MaxNetwork network, int index, bool interactive = true)
         {
-            if (webRequest == null) return;
+            string path = Path.Combine(Application.temporaryCachePath, GetPluginFileName(network)); // TODO: Maybe delete plugin file after finishing import.
 
-            webRequest.Abort();
+#if UNITY_2017_2_OR_NEWER
+            var downloadHandler = new DownloadHandlerFile(path);
+#else
+            var downloadHandler = new AppLovinDownloadHandler(path);
+#endif
+            _branWidthRequest[index] = new UnityWebRequest(network.DownloadUrl) {method = UnityWebRequest.kHttpVerbGET, downloadHandler = downloadHandler};
+
+#if UNITY_2017_2_OR_NEWER
+            var operation = _branWidthRequest[index].SendWebRequest();
+#else
+            var operation = _branWidthRequest[index].Send();
+#endif
+
+            while (!operation.isDone)
+            {
+                yield return _wait; // Just wait till webRequest is completed. Our coroutine is pretty rudimentary.
+                CallDownloadPluginProgressCallback(network.DisplayName, operation.progress, operation.isDone, _branWidthRequest[index]);
+            }
+
+#if UNITY_2020_1_OR_NEWER
+            if (_branWidthRequest[index].result != UnityWebRequest.Result.Success)
+#elif UNITY_2017_2_OR_NEWER
+            if (_branWidthRequest[index].isNetworkError || _branWidthRequest[index].isHttpError)
+#else
+            if (_branWidthRequest[index].isError)
+#endif
+            {
+                Debug.LogError(_branWidthRequest[index].error);
+            }
+            else
+            {
+                Settings.MaxSettings.importingMediationNetwork = network;
+                AssetDatabase.ImportPackage(path, interactive);
+            }
+
+            _branWidthRequest[index] = null;
+        }
+
+        public void DownloadAllPlugin(List<MaxNetwork> networks)
+        {
+            _branWidthRequest = new UnityWebRequest[networks.Count];
+
+            for (var i = 0; i < networks.Count; i++)
+            {
+                EditorCoroutine.StartCoroutine(DownloadPlugin(networks[i], i, false));
+            }
         }
 
         /// <summary>
@@ -682,11 +739,9 @@ namespace Pancake.Editor
             return isFolderAsset && !hasLabels;
         }
 
-        private static void CallDownloadPluginProgressCallback(string pluginName, float progress, bool isDone)
+        private static void CallDownloadPluginProgressCallback(string pluginName, float progress, bool isDone, UnityWebRequest webRequest)
         {
-            if (downloadPluginProgressCallback == null) return;
-
-            downloadPluginProgressCallback(pluginName, progress, isDone);
+            downloadPluginProgressCallback?.Invoke(pluginName, progress, isDone, webRequest);
         }
 
         private static void CallImportPackageCompletedCallback(MaxNetwork network)
@@ -719,7 +774,6 @@ namespace Pancake.Editor
         }
 
         private static string GetPluginFileName(MaxNetwork network) { return network.Name.ToLowerInvariant() + "_" + network.LatestVersions.Unity + ".unitypackage"; }
-
 
         public void Load()
         {
