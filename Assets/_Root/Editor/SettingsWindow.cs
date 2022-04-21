@@ -68,7 +68,7 @@ namespace Pancake.Editor
             IronSourceManager.importPackageCompletedCallback = OnImportIronSourceCompleted;
 
             SettingManager.Instance.Load();
-            SettingManager.Instance.LoadGMA();
+            SettingManager.Instance.LoadGma();
             IronSourceManager.Instance.Load();
             MaxManager.Instance.Load();
             Uniform.FoldoutSettings.LoadSetting();

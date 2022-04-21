@@ -270,7 +270,7 @@ namespace Pancake.Editor
                             {
                                 if (GUILayout.Button("Update Admob Plugin", GUILayout.Height(EditorGUIUtility.singleLineHeight * 1.3f)))
                                 {
-                                    EditorCoroutine.StartCoroutine(SettingManager.Instance.DownloadGMA(Settings.AdmobSettings.importingSdk));
+                                    EditorCoroutine.StartCoroutine(SettingManager.Instance.DownloadGma(Settings.AdmobSettings.importingSdk));
                                 }
                             }
 
@@ -304,6 +304,8 @@ namespace Pancake.Editor
                                     {
                                         DrawAdmobNetworkDetailRow(network);
                                     }
+                                    
+                                    //DrawAdmobInstallAllNetwork();
                                 });
 
                             EditorGUILayout.Space();
@@ -322,7 +324,7 @@ namespace Pancake.Editor
                             {
                                 if (Settings.AdmobSettings.importingSdk != null)
                                 {
-                                    EditorCoroutine.StartCoroutine(SettingManager.Instance.DownloadGMA(Settings.AdmobSettings.importingSdk));
+                                    EditorCoroutine.StartCoroutine(SettingManager.Instance.DownloadGma(Settings.AdmobSettings.importingSdk));
                                 }
                                 else
                                 {
@@ -371,8 +373,7 @@ namespace Pancake.Editor
                                     {
                                         DrawApplovinNetworkDetailRow(network);
                                     }
-
-                                    Uniform.SpaceHalfLine();
+                                    
                                     DrawApplovinInstallAllNetwork();
                                 });
                             EditorGUILayout.Space();
@@ -421,7 +422,6 @@ namespace Pancake.Editor
                                         DrawIronSourceNetworkDetailRow(network);
                                     }
                                     
-                                    Uniform.SpaceHalfLine();
                                     DrawIronsourceInstallAllNetwork();
                                 });
                             EditorGUILayout.Space();
@@ -468,42 +468,16 @@ namespace Pancake.Editor
 
         private void DrawAdmobNetworkDetailRow(Network network)
         {
-            string action;
             string currentVersion = network.currentVersion != null ? network.currentVersion.unity : "";
             string latestVersion = network.lastVersion.unity;
-            bool isActionEnabled;
-            bool isInstalled;
-            if (string.IsNullOrEmpty(currentVersion))
-            {
-                action = "Install";
-                currentVersion = "Not Installed";
-                isActionEnabled = true;
-                isInstalled = false;
-            }
-            else
-            {
-                isInstalled = true;
-
-                var comparison = network.CurrentToLatestVersionComparisonResult;
-                // A newer version is available
-                if (comparison == EVersionComparisonResult.Lesser)
-                {
-                    action = "Upgrade";
-                    isActionEnabled = true;
-                }
-                // Current installed version is newer than latest version from DB (beta version)
-                else if (comparison == EVersionComparisonResult.Greater)
-                {
-                    action = "Installed";
-                    isActionEnabled = false;
-                }
-                // Already on the latest version
-                else
-                {
-                    action = "Installed";
-                    isActionEnabled = false;
-                }
-            }
+            var status = "";
+            var isActionEnabled = false;
+            var isInstalled = false;
+            ValidateVersionAdmob(network.CurrentToLatestVersionComparisonResult,
+                ref currentVersion,
+                ref status,
+                ref isActionEnabled,
+                ref isInstalled);
 
             GUILayout.Space(4);
             using (new EditorGUILayout.HorizontalScope(GUILayout.ExpandHeight(false)))
@@ -522,7 +496,7 @@ namespace Pancake.Editor
                 }
 
                 GUI.enabled = isActionEnabled && !EditorApplication.isCompiling;
-                if (GUILayout.Button(new GUIContent(action), FieldWidth))
+                if (GUILayout.Button(new GUIContent(status), FieldWidth))
                 {
                     // Download the plugin.
                     EditorCoroutine.StartCoroutine(SettingManager.Instance.DownloadPlugin(network));
@@ -658,41 +632,17 @@ namespace Pancake.Editor
         {
             if (!network.Equals(default(AdapterMediationIronSource)))
             {
-                string action;
                 string currentVersion = network.currentUnityVersion;
                 string latestVersion = network.latestUnityVersion;
-                bool isActionEnabled;
-                bool isInstalled;
+                var status = "";
+                var isActionEnabled = false;
+                var isInstalled = false;
 
-                if (string.IsNullOrEmpty(currentVersion))
-                {
-                    action = "Install";
-                    currentVersion = "Not Installed";
-                    isActionEnabled = true;
-                    isInstalled = false;
-                }
-                else
-                {
-                    isInstalled = true;
-                    switch (network.currentStatus)
-                    {
-                        // A newer version is available
-                        case EAdapterStatus.Upgrade:
-                            action = "Upgrade";
-                            isActionEnabled = true;
-                            break;
-                        // Current installed version is newer than latest version from DB (beta version)
-                        case EAdapterStatus.Installed:
-                            action = "Installed";
-                            isActionEnabled = false;
-                            break;
-                        // Already on the latest version
-                        default:
-                            action = "Installed";
-                            isActionEnabled = false;
-                            break;
-                    }
-                }
+                ValidateVersionIronSource(network.currentStatus,
+                    ref currentVersion,
+                    ref status,
+                    ref isActionEnabled,
+                    ref isInstalled);
 
                 GUILayout.Space(4);
                 using (new EditorGUILayout.HorizontalScope(GUILayout.ExpandHeight(false)))
@@ -708,7 +658,7 @@ namespace Pancake.Editor
                     GUILayout.FlexibleSpace();
 
                     GUI.enabled = isActionEnabled && !EditorApplication.isCompiling;
-                    if (GUILayout.Button(new GUIContent(action), FieldWidth))
+                    if (GUILayout.Button(new GUIContent(status), FieldWidth))
                     {
                         // Download the plugin.
                         EditorCoroutine.StartCoroutine(IronSourceManager.Instance.DownloadFileDependency(network.downloadUrl));
@@ -737,6 +687,89 @@ namespace Pancake.Editor
             }
         }
 
+        /// <summary>
+        /// Use Install All Network to import package => AssetDatabase.importPackageCompleted not called
+        /// </summary>
+        private void DrawAdmobInstallAllNetwork()
+        {
+            var showInstallAll = false;
+            var showUninstallAll = false;
+            for (int i = 0; i < Settings.AdmobSettings.MediationNetworks.Count; i++)
+            {
+                var network = Settings.AdmobSettings.MediationNetworks[i];
+                string currentVersion = network.currentVersion != null ? network.currentVersion.unity : "";
+                var status = "";
+                var isActionEnabled = false;
+                var isInstalled = false;
+                ValidateVersionAdmob(network.CurrentToLatestVersionComparisonResult,
+                    ref currentVersion,
+                    ref status,
+                    ref isActionEnabled,
+                    ref isInstalled);
+
+                if (isActionEnabled) showInstallAll = true;
+                if (isInstalled) showUninstallAll = true;
+            }
+
+            GUILayout.Space(4);
+            using (new EditorGUILayout.HorizontalScope(GUILayout.ExpandHeight(false)))
+            {
+                GUILayout.Space(5);
+                EditorGUILayout.LabelField(new GUIContent(), NetworkWidthOption);
+                EditorGUILayout.LabelField(new GUIContent(), VersionWidthOption);
+                GUILayout.Space(3);
+                EditorGUILayout.LabelField(new GUIContent(), VersionWidthOption);
+                GUILayout.Space(3);
+                GUILayout.FlexibleSpace();
+
+                GUI.enabled = showInstallAll && !EditorApplication.isCompiling;
+                if (GUILayout.Button(new GUIContent("Install All"), FieldWidth))
+                {
+                    SettingManager.Instance.DownloadAllPlugin(Settings.AdmobSettings.MediationNetworks);
+                }
+
+                GUI.enabled = !EditorApplication.isCompiling;
+                GUILayout.Space(2);
+
+                GUI.enabled = showUninstallAll && !EditorApplication.isCompiling;
+                if (GUILayout.Button(new GUIContent("Unistall All"), GUILayout.Width(ACTION_FIELD_WIDTH + 10)))
+                {
+                    EditorUtility.DisplayProgressBar("Ads", "Deleting All Network...", 0.5f);
+                    var pluginRoot = SettingManager.MediationSpecificPluginParentDirectory;
+
+                    foreach (var network in Settings.AdmobSettings.MediationNetworks)
+                    {
+                        foreach (var pluginFilePath in network.pluginFilePath)
+                        {
+                            if (pluginFilePath.StartsWith("Plugins"))
+                            {
+                                FileUtil.DeleteFileOrDirectory(Path.Combine("Assets", pluginFilePath));
+                                FileUtil.DeleteFileOrDirectory(Path.Combine("Assets", pluginFilePath + ".meta"));
+                            }
+                            else
+                            {
+                                FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, pluginFilePath));
+                                FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, pluginFilePath + ".meta"));
+                            }
+                        }
+
+                        SettingManager.RemoveAllEmptyFolder(new DirectoryInfo(pluginRoot));
+                        SettingManager.Instance.UpdateCurrentVersion(network);
+                    }
+
+                    // Refresh UI
+                    AssetDatabase.Refresh();
+                    EditorUtility.ClearProgressBar();
+                }
+
+                GUI.enabled = !EditorApplication.isCompiling;
+                GUILayout.Space(5);
+            }
+        }
+
+        /// <summary>
+        /// AssetDatabase.importPackageCompleted not called
+        /// </summary>
         private void DrawApplovinInstallAllNetwork()
         {
             var showInstallAll = false;
@@ -817,6 +850,9 @@ namespace Pancake.Editor
             }
         }
 
+        /// <summary>
+        /// AssetDatabase.importPackageCompleted not called
+        /// </summary>
         private void DrawIronsourceInstallAllNetwork()
         {
             var showInstallAll = false;
@@ -859,7 +895,7 @@ namespace Pancake.Editor
 
                 GUI.enabled = !EditorApplication.isCompiling;
                 GUILayout.Space(2);
-                
+
                 GUI.enabled = showUninstallAll && !EditorApplication.isCompiling;
                 if (GUILayout.Button(new GUIContent("Unistall All"), GUILayout.Width(ACTION_FIELD_WIDTH + 10)))
                 {
@@ -870,7 +906,7 @@ namespace Pancake.Editor
                     {
                         FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, "IronSource", "Editor", network.fileName));
                         FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, "IronSource", "Editor", network.fileName + ".meta"));
-                        
+
                         IronSourceManager.RefreshAllCurrentVersionAdapter();
                     }
 
@@ -882,6 +918,50 @@ namespace Pancake.Editor
                 GUI.enabled = !EditorApplication.isCompiling;
                 GUILayout.Space(5);
             }
+        }
+
+        private bool ValidateVersionAdmob(
+            EVersionComparisonResult comparison,
+            ref string currentVersion,
+            // ReSharper disable once RedundantAssignment
+            ref string status,
+            // ReSharper disable once RedundantAssignment
+            ref bool isActionEnabled,
+            // ReSharper disable once RedundantAssignment
+            ref bool isInstalled)
+        {
+            if (string.IsNullOrEmpty(currentVersion))
+            {
+                status = "Install";
+                currentVersion = "Not Installed";
+                isActionEnabled = true;
+                isInstalled = false;
+            }
+            else
+            {
+                isInstalled = true;
+
+                // A newer version is available
+                if (comparison == EVersionComparisonResult.Lesser)
+                {
+                    status = "Upgrade";
+                    isActionEnabled = true;
+                }
+                // Current installed version is newer than latest version from DB (beta version)
+                else if (comparison == EVersionComparisonResult.Greater)
+                {
+                    status = "Installed";
+                    isActionEnabled = false;
+                }
+                // Already on the latest version
+                else
+                {
+                    status = "Installed";
+                    isActionEnabled = false;
+                }
+            }
+
+            return isActionEnabled;
         }
 
         private bool ValidateVersionMax(

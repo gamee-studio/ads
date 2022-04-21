@@ -335,9 +335,8 @@ namespace Pancake.Editor
         /// Downloads the plugin file for a given network.
         /// </summary>
         /// <param name="network">Network for which to download the current version.</param>
-        /// <param name="interactive"></param>
         /// <returns></returns>
-        public IEnumerator DownloadPlugin(MaxNetwork network, bool interactive = true)
+        public IEnumerator DownloadPlugin(MaxNetwork network)
         {
             string path = Path.Combine(Application.temporaryCachePath, GetPluginFileName(network)); // TODO: Maybe delete plugin file after finishing import.
 
@@ -373,7 +372,7 @@ namespace Pancake.Editor
             else
             {
                 Settings.MaxSettings.importingMediationNetwork = network;
-                AssetDatabase.ImportPackage(path, interactive);
+                AssetDatabase.ImportPackage(path, true);
             }
 
             webRequest = null;
@@ -386,7 +385,7 @@ namespace Pancake.Editor
         /// <param name="index"></param>
         /// <param name="interactive"></param>
         /// <returns></returns>
-        public IEnumerator DownloadPlugin(MaxNetwork network, int index, bool interactive = true)
+        private IEnumerator DownloadPlugin(MaxNetwork network, int index, bool interactive = true)
         {
             string path = Path.Combine(Application.temporaryCachePath, GetPluginFileName(network)); // TODO: Maybe delete plugin file after finishing import.
 
@@ -428,6 +427,10 @@ namespace Pancake.Editor
             branWidthRequest[index] = null;
         }
 
+        /// <summary>
+        /// Download all mediation network
+        /// </summary>
+        /// <param name="networks"></param>
         public void DownloadAllPlugin(List<MaxNetwork> networks)
         {
             branWidthRequest = new UnityWebRequest[networks.Count];
@@ -735,9 +738,7 @@ namespace Pancake.Editor
 
         private static void CallImportPackageCompletedCallback(MaxNetwork network)
         {
-            if (importPackageCompletedCallback == null) return;
-
-            importPackageCompletedCallback(network);
+            importPackageCompletedCallback?.Invoke(network);
         }
 
         private static object GetEditorUserBuildSetting(string name, object defaultValue)

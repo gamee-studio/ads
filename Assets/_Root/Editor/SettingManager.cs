@@ -145,16 +145,12 @@ namespace Pancake.Editor
 
         private static void CallImportPackageCompletedCallback(Network network)
         {
-            if (importPackageCompletedCallback == null) return;
-
-            importPackageCompletedCallback(network);
+            importPackageCompletedCallback?.Invoke(network);
         }
 
         private static void CallImportGmaCompletedCallback(Network network)
         {
-            if (importGmaCompletedCallback == null) return;
-
-            importGmaCompletedCallback(network);
+            importGmaCompletedCallback?.Invoke(network);
         }
 
         /// <summary>
@@ -399,7 +395,55 @@ namespace Pancake.Editor
             webRequest = null;
         }
 
-        public IEnumerator DownloadGMA(Network network)
+        private IEnumerator DownloadPlugin(Network network, int index)
+        {
+            string pathFile = Path.Combine(Application.temporaryCachePath, $"{network.name.ToLowerInvariant()}_{network.lastVersion.unity}.zip");
+            string urlDownload = string.Format(network.path, network.lastVersion.unity);
+            var downloadHandler = new DownloadHandlerFile(pathFile);
+            brandWidthWebRequest[index] = new UnityWebRequest(urlDownload) { method = UnityWebRequest.kHttpVerbGET, downloadHandler = downloadHandler };
+            var operation = brandWidthWebRequest[index].SendWebRequest();
+            
+            while (!operation.isDone)
+            {
+                yield return new WaitForSeconds(0.1f); // Just wait till webRequest is completed. Our coroutine is pretty rudimentary.
+                downloadPluginProgressCallback?.Invoke(network.displayName, operation.progress, operation.isDone, index);
+            }
+
+#if UNITY_2020_1_OR_NEWER
+            if (brandWidthWebRequest[index].result != UnityWebRequest.Result.Success)
+#elif UNITY_2017_2_OR_NEWER
+            if (brandWidthWebRequest[index].isNetworkError || brandWidthWebRequest[index].isHttpError)
+#else
+            if (brandWidthWebRequest[index].isError)
+#endif
+            {
+                Debug.LogError(brandWidthWebRequest[index].error);
+            }
+            else
+            {
+                Settings.AdmobSettings.importingMediationNetwork = network;
+
+                string folderUnZip = Path.Combine(Application.temporaryCachePath, "UnZip");
+                UnZip(folderUnZip, File.ReadAllBytes(pathFile));
+
+                AssetDatabase.ImportPackage(Path.Combine(folderUnZip, $"{network.displayName}UnityAdapter-{network.lastVersion.unity}", GetPluginFileName(network)),
+                    false);
+            }
+
+            brandWidthWebRequest[index] = null;
+        }
+
+        public void DownloadAllPlugin(List<Network> networks)
+        {
+            brandWidthWebRequest = new UnityWebRequest[networks.Count];
+
+            for (var i = 0; i < networks.Count; i++)
+            {
+                EditorCoroutine.StartCoroutine(DownloadPlugin(networks[i], i));
+            }
+        }
+        
+        public IEnumerator DownloadGma(Network network)
         {
             string pathFile = Path.Combine(Application.temporaryCachePath, $"GoogleMobileAds-v{network.lastVersion.unity}.unitypackage");
             string urlDownload = string.Format(network.path, network.lastVersion.unity);
@@ -432,7 +476,7 @@ namespace Pancake.Editor
             webRequest = null;
         }
 
-        public void LoadGMA()
+        public void LoadGma()
         {
             using var curl = new WebClient();
             curl.Headers.Add(HttpRequestHeader.UserAgent, "request");
