@@ -22,6 +22,7 @@ namespace Pancake.Monetization
         public List<MaxNetwork> editorListNetwork = new List<MaxNetwork>();
         public MaxNetwork editorImportingNetwork;
         public List<MaxNetwork> editorImportingListNetwork = new List<MaxNetwork>();
+        public bool editorInstallAllFlag;
 #endif
 
         public bool Enable => enable;

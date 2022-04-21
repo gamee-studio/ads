@@ -27,7 +27,7 @@ namespace Pancake.Editor
         /// <param name="pluginName">The name of the plugin being downloaded.</param>
         /// <param name="progress">Percentage downloaded.</param>
         /// <param name="done">Whether or not the download is complete.</param>
-        public delegate void DownloadPluginProgressCallback(string pluginName, float progress, bool done,int index);
+        public delegate void DownloadPluginProgressCallback(string pluginName, float progress, bool done, int index);
 
         /// <summary>
         /// Delegate to be called when a plugin package is imported.
@@ -153,33 +153,70 @@ namespace Pancake.Editor
         private MaxManager()
         {
             // Add asset import callbacks.
-            AssetDatabase.importPackageCompleted += packageName =>
-            {
-                if (!IsImportingNetwork(packageName)) return;
+            AssetDatabase.importPackageCompleted += OnAssetDatabaseOnimportPackageCompleted;
+            AssetDatabase.importPackageCancelled += OnAssetDatabaseOnimportPackageCancelled;
+            AssetDatabase.importPackageFailed += OnAssetDatabaseOnimportPackageFailed;
+            
+            AssetDatabase.importPackageCompleted += OnAssetDatabaseOnimportAllPackageCompleted;
+            AssetDatabase.importPackageCancelled += OnAssetDatabaseOnimportAllPackageCancelled;
+            AssetDatabase.importPackageFailed += OnAssetDatabaseOnimportAllPackageFailed;
+        }
 
-                var pluginParentDir = PluginParentDirectory;
-                var isPluginOutsideAssetsDir = IsPluginOutsideAssetsDirectory;
-                MovePluginFilesIfNeeded(pluginParentDir, isPluginOutsideAssetsDir);
-                AddLabelsToAssetsIfNeeded(pluginParentDir, isPluginOutsideAssetsDir);
-                AssetDatabase.Refresh();
+        private void OnAssetDatabaseOnimportAllPackageCancelled(string packageName)
+        {
+            var result = IsIncludeImportAllNetwork(packageName);
+            if (!result.Item1) return;
+            
+            Settings.MaxSettings.editorImportingListNetwork[result.Item2] = null;
+        }
 
-                CallImportPackageCompletedCallback(Settings.MaxSettings.editorImportingNetwork);
-                Settings.MaxSettings.editorImportingNetwork = null;
-            };
+        private void OnAssetDatabaseOnimportAllPackageFailed(string packageName, string errormessage)
+        {
+            var result = IsIncludeImportAllNetwork(packageName);
+            if (!result.Item1) return;
+            
+            Settings.MaxSettings.editorImportingListNetwork[result.Item2] = null;
+        }
 
-            AssetDatabase.importPackageCancelled += packageName =>
-            {
-                if (!IsImportingNetwork(packageName)) return;
+        private void OnAssetDatabaseOnimportAllPackageCompleted(string packageName)
+        {
+            var result = IsIncludeImportAllNetwork(packageName);
+            if (!result.Item1) return;
+            string pluginParentDir = PluginParentDirectory;
+            bool isPluginOutsideAssetsDir = IsPluginOutsideAssetsDirectory;
+            MovePluginFilesIfNeeded(pluginParentDir, isPluginOutsideAssetsDir);
+            AddLabelsToAssetsIfNeeded(pluginParentDir, isPluginOutsideAssetsDir);
+            AssetDatabase.Refresh();
+            
+            CallImportPackageCompletedCallback(Settings.MaxSettings.editorImportingListNetwork[result.Item2]);
+            Settings.MaxSettings.editorImportingListNetwork[result.Item2] = null;
+        }
 
-                Settings.MaxSettings.editorImportingNetwork = null;
-            };
+        private void OnAssetDatabaseOnimportPackageFailed(string packageName, string errorMessage)
+        {
+            if (!IsImportingNetwork(packageName)) return;
 
-            AssetDatabase.importPackageFailed += (packageName, errorMessage) =>
-            {
-                if (!IsImportingNetwork(packageName)) return;
+            Settings.MaxSettings.editorImportingNetwork = null;
+        }
 
-                Settings.MaxSettings.editorImportingNetwork = null;
-            };
+        private void OnAssetDatabaseOnimportPackageCancelled(string packageName)
+        {
+            if (!IsImportingNetwork(packageName)) return;
+
+            Settings.MaxSettings.editorImportingNetwork = null;
+        }
+
+        private void OnAssetDatabaseOnimportPackageCompleted(string packageName)
+        {
+            if (!IsImportingNetwork(packageName)) return;
+            string pluginParentDir = PluginParentDirectory;
+            bool isPluginOutsideAssetsDir = IsPluginOutsideAssetsDirectory;
+            MovePluginFilesIfNeeded(pluginParentDir, isPluginOutsideAssetsDir);
+            AddLabelsToAssetsIfNeeded(pluginParentDir, isPluginOutsideAssetsDir);
+            AssetDatabase.Refresh();
+
+            CallImportPackageCompletedCallback(Settings.MaxSettings.editorImportingNetwork);
+            Settings.MaxSettings.editorImportingNetwork = null;
         }
 
         static MaxManager() { }
@@ -338,6 +375,7 @@ namespace Pancake.Editor
         /// <returns></returns>
         public IEnumerator DownloadPlugin(MaxNetwork network)
         {
+            Settings.MaxSettings.editorInstallAllFlag = false;
             string path = Path.Combine(Application.temporaryCachePath, GetPluginFileName(network)); // TODO: Maybe delete plugin file after finishing import.
 
 #if UNITY_2017_2_OR_NEWER
@@ -420,7 +458,7 @@ namespace Pancake.Editor
             }
             else
             {
-                Settings.MaxSettings.editorImportingNetwork = network;
+                Settings.MaxSettings.editorImportingListNetwork.Add(network);
                 AssetDatabase.ImportPackage(path, interactive);
             }
 
@@ -434,6 +472,9 @@ namespace Pancake.Editor
         public void DownloadAllPlugin(List<MaxNetwork> networks)
         {
             branWidthRequest = new UnityWebRequest[networks.Count];
+            Settings.MaxSettings.editorImportingListNetwork.Clear();
+            Settings.MaxSettings.editorImportingNetwork = null;
+            Settings.MaxSettings.editorInstallAllFlag = true;
 
             for (var i = 0; i < networks.Count; i++)
             {
@@ -553,8 +594,29 @@ namespace Pancake.Editor
         /// <returns>true if the importing package matches the given package name.</returns>
         private bool IsImportingNetwork(string packageName)
         {
+            Debug.Log(GetPluginFileName(Settings.MaxSettings.editorImportingNetwork));
             // Note: The pluginName doesn't have the '.unitypacakge' extension included in its name but the pluginFileName does. So using Contains instead of Equals.
             return Settings.MaxSettings.editorImportingNetwork != null && GetPluginFileName(Settings.MaxSettings.editorImportingNetwork).Contains(packageName);
+        }
+
+        private (bool, int) IsIncludeImportAllNetwork(string packageName)
+        {
+            if (packageName.Contains('\\')) packageName = packageName.Split('\\')[1];
+          
+            var flag = false;
+            var index = 0;
+            for (var i = 0; i < Settings.MaxSettings.editorImportingListNetwork.Count; i++)
+            {
+                var importing = Settings.MaxSettings.editorImportingListNetwork[i];
+                if (importing != null && GetPluginFileName(importing).Contains(packageName))
+                {
+                    flag = true;
+                    index = i;
+                    break;
+                }
+            }
+
+            return (Settings.MaxSettings.editorInstallAllFlag && flag, index);
         }
 
 #if PANCAKE_MAX_ENABLE
@@ -736,10 +798,7 @@ namespace Pancake.Editor
             return isFolderAsset && !hasLabels;
         }
 
-        private static void CallImportPackageCompletedCallback(MaxNetwork network)
-        {
-            importPackageCompletedCallback?.Invoke(network);
-        }
+        private static void CallImportPackageCompletedCallback(MaxNetwork network) { importPackageCompletedCallback?.Invoke(network); }
 
         private static object GetEditorUserBuildSetting(string name, object defaultValue)
         {

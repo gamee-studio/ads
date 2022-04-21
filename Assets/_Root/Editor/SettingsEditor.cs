@@ -374,7 +374,7 @@ namespace Pancake.Editor
                                         DrawApplovinNetworkDetailRow(network);
                                     }
                                     
-                                    //DrawApplovinInstallAllNetwork();
+                                    DrawApplovinInstallAllNetwork();
                                 });
                             EditorGUILayout.Space();
                         }
