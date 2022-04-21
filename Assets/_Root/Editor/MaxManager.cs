@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Xml.Linq;
+using Newtonsoft.Json;
 using Pancake.Monetization;
 #if PANCAKE_MAX_ENABLE
 using AppLovinMax.Scripts.IntegrationManager.Editor;
@@ -48,7 +50,9 @@ namespace Pancake.Editor
         /// </summary>
         private static readonly List<string> PluginPathsToIgnoreMoveWhenPluginOutsideAssetsDirectory = new List<string>
         {
-            "MaxSdk/Mediation", "MaxSdk/Mediation.meta", "MaxSdk/Resources.meta",
+            "MaxSdk/Mediation",
+            "MaxSdk/Mediation.meta",
+            "MaxSdk/Resources.meta",
 #if PANCAKE_MAX_ENABLE
             AppLovinSettings.SettingsExportPath,
             AppLovinSettings.SettingsExportPath + ".meta"
@@ -237,6 +241,27 @@ namespace Pancake.Editor
                 callback(pluginData);
             }
         }
+
+
+        public void LoadPluginDataExtend(Action<List<MaxNetwork>> callback)
+        {
+            using var curl = new WebClient();
+            curl.Headers.Add(HttpRequestHeader.UserAgent, "request");
+            string json = curl.DownloadString("https://gist.githubusercontent.com/yenmoc/a7507066fe5fd1113fce84f06fabe564/raw");
+            Debug.Log(json);
+            var convert = JsonConvert.DeserializeObject<List<MaxNetwork>>(json);
+
+            if (convert != null)
+            {
+                var mediationPluginParentDirectory = MediationSpecificPluginParentDirectory;
+                foreach (var network in convert)
+                {
+                    UpdateCurrentVersions(network, mediationPluginParentDirectory);
+                }
+            }
+
+            callback(convert);
+        }
 #endif
 
         /// <summary>
@@ -257,10 +282,10 @@ namespace Pancake.Editor
             {
                 network.CurrentVersions.Unity = MaxSdk.Version;
 
-                var unityVersionComparison = (EVersionComparisonResult)(int)MaxSdkUtils.CompareVersions(network.CurrentVersions.Unity, network.LatestVersions.Unity);
+                var unityVersionComparison = (EVersionComparisonResult) (int) MaxSdkUtils.CompareVersions(network.CurrentVersions.Unity, network.LatestVersions.Unity);
                 var androidVersionComparison =
-                    (EVersionComparisonResult)(int)MaxSdkUtils.CompareVersions(network.CurrentVersions.Android, network.LatestVersions.Android);
-                var iosVersionComparison = (EVersionComparisonResult)(int)MaxSdkUtils.CompareVersions(network.CurrentVersions.Ios, network.LatestVersions.Ios);
+                    (EVersionComparisonResult) (int) MaxSdkUtils.CompareVersions(network.CurrentVersions.Android, network.LatestVersions.Android);
+                var iosVersionComparison = (EVersionComparisonResult) (int) MaxSdkUtils.CompareVersions(network.CurrentVersions.Ios, network.LatestVersions.Ios);
 
                 // Overall version is same if all the current and latest (from db) versions are same.
                 if (unityVersionComparison == EVersionComparisonResult.Equal && androidVersionComparison == EVersionComparisonResult.Equal &&
@@ -288,7 +313,7 @@ namespace Pancake.Editor
                 if (!string.IsNullOrEmpty(currentVersions.Unity))
                 {
                     network.CurrentToLatestVersionComparisonResult =
-                        (EVersionComparisonResult)(int)MaxSdkUtils.CompareUnityMediationVersions(currentVersions.Unity, network.LatestVersions.Unity);
+                        (EVersionComparisonResult) (int) MaxSdkUtils.CompareUnityMediationVersions(currentVersions.Unity, network.LatestVersions.Unity);
                 }
 
                 if (!string.IsNullOrEmpty(network.CurrentVersions.Unity) && AppLovinAutoUpdater.MinAdapterVersions.ContainsKey(network.Name))
@@ -319,7 +344,7 @@ namespace Pancake.Editor
 #else
             var downloadHandler = new AppLovinDownloadHandler(path);
 #endif
-            webRequest = new UnityWebRequest(network.DownloadUrl) { method = UnityWebRequest.kHttpVerbGET, downloadHandler = downloadHandler };
+            webRequest = new UnityWebRequest(network.DownloadUrl) {method = UnityWebRequest.kHttpVerbGET, downloadHandler = downloadHandler};
 
 #if UNITY_2017_2_OR_NEWER
             var operation = webRequest.SendWebRequest();
@@ -710,13 +735,14 @@ namespace Pancake.Editor
                         mediationNetwork.Name.Equals("MYTARGET_NETWORK") || mediationNetwork.Name.Equals("NEND_NETWORK") ||
                         mediationNetwork.Name.Equals("OGURY_PRESAGE_NETWORK") || mediationNetwork.Name.Equals("SMAATO_NETWORK") ||
                         mediationNetwork.Name.Equals("SNAP_NETWORK") || mediationNetwork.Name.Equals("TAPJOY_NETWORK") ||
-                        mediationNetwork.Name.Equals("TENCENT_NETWORK") ||
-                        mediationNetwork.Name.Equals("VERIZON_NETWORK") || mediationNetwork.Name.Equals("VERVE_NETWORK") ||
-                        mediationNetwork.Name.Equals("YANDEX_NETWORK"))
+                        mediationNetwork.Name.Equals("TENCENT_NETWORK") || mediationNetwork.Name.Equals("VERIZON_NETWORK") ||
+                        mediationNetwork.Name.Equals("VERVE_NETWORK") || mediationNetwork.Name.Equals("YANDEX_NETWORK"))
                     {
                         Settings.MaxSettings.MediationNetworks.Remove(mediationNetwork);
                     }
                 }
+
+                LoadPluginDataExtend(_ => { Settings.MaxSettings.MediationNetworks.AddRange(_); });
             }));
 #endif
         }
