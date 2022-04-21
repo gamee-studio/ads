@@ -27,9 +27,7 @@ namespace Pancake.Editor
         /// <param name="pluginName">The name of the plugin being downloaded.</param>
         /// <param name="progress">Percentage downloaded.</param>
         /// <param name="done">Whether or not the download is complete.</param>
-        public delegate void DownloadPluginProgressCallback(string pluginName, float progress, bool done);
-
-        public delegate void DownloadPluginProgressCallbackWeb(string pluginName, float progress, bool done, UnityWebRequest webRequest);
+        public delegate void DownloadPluginProgressCallback(string pluginName, float progress, bool done,int index);
 
         /// <summary>
         /// Delegate to be called when a plugin package is imported.
@@ -63,10 +61,10 @@ namespace Pancake.Editor
 
         private static string externalDependencyManagerVersion;
 
-        public static DownloadPluginProgressCallbackWeb downloadPluginProgressCallback;
+        public static DownloadPluginProgressCallback downloadPluginProgressCallback;
         public static ImportPackageCompletedCallback importPackageCompletedCallback;
-        private UnityWebRequest _webRequest;
-        private UnityWebRequest[] _branWidthRequest;
+        public UnityWebRequest webRequest;
+        public UnityWebRequest[] branWidthRequest;
         private readonly WaitForSeconds _wait = new WaitForSeconds(0.1f);
 
         /// <summary>
@@ -187,10 +185,6 @@ namespace Pancake.Editor
         static MaxManager() { }
 
 #if PANCAKE_MAX_ENABLE
-        public static void SetUnityWebRequest(UnityWebRequest value) { Instance._webRequest = value; }
-
-        public static UnityWebRequest GetUnityWebRequest() { return Instance._webRequest; }
-
         /// <summary>
         /// Loads the plugin data to be display by integration manager window.
         /// </summary>
@@ -352,10 +346,10 @@ namespace Pancake.Editor
 #else
             var downloadHandler = new AppLovinDownloadHandler(path);
 #endif
-            _webRequest = new UnityWebRequest(network.DownloadUrl) {method = UnityWebRequest.kHttpVerbGET, downloadHandler = downloadHandler};
+            webRequest = new UnityWebRequest(network.DownloadUrl) {method = UnityWebRequest.kHttpVerbGET, downloadHandler = downloadHandler};
 
 #if UNITY_2017_2_OR_NEWER
-            var operation = _webRequest.SendWebRequest();
+            var operation = webRequest.SendWebRequest();
 #else
             var operation = _webRequest.Send();
 #endif
@@ -363,18 +357,18 @@ namespace Pancake.Editor
             while (!operation.isDone)
             {
                 yield return _wait; // Just wait till webRequest is completed. Our coroutine is pretty rudimentary.
-                CallDownloadPluginProgressCallback(network.DisplayName, operation.progress, operation.isDone, _webRequest);
+                downloadPluginProgressCallback?.Invoke(network.DisplayName, operation.progress, operation.isDone, -1);
             }
 
 #if UNITY_2020_1_OR_NEWER
-            if (_webRequest.result != UnityWebRequest.Result.Success)
+            if (webRequest.result != UnityWebRequest.Result.Success)
 #elif UNITY_2017_2_OR_NEWER
             if (_webRequest.isNetworkError || _webRequest.isHttpError)
 #else
             if (_webRequest.isError)
 #endif
             {
-                Debug.LogError(_webRequest.error);
+                Debug.LogError(webRequest.error);
             }
             else
             {
@@ -382,7 +376,7 @@ namespace Pancake.Editor
                 AssetDatabase.ImportPackage(path, interactive);
             }
 
-            _webRequest = null;
+            webRequest = null;
         }
 
         /// <summary>
@@ -401,10 +395,10 @@ namespace Pancake.Editor
 #else
             var downloadHandler = new AppLovinDownloadHandler(path);
 #endif
-            _branWidthRequest[index] = new UnityWebRequest(network.DownloadUrl) {method = UnityWebRequest.kHttpVerbGET, downloadHandler = downloadHandler};
+            branWidthRequest[index] = new UnityWebRequest(network.DownloadUrl) {method = UnityWebRequest.kHttpVerbGET, downloadHandler = downloadHandler};
 
 #if UNITY_2017_2_OR_NEWER
-            var operation = _branWidthRequest[index].SendWebRequest();
+            var operation = branWidthRequest[index].SendWebRequest();
 #else
             var operation = _branWidthRequest[index].Send();
 #endif
@@ -412,18 +406,18 @@ namespace Pancake.Editor
             while (!operation.isDone)
             {
                 yield return _wait; // Just wait till webRequest is completed. Our coroutine is pretty rudimentary.
-                CallDownloadPluginProgressCallback(network.DisplayName, operation.progress, operation.isDone, _branWidthRequest[index]);
+                downloadPluginProgressCallback?.Invoke(network.DisplayName, operation.progress, operation.isDone, index);
             }
 
 #if UNITY_2020_1_OR_NEWER
-            if (_branWidthRequest[index].result != UnityWebRequest.Result.Success)
+            if (branWidthRequest[index].result != UnityWebRequest.Result.Success)
 #elif UNITY_2017_2_OR_NEWER
             if (_branWidthRequest[index].isNetworkError || _branWidthRequest[index].isHttpError)
 #else
             if (_branWidthRequest[index].isError)
 #endif
             {
-                Debug.LogError(_branWidthRequest[index].error);
+                Debug.LogError(branWidthRequest[index].error);
             }
             else
             {
@@ -431,12 +425,12 @@ namespace Pancake.Editor
                 AssetDatabase.ImportPackage(path, interactive);
             }
 
-            _branWidthRequest[index] = null;
+            branWidthRequest[index] = null;
         }
 
         public void DownloadAllPlugin(List<MaxNetwork> networks)
         {
-            _branWidthRequest = new UnityWebRequest[networks.Count];
+            branWidthRequest = new UnityWebRequest[networks.Count];
 
             for (var i = 0; i < networks.Count; i++)
             {
@@ -737,11 +731,6 @@ namespace Pancake.Editor
 
             // If it is a folder asset and doesn't have a label, the meta file is auto generated by 
             return isFolderAsset && !hasLabels;
-        }
-
-        private static void CallDownloadPluginProgressCallback(string pluginName, float progress, bool isDone, UnityWebRequest webRequest)
-        {
-            downloadPluginProgressCallback?.Invoke(pluginName, progress, isDone, webRequest);
         }
 
         private static void CallImportPackageCompletedCallback(MaxNetwork network)

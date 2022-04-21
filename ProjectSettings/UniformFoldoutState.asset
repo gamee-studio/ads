@@ -10,15 +10,15 @@
         },
         {
             "key": "ADMOB_MODULE",
-            "state": false
-        },
-        {
-            "key": "MAX_MODULE",
             "state": true
         },
         {
-            "key": "IRONSOURCE_MODULE",
+            "key": "MAX_MODULE",
             "state": false
+        },
+        {
+            "key": "IRONSOURCE_MODULE",
+            "state": true
         },
         {
             "key": "APPLOVIN_MODULE_MEDIATION",
@@ -26,6 +26,10 @@
         },
         {
             "key": "ADMOB_MODULE_MEDIATION",
+            "state": true
+        },
+        {
+            "key": "IRONSOURCE_MODULE_MEDIATION",
             "state": true
         }
     ]

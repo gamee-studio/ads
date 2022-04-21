@@ -372,6 +372,7 @@ namespace Pancake.Editor
                                         DrawApplovinNetworkDetailRow(network);
                                     }
 
+                                    Uniform.SpaceHalfLine();
                                     DrawApplovinInstallAllNetwork();
                                 });
                             EditorGUILayout.Space();
@@ -419,6 +420,9 @@ namespace Pancake.Editor
                                     {
                                         DrawIronSourceNetworkDetailRow(network);
                                     }
+                                    
+                                    Uniform.SpaceHalfLine();
+                                    DrawIronsourceInstallAllNetwork();
                                 });
                             EditorGUILayout.Space();
                         }
@@ -570,7 +574,7 @@ namespace Pancake.Editor
             var status = "";
             var isActionEnabled = false;
             var isInstalled = false;
-            ValidateVersion(network.CurrentToLatestVersionComparisonResult,
+            ValidateVersionMax(network.CurrentToLatestVersionComparisonResult,
                 ref currentVersion,
                 ref status,
                 ref isActionEnabled,
@@ -744,7 +748,7 @@ namespace Pancake.Editor
                 string currentVersion = network.CurrentVersions != null ? network.CurrentVersions.Unity : "";
                 var isActionEnabled = false;
                 var isInstalled = false;
-                ValidateVersion(network.CurrentToLatestVersionComparisonResult,
+                ValidateVersionMax(network.CurrentToLatestVersionComparisonResult,
                     ref currentVersion,
                     ref status,
                     ref isActionEnabled,
@@ -787,7 +791,7 @@ namespace Pancake.Editor
                         var isInstalled = false;
                         string currentVersion = network.CurrentVersions != null ? network.CurrentVersions.Unity : "";
 
-                        if (!ValidateVersion(network.CurrentToLatestVersionComparisonResult,
+                        if (!ValidateVersionMax(network.CurrentToLatestVersionComparisonResult,
                                 ref currentVersion,
                                 ref status,
                                 ref isActionEnabled,
@@ -813,7 +817,70 @@ namespace Pancake.Editor
             }
         }
 
-        private bool ValidateVersion(
+        private void DrawIronsourceInstallAllNetwork()
+        {
+            var showInstallAll = false;
+            var showUninstallAll = false;
+            for (int i = 0; i < Settings.IronSourceSettings.MediationNetworks.Count; i++)
+            {
+                var network = Settings.IronSourceSettings.MediationNetworks[i];
+                var status = "";
+                string currentVersion = network.currentUnityVersion;
+                var isActionEnabled = false;
+                var isInstalled = false;
+                ValidateVersionIronSource(network.currentStatus,
+                    ref currentVersion,
+                    ref status,
+                    ref isActionEnabled,
+                    ref isInstalled);
+
+                if (isActionEnabled) showInstallAll = true;
+                if (isInstalled) showUninstallAll = true;
+            }
+
+            GUILayout.Space(4);
+            using (new EditorGUILayout.HorizontalScope(GUILayout.ExpandHeight(false)))
+            {
+                GUILayout.Space(5);
+                EditorGUILayout.LabelField(new GUIContent(), NetworkWidthOption);
+                EditorGUILayout.LabelField(new GUIContent(), VersionWidthOption);
+                GUILayout.Space(3);
+                EditorGUILayout.LabelField(new GUIContent(), VersionWidthOption);
+                GUILayout.Space(3);
+                GUILayout.FlexibleSpace();
+
+                GUI.enabled = showInstallAll && !EditorApplication.isCompiling;
+                if (GUILayout.Button(new GUIContent("Install All"), FieldWidth))
+                {
+                    IronSourceManager.Instance.DownloadAllPlugin(Settings.IronSourceSettings.MediationNetworks);
+                }
+
+                GUI.enabled = !EditorApplication.isCompiling;
+                GUILayout.Space(2);
+
+                GUI.enabled = showUninstallAll && !EditorApplication.isCompiling;
+                if (GUILayout.Button(new GUIContent("Unistall All"), GUILayout.Width(ACTION_FIELD_WIDTH + 10)))
+                {
+                    EditorUtility.DisplayProgressBar("Ads", "Deleting All Network...", 0.5f);
+                    var pluginRoot = SettingManager.MediationSpecificPluginParentDirectory;
+
+                    foreach (var network in Settings.IronSourceSettings.MediationNetworks)
+                    {
+                        FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, "IronSource", "Editor", network.fileName));
+                        FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, "IronSource", "Editor", network.fileName + ".meta"));
+                    }
+
+                    // Refresh UI
+                    AssetDatabase.Refresh();
+                    EditorUtility.ClearProgressBar();
+                }
+
+                GUI.enabled = !EditorApplication.isCompiling;
+                GUILayout.Space(5);
+            }
+        }
+
+        private bool ValidateVersionMax(
             EVersionComparisonResult comparisonResult,
             ref string currentVersion,
             // ReSharper disable once RedundantAssignment
@@ -851,6 +918,49 @@ namespace Pancake.Editor
                 {
                     status = "Installed";
                     isActionEnabled = false;
+                }
+            }
+
+            return isActionEnabled;
+        }
+
+        private bool ValidateVersionIronSource(
+            EAdapterStatus currentStatus,
+            ref string currentVersion,
+            // ReSharper disable once RedundantAssignment
+            ref string status,
+            // ReSharper disable once RedundantAssignment
+            ref bool isActionEnabled,
+            // ReSharper disable once RedundantAssignment
+            ref bool isInstalled)
+        {
+            if (string.IsNullOrEmpty(currentVersion))
+            {
+                status = "Install";
+                currentVersion = "Not Installed";
+                isActionEnabled = true;
+                isInstalled = false;
+            }
+            else
+            {
+                isInstalled = true;
+                switch (currentStatus)
+                {
+                    // A newer version is available
+                    case EAdapterStatus.Upgrade:
+                        status = "Upgrade";
+                        isActionEnabled = true;
+                        break;
+                    // Current installed version is newer than latest version from DB (beta version)
+                    case EAdapterStatus.Installed:
+                        status = "Installed";
+                        isActionEnabled = false;
+                        break;
+                    // Already on the latest version
+                    default:
+                        status = "Installed";
+                        isActionEnabled = false;
+                        break;
                 }
             }
 

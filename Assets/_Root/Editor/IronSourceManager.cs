@@ -31,6 +31,7 @@ namespace Pancake.Editor
         private EditorCoroutine _editorCoroutine;
 
         public UnityWebRequest webRequest;
+        public UnityWebRequest[] branWidthRequest;
 
         // ReSharper disable once CollectionNeverUpdated.Local
         private static readonly List<string> PluginPathsToIgnoreMoveWhenPluginOutsideAssetsDirectory = new List<string>();
@@ -353,6 +354,7 @@ namespace Pancake.Editor
             }
         }
 
+
         public IEnumerator DownloadPlugin(Network network)
         {
             string pathFile = Path.Combine(Application.temporaryCachePath, $"IronSource_IntegrationManager_v{network.lastVersion.unity}.unitypackage");
@@ -361,17 +363,10 @@ namespace Pancake.Editor
             webRequest = new UnityWebRequest(urlDownload) {method = UnityWebRequest.kHttpVerbGET, downloadHandler = downloadHandler};
             var operation = webRequest.SendWebRequest();
 
-            static void CallDownloadPluginProgressCallback(string pluginName, float progress, bool isDone)
-            {
-                if (downloadPluginProgressCallback == null) return;
-
-                downloadPluginProgressCallback(pluginName, progress, isDone);
-            }
-
             while (!operation.isDone)
             {
                 yield return new WaitForSeconds(0.1f); // Just wait till webRequest is completed. Our coroutine is pretty rudimentary.
-                CallDownloadPluginProgressCallback(network.displayName, operation.progress, operation.isDone);
+                downloadPluginProgressCallback?.Invoke(network.displayName, operation.progress, operation.isDone, -1);
             }
 
 #if UNITY_2020_1_OR_NEWER
@@ -392,6 +387,17 @@ namespace Pancake.Editor
             }
 
             webRequest = null;
+        }
+
+
+        public void DownloadAllPlugin(List<AdapterMediationIronSource> networks)
+        {
+            branWidthRequest = new UnityWebRequest[networks.Count];
+
+            for (var i = 0; i < networks.Count; i++)
+            {
+                EditorCoroutine.StartCoroutine(DownloadFileDependency(networks[i].downloadUrl));
+            }
         }
 
         public IEnumerator GetVersions()

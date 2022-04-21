@@ -22,7 +22,7 @@ namespace Pancake.Editor
     /// <param name="pluginName">The name of the plugin being downloaded.</param>
     /// <param name="progress">Percentage downloaded.</param>
     /// <param name="done">Whether or not the download is complete.</param>
-    public delegate void DownloadPluginProgressCallback(string pluginName, float progress, bool done);
+    public delegate void DownloadPluginProgressCallback(string pluginName, float progress, bool done, int index);
 
     /// <summary>
     /// Delegate to be called when a plugin package is imported.
@@ -36,6 +36,7 @@ namespace Pancake.Editor
         private static readonly SettingManager instance = new SettingManager();
         public static SettingManager Instance => instance;
         public UnityWebRequest webRequest;
+        public UnityWebRequest[] brandWidthWebRequest;
         public static readonly string DefaultPluginExportPath = Path.Combine("Assets", "GoogleMobileAds");
         public const string DEFAULT_ADMOB_SDK_ASSET_EXPORT_PATH = @"GoogleMobileAds\GoogleMobileAds.dll";
         private static readonly string AdmobSdkAssetExportPath = Path.Combine("GoogleMobileAds", "GoogleMobileAds.dll");
@@ -367,18 +368,11 @@ namespace Pancake.Editor
             var downloadHandler = new DownloadHandlerFile(pathFile);
             webRequest = new UnityWebRequest(urlDownload) { method = UnityWebRequest.kHttpVerbGET, downloadHandler = downloadHandler };
             var operation = webRequest.SendWebRequest();
-
-            static void CallDownloadPluginProgressCallback(string pluginName, float progress, bool isDone)
-            {
-                if (downloadPluginProgressCallback == null) return;
-
-                downloadPluginProgressCallback(pluginName, progress, isDone);
-            }
-
+            
             while (!operation.isDone)
             {
                 yield return new WaitForSeconds(0.1f); // Just wait till webRequest is completed. Our coroutine is pretty rudimentary.
-                CallDownloadPluginProgressCallback(network.displayName, operation.progress, operation.isDone);
+                downloadPluginProgressCallback?.Invoke(network.displayName, operation.progress, operation.isDone, -1);
             }
 
 #if UNITY_2020_1_OR_NEWER
@@ -413,17 +407,10 @@ namespace Pancake.Editor
             webRequest = new UnityWebRequest(urlDownload) { method = UnityWebRequest.kHttpVerbGET, downloadHandler = downloadHandler };
             var operation = webRequest.SendWebRequest();
 
-            static void CallDownloadPluginProgressCallback(string pluginName, float progress, bool isDone)
-            {
-                if (downloadPluginProgressCallback == null) return;
-
-                downloadPluginProgressCallback(pluginName, progress, isDone);
-            }
-
             while (!operation.isDone)
             {
                 yield return new WaitForSeconds(0.1f); // Just wait till webRequest is completed. Our coroutine is pretty rudimentary.
-                CallDownloadPluginProgressCallback(network.displayName, operation.progress, operation.isDone);
+                downloadPluginProgressCallback?.Invoke(network.displayName, operation.progress, operation.isDone, -1);
             }
 
 #if UNITY_2020_1_OR_NEWER

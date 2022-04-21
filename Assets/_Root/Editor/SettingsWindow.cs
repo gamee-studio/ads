@@ -26,7 +26,7 @@ namespace Pancake.Editor
 
             _editor.DrawHeader();
             _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition);
-            EditorGUILayout.BeginVertical(new GUIStyle { padding = new RectOffset(6, 3, 3, 3) });
+            EditorGUILayout.BeginVertical(new GUIStyle {padding = new RectOffset(6, 3, 3, 3)});
             _editor.OnInspectorGUI();
             EditorGUILayout.EndVertical();
             EditorGUILayout.EndScrollView();
@@ -61,7 +61,7 @@ namespace Pancake.Editor
 
             SettingManager.importGmaCompletedCallback = OnImportGmaCompleted;
 
-            MaxManager.downloadPluginProgressCallback = OnMaxDownloadPluginProgress;
+            MaxManager.downloadPluginProgressCallback = OnDownloadMaxPluginProgress;
             MaxManager.importPackageCompletedCallback = OnMaxImportPackageCompleted;
 
             IronSourceManager.downloadPluginProgressCallback = OnDownloadIronSourcePluginProgress;
@@ -121,7 +121,7 @@ namespace Pancake.Editor
         /// <summary>
         /// Callback method that will be called with progress updates when the plugin is being downloaded.
         /// </summary>
-        private static void OnDownloadPluginProgress(string pluginName, float progress, bool done)
+        private static void OnDownloadPluginProgress(string pluginName, float progress, bool done, int index)
         {
             // Download is complete. Clear progress bar.
             if (done)
@@ -133,7 +133,15 @@ namespace Pancake.Editor
             {
                 if (EditorUtility.DisplayCancelableProgressBar("Ads", string.Format("Downloading {0} plugin...", pluginName), progress))
                 {
-                    SettingManager.Instance.webRequest?.Abort();
+                    if (index == -1)
+                    {
+                        SettingManager.Instance.webRequest?.Abort();
+                    }
+                    else
+                    {
+                        SettingManager.Instance.brandWidthWebRequest[index]?.Abort();
+                    }
+
                     EditorUtility.ClearProgressBar();
                 }
             }
@@ -152,7 +160,7 @@ namespace Pancake.Editor
         /// <summary>
         /// Callback method that will be called with progress updates when the plugin is being downloaded.
         /// </summary>
-        private static void OnMaxDownloadPluginProgress(string pluginName, float progress, bool done, UnityWebRequest webRequest)
+        private static void OnDownloadMaxPluginProgress(string pluginName, float progress, bool done, int index)
         {
             // Download is complete. Clear progress bar.
             if (done)
@@ -164,7 +172,15 @@ namespace Pancake.Editor
             {
                 if (EditorUtility.DisplayCancelableProgressBar("Ads", string.Format("Downloading {0} plugin...", pluginName), progress))
                 {
-                    webRequest?.Abort(); // Cancels the plugin download if one is in progress.
+                    if (index == -1)
+                    {
+                        MaxManager.Instance.webRequest?.Abort();
+                    }
+                    else
+                    {
+                        MaxManager.Instance.branWidthRequest[index]?.Abort();
+                    }
+
                     EditorUtility.ClearProgressBar();
                 }
             }
@@ -173,7 +189,7 @@ namespace Pancake.Editor
         /// <summary>
         /// Callback method that will be called with progress updates when the plugin is being downloaded.
         /// </summary>
-        private static void OnDownloadIronSourcePluginProgress(string pluginName, float progress, bool done)
+        private static void OnDownloadIronSourcePluginProgress(string pluginName, float progress, bool done, int index)
         {
             // Download is complete. Clear progress bar.
             if (done)
@@ -185,7 +201,15 @@ namespace Pancake.Editor
             {
                 if (EditorUtility.DisplayCancelableProgressBar("Ads", string.Format("Downloading {0} plugin...", pluginName), progress))
                 {
-                    IronSourceManager.Instance.webRequest?.Abort();
+                    if (index == -1)
+                    {
+                        IronSourceManager.Instance.webRequest?.Abort();
+                    }
+                    else
+                    {
+                        IronSourceManager.Instance.branWidthRequest[index]?.Abort();
+                    }
+
                     EditorUtility.ClearProgressBar();
                 }
             }
