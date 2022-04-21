@@ -374,7 +374,7 @@ namespace Pancake.Editor
                                         DrawApplovinNetworkDetailRow(network);
                                     }
                                     
-                                    DrawApplovinInstallAllNetwork();
+                                    //DrawApplovinInstallAllNetwork();
                                 });
                             EditorGUILayout.Space();
                         }
@@ -422,7 +422,7 @@ namespace Pancake.Editor
                                         DrawIronSourceNetworkDetailRow(network);
                                     }
                                     
-                                    DrawIronsourceInstallAllNetwork();
+                                    //DrawIronsourceInstallAllNetwork();
                                 });
                             EditorGUILayout.Space();
                         }
