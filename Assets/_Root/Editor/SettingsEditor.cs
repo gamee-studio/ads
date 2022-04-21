@@ -371,6 +371,8 @@ namespace Pancake.Editor
                                     {
                                         DrawApplovinNetworkDetailRow(network);
                                     }
+
+                                    DrawApplovinInstallAllNetwork();
                                 });
                             EditorGUILayout.Space();
                         }
@@ -753,6 +755,57 @@ namespace Pancake.Editor
                     GUI.enabled = !EditorApplication.isCompiling;
                     GUILayout.Space(5);
                 }
+            }
+        }
+        
+        private void DrawApplovinInstallAllNetwork()
+        {
+            bool isActionEnabled = false;
+            bool isInstalled = false;
+            string action = "Install All";
+            GUILayout.Space(4);
+            using (new EditorGUILayout.HorizontalScope(GUILayout.ExpandHeight(false)))
+            {
+                GUILayout.Space(5);
+                EditorGUILayout.LabelField(new GUIContent(), NetworkWidthOption);
+                EditorGUILayout.LabelField(new GUIContent(), VersionWidthOption);
+                GUILayout.Space(3);
+                EditorGUILayout.LabelField(new GUIContent(), VersionWidthOption);
+                GUILayout.Space(3);
+                GUILayout.FlexibleSpace();
+
+                GUI.enabled = isActionEnabled && !EditorApplication.isCompiling;
+                if (GUILayout.Button(new GUIContent(action), FieldWidth))
+                {
+                    
+                    
+                    // Download the plugin.
+                   // EditorCoroutine.StartCoroutine(MaxManager.Instance.DownloadPlugin(network));
+                }
+
+                GUI.enabled = !EditorApplication.isCompiling;
+                GUILayout.Space(2);
+
+                GUI.enabled = isInstalled && !EditorApplication.isCompiling;
+                if (GUILayout.Button(new GUIContent("Unistall All"), GUILayout.Width(ACTION_FIELD_WIDTH + 10)))
+                {
+                    //EditorUtility.DisplayProgressBar("Ads", "Deleting " + network.DisplayName + "...", 0.5f);
+                    var pluginRoot = SettingManager.MediationSpecificPluginParentDirectory;
+                    // foreach (var pluginFilePath in network.PluginFilePaths)
+                    // {
+                    //     FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, pluginFilePath));
+                    //     FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, pluginFilePath + ".meta"));
+                    // }
+                    //
+                    // MaxManager.UpdateCurrentVersions(network, pluginRoot);
+
+                    // Refresh UI
+                    AssetDatabase.Refresh();
+                    EditorUtility.ClearProgressBar();
+                }
+
+                GUI.enabled = !EditorApplication.isCompiling;
+                GUILayout.Space(5);
             }
         }
 

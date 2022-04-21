@@ -10,11 +10,11 @@
         },
         {
             "key": "ADMOB_MODULE",
-            "state": true
+            "state": false
         },
         {
             "key": "MAX_MODULE",
-            "state": false
+            "state": true
         },
         {
             "key": "IRONSOURCE_MODULE",

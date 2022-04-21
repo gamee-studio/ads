@@ -248,7 +248,6 @@ namespace Pancake.Editor
             using var curl = new WebClient();
             curl.Headers.Add(HttpRequestHeader.UserAgent, "request");
             string json = curl.DownloadString("https://gist.githubusercontent.com/yenmoc/a7507066fe5fd1113fce84f06fabe564/raw");
-            Debug.Log(json);
             var convert = JsonConvert.DeserializeObject<List<MaxNetwork>>(json);
 
             if (convert != null)
