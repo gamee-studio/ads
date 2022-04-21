@@ -353,8 +353,7 @@ namespace Pancake.Editor
                 network.CurrentToLatestVersionComparisonResult = EVersionComparisonResult.Lesser;
             }
         }
-
-
+        
         public IEnumerator DownloadPlugin(Network network)
         {
             string pathFile = Path.Combine(Application.temporaryCachePath, $"IronSource_IntegrationManager_v{network.lastVersion.unity}.unitypackage");
@@ -388,8 +387,7 @@ namespace Pancake.Editor
 
             webRequest = null;
         }
-
-
+        
         public void DownloadAllPlugin(List<AdapterMediationIronSource> networks)
         {
             branWidthRequest = new UnityWebRequest[networks.Count];

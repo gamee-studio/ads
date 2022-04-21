@@ -12,7 +12,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "9970e2e1e039582a8f8cc706182f7d494f7273ef"
+      "hash": "54b4c102c2c921d78890557bcb2afe005a80a07a"
     },
     "com.snorlax.locale": {
       "version": "https://github.com/snorluxe/locale.git?path=Assets/_Root#1.0.2",

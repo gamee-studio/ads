@@ -849,15 +849,17 @@ namespace Pancake.Editor
                 GUILayout.Space(3);
                 GUILayout.FlexibleSpace();
 
-                GUI.enabled = showInstallAll && !EditorApplication.isCompiling;
+                const string ironsourceKeyInstallAll = "IronSource_InstallAll";
+                GUI.enabled = showInstallAll && !EditorApplication.isCompiling && UtilEditor.IsCompleteDelay(ironsourceKeyInstallAll);
                 if (GUILayout.Button(new GUIContent("Install All"), FieldWidth))
                 {
+                    UtilEditor.Delay(ironsourceKeyInstallAll, 2f);
                     IronSourceManager.Instance.DownloadAllPlugin(Settings.IronSourceSettings.MediationNetworks);
                 }
 
                 GUI.enabled = !EditorApplication.isCompiling;
                 GUILayout.Space(2);
-
+                
                 GUI.enabled = showUninstallAll && !EditorApplication.isCompiling;
                 if (GUILayout.Button(new GUIContent("Unistall All"), GUILayout.Width(ACTION_FIELD_WIDTH + 10)))
                 {
