@@ -594,7 +594,6 @@ namespace Pancake.Editor
         /// <returns>true if the importing package matches the given package name.</returns>
         private bool IsImportingNetwork(string packageName)
         {
-            Debug.Log(GetPluginFileName(Settings.MaxSettings.editorImportingNetwork));
             // Note: The pluginName doesn't have the '.unitypacakge' extension included in its name but the pluginFileName does. So using Contains instead of Equals.
             return Settings.MaxSettings.editorImportingNetwork != null && GetPluginFileName(Settings.MaxSettings.editorImportingNetwork).Contains(packageName);
         }
