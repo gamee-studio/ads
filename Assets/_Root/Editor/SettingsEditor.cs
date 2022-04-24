@@ -422,7 +422,7 @@ namespace Pancake.Editor
                                         DrawIronSourceNetworkDetailRow(network);
                                     }
                                     
-                                    //DrawIronsourceInstallAllNetwork();
+                                    DrawIronsourceInstallAllNetwork();
                                 });
                             EditorGUILayout.Space();
                         }

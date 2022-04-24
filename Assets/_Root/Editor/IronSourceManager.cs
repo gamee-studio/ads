@@ -394,7 +394,7 @@ namespace Pancake.Editor
 
             for (var i = 0; i < networks.Count; i++)
             {
-                EditorCoroutine.StartCoroutine(DownloadFileDependency(networks[i].downloadUrl));
+                EditorCoroutine.StartCoroutine(DownloadFileDependency(networks[i].downloadUrl, i, false));
             }
         }
 
@@ -509,6 +509,53 @@ namespace Pancake.Editor
             AssetDatabase.Refresh();
         }
 
+        public IEnumerator DownloadFileDependency(string url, int index, bool interactive = true)
+        {
+            int fileNameIndex = url.LastIndexOf("/", StringComparison.Ordinal) + 1;
+            string downloadFileName = url.Substring(fileNameIndex);
+            string genericFileName = Regex.Replace(downloadFileName, @"_v+(\d\.\d\.\d\.\d|\d\.\d\.\d)", "");
+            string path = Path.Combine(AdapterMediationIronSource.AdapterInstallPath, genericFileName);
+            bool isCancelled = false;
+            branWidthRequest[index] = new UnityWebRequest(url);
+            branWidthRequest[index].downloadHandler = new DownloadHandlerFile(path);
+#if UNITY_2017_2_OR_NEWER
+            var operation = branWidthRequest[index].SendWebRequest();
+#else
+            var operation = branWidthRequest[index].Send();
+#endif
+
+            if (branWidthRequest[index].result != UnityWebRequest.Result.ConnectionError)
+            {
+                while (!operation.isDone)
+                {
+                    yield return new WaitForSeconds(0.1f);
+
+                    if (EditorUtility.DisplayCancelableProgressBar("Download Manager", $"Downloading {downloadFileName}", branWidthRequest[index].downloadProgress))
+                    {
+                        if (branWidthRequest[index].error != null) Debug.LogError(branWidthRequest[index].error);
+
+                        CancelAdapterDownload();
+                        isCancelled = true;
+                    }
+                }
+            }
+            else
+            {
+                Debug.LogError("Error Downloading " + genericFileName + " : " + branWidthRequest[index].error);
+            }
+
+            EditorUtility.ClearProgressBar();
+
+            if (isCancelled && File.Exists(Path.Combine("Assets/IronSource/Editor", genericFileName)))
+            {
+                File.Delete(Path.Combine("Assets/IronSource/Editor", genericFileName));
+            }
+
+            EditorCoroutine.StartCoroutine(GetVersions());
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+        }
+        
         public static void RefreshAllCurrentVersionAdapter()
         {
             foreach (var source in Settings.IronSourceSettings.editorListNetwork)
@@ -516,16 +563,5 @@ namespace Pancake.Editor
                 source.RefreshCurrentUnityVersion();
             }
         }
-
-        // internal class PostProcessIronSource : UnityEditor.AssetModificationProcessor
-        // {
-        //     private static void OnWillCreateAsset(string assetName)
-        //     {
-        //         if (assetName.Contains("pancake_empty.cs") || assetName.Equals("Assets/pancake_empty.cs.meta"))
-        //         {
-        //             EditorPrefs.SetBool(Application.identifier + KEY_STORE_STATE_IMPORT_SDK, false);
-        //         }
-        //     }
-        // }
     }
 }
