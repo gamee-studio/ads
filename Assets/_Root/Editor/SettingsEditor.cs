@@ -417,7 +417,7 @@ namespace Pancake.Editor
                                 () =>
                                 {
                                     DrawHeaderMediation();
-                                    foreach (var network in Settings.IronSourceSettings.MediationNetworks)
+                                    foreach (var network in Settings.IronSourceSettings.editorListNetwork)
                                     {
                                         DrawIronSourceNetworkDetailRow(network);
                                     }
@@ -431,9 +431,9 @@ namespace Pancake.Editor
                             EditorGUILayout.HelpBox("IronSource plugin not found. Please import it to show ads from IronSource", MessageType.Warning);
                             if (GUILayout.Button("Import IronSource Plugin", GUILayout.Height(EditorGUIUtility.singleLineHeight * 1.3f)))
                             {
-                                if (Settings.IronSourceSettings.importingSdk != null)
+                                if (Settings.IronSourceSettings.editorImportingSdk != null)
                                 {
-                                    EditorCoroutine.StartCoroutine(IronSourceManager.Instance.DownloadPlugin(Settings.IronSourceSettings.importingSdk));
+                                    EditorCoroutine.StartCoroutine(IronSourceManager.Instance.DownloadPlugin(Settings.IronSourceSettings.editorImportingSdk));
                                 }
                                 else
                                 {
@@ -857,9 +857,9 @@ namespace Pancake.Editor
         {
             var showInstallAll = false;
             var showUninstallAll = false;
-            for (int i = 0; i < Settings.IronSourceSettings.MediationNetworks.Count; i++)
+            for (int i = 0; i < Settings.IronSourceSettings.editorListNetwork.Count; i++)
             {
-                var network = Settings.IronSourceSettings.MediationNetworks[i];
+                var network = Settings.IronSourceSettings.editorListNetwork[i];
                 var status = "";
                 string currentVersion = network.currentUnityVersion;
                 var isActionEnabled = false;
@@ -890,7 +890,7 @@ namespace Pancake.Editor
                 if (GUILayout.Button(new GUIContent("Install All"), FieldWidth))
                 {
                     UtilEditor.Delay(ironsourceKeyInstallAll, 2f);
-                    IronSourceManager.Instance.DownloadAllPlugin(Settings.IronSourceSettings.MediationNetworks);
+                    IronSourceManager.Instance.DownloadAllPlugin(Settings.IronSourceSettings.editorListNetwork);
                 }
 
                 GUI.enabled = !EditorApplication.isCompiling;
@@ -902,7 +902,7 @@ namespace Pancake.Editor
                     EditorUtility.DisplayProgressBar("Ads", "Deleting All Network...", 0.5f);
                     var pluginRoot = SettingManager.MediationSpecificPluginParentDirectory;
 
-                    foreach (var network in Settings.IronSourceSettings.MediationNetworks)
+                    foreach (var network in Settings.IronSourceSettings.editorListNetwork)
                     {
                         FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, "IronSource", "Editor", network.fileName));
                         FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, "IronSource", "Editor", network.fileName + ".meta"));

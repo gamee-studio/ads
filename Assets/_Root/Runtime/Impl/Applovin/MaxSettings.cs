@@ -19,9 +19,24 @@ namespace Pancake.Monetization
         [SerializeField] private bool enableMaxAdReview;
 
 #if UNITY_EDITOR
+        /// <summary>
+        /// editor only
+        /// </summary>
         public List<MaxNetwork> editorListNetwork = new List<MaxNetwork>();
+
+        /// <summary>
+        /// editor only
+        /// </summary>
         public MaxNetwork editorImportingNetwork;
+
+        /// <summary>
+        /// editor only
+        /// </summary>
         public List<MaxNetwork> editorImportingListNetwork = new List<MaxNetwork>();
+
+        /// <summary>
+        /// editor only
+        /// </summary>
         public bool editorInstallAllFlag;
 #endif
 

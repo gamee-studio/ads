@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace Pancake.Monetization
 {
@@ -13,17 +14,31 @@ namespace Pancake.Monetization
 
 
 #if UNITY_EDITOR
-        private System.Collections.Generic.List<AdapterMediationIronSource> _mediationNetworks = new System.Collections.Generic.List<AdapterMediationIronSource>();
 
         /// <summary>
         /// editor only
         /// </summary>
-        public Network importingSdk;
+        public Network editorImportingSdk;
 
         /// <summary>
         /// editor only
         /// </summary>
-        public AdapterMediationIronSource importingMediationNetwork;
+        public AdapterMediationIronSource editorImportingNetwork;
+
+        /// <summary>
+        /// editor only
+        /// </summary>
+        public List<AdapterMediationIronSource> editorImportingListNetwork;
+
+        /// <summary>
+        /// editor only
+        /// </summary>
+        public List<AdapterMediationIronSource> editorListNetwork = new List<AdapterMediationIronSource>();
+
+        /// <summary>
+        /// editor only
+        /// </summary>
+        public bool editorInstallAllFlag;
 #endif
 
         public bool Enable => enable;
@@ -33,12 +48,5 @@ namespace Pancake.Monetization
         public AppUnit AppKey => appKey;
 
         public bool UseAdaptiveBanner => useAdaptiveBanner;
-
-#if UNITY_EDITOR
-        /// <summary>
-        /// editor only
-        /// </summary>
-        public System.Collections.Generic.List<AdapterMediationIronSource> MediationNetworks { get => _mediationNetworks; set => _mediationNetworks = value; }
-#endif
     }
 }

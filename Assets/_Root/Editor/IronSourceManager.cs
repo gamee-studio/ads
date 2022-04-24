@@ -97,15 +97,15 @@ namespace Pancake.Editor
                 AddLabelsToAssetsIfNeeded(pluginParentDir, isPluginOutsideAssetsDir);
                 AssetDatabase.Refresh();
 
-                InvokeImportPackageCompletedCallback(Settings.IronSourceSettings.importingSdk);
-                Settings.IronSourceSettings.importingSdk = null;
+                InvokeImportPackageCompletedCallback(Settings.IronSourceSettings.editorImportingSdk);
+                Settings.IronSourceSettings.editorImportingSdk = null;
             };
 
             AssetDatabase.importPackageCancelled += packageName =>
             {
                 if (!IsImportingSdk(packageName)) return;
 
-                Settings.IronSourceSettings.importingSdk = null;
+                Settings.IronSourceSettings.editorImportingSdk = null;
             };
 
             AssetDatabase.importPackageFailed += (packageName, errorMessage) =>
@@ -113,19 +113,19 @@ namespace Pancake.Editor
                 if (!IsImportingSdk(packageName)) return;
 
                 Debug.LogError(errorMessage);
-                Settings.IronSourceSettings.importingSdk = null;
+                Settings.IronSourceSettings.editorImportingSdk = null;
             };
         }
 
         private bool IsImportingMedationNetwork(string packageName)
         {
             // Note: The pluginName doesn't have the '.unitypacakge' extension included in its name but the pluginFileName does. So using Contains instead of Equals.
-            return Settings.IronSourceSettings.importingMediationNetwork != null && packageName.Contains("Dependencies");
+            return Settings.IronSourceSettings.editorImportingNetwork != null && packageName.Contains("Dependencies");
         }
 
         private bool IsImportingSdk(string packageName)
         {
-            return Settings.IronSourceSettings.importingSdk != null && packageName.Contains("IronSource_IntegrationManager_v");
+            return Settings.IronSourceSettings.editorImportingSdk != null && packageName.Contains("IronSource_IntegrationManager_v");
         }
 
         private string GetPluginFileName(Network network) { return $"IronSource_IntegrationManager_v{network.lastVersion.unity}.unitypackage"; }
@@ -304,9 +304,9 @@ namespace Pancake.Editor
             using var curl = new WebClient();
             curl.Headers.Add(HttpRequestHeader.UserAgent, "request");
             string json = curl.DownloadString("https://gist.githubusercontent.com/yenmoc/3affa7177f0cd83c1e1aac3e6fbcf33d/raw");
-            Settings.IronSourceSettings.importingSdk = JsonConvert.DeserializeObject<Network>(json);
+            Settings.IronSourceSettings.editorImportingSdk = JsonConvert.DeserializeObject<Network>(json);
 
-            UpdateCurrentVersion(Settings.IronSourceSettings.importingSdk);
+            UpdateCurrentVersion(Settings.IronSourceSettings.editorImportingSdk);
 
             EditorCoroutine.StartCoroutine(GetVersions());
         }
@@ -380,7 +380,7 @@ namespace Pancake.Editor
             }
             else
             {
-                Settings.IronSourceSettings.importingSdk = network;
+                Settings.IronSourceSettings.editorImportingSdk = network;
                 AssetDatabase.ImportPackage(Path.Combine(Application.temporaryCachePath, $"IronSource_IntegrationManager_v{network.lastVersion.unity}.unitypackage"),
                     true);
             }
@@ -425,8 +425,8 @@ namespace Pancake.Editor
             else
             {
                 string json = www.downloadHandler.text;
-                Settings.IronSourceSettings.MediationNetworks.Clear();
-                Settings.IronSourceSettings.importingMediationNetwork = new AdapterMediationIronSource();
+                Settings.IronSourceSettings.editorListNetwork.Clear();
+                Settings.IronSourceSettings.editorImportingNetwork = new AdapterMediationIronSource();
                 if (Json.Deserialize(json) is Dictionary<string, object> dic && dic.Count != 0)
                 {
                     if (dic.TryGetValue("SDKSInfo", out object adapterJson))
@@ -438,7 +438,7 @@ namespace Pancake.Editor
                             var info = new AdapterMediationIronSource();
                             if (info.GetFromJson(item.Key, item.Value as Dictionary<string, object>))
                             {
-                                if (key.Contains("ironsource")) Settings.IronSourceSettings.importingMediationNetwork = info;
+                                if (key.Contains("ironsource")) Settings.IronSourceSettings.editorImportingNetwork = info;
                                 else
                                 {
                                     if (key.Equals("hyprmx") || key.Equals("liftoff") || key.Equals("maio") || key.Equals("mytarget") || key.Equals("smaato") ||
@@ -447,7 +447,7 @@ namespace Pancake.Editor
                                         continue;
                                     }
 
-                                    Settings.IronSourceSettings.MediationNetworks.Add(info);
+                                    Settings.IronSourceSettings.editorListNetwork.Add(info);
                                 }
                             }
                         }
@@ -511,7 +511,7 @@ namespace Pancake.Editor
 
         public static void RefreshAllCurrentVersionAdapter()
         {
-            foreach (var source in Settings.IronSourceSettings.MediationNetworks)
+            foreach (var source in Settings.IronSourceSettings.editorListNetwork)
             {
                 source.RefreshCurrentUnityVersion();
             }
