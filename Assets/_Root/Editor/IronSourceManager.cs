@@ -87,34 +87,38 @@ namespace Pancake.Editor
 
         public IronSourceManager()
         {
-            AssetDatabase.importPackageCompleted += packageName =>
-            {
-                if (!IsImportingSdk(packageName)) return;
+            AssetDatabase.importPackageCompleted += OnAssetDatabaseOnimportPackageCompleted;
+            AssetDatabase.importPackageCancelled += OnAssetDatabaseOnimportPackageCancelled;
+            AssetDatabase.importPackageFailed += OnAssetDatabaseOnimportPackageFailed;
+        }
 
-                var pluginParentDir = PluginParentDirectory;
-                var isPluginOutsideAssetsDir = IsPluginOutsideAssetsDirectory;
-                MovePluginFilesIfNeeded(pluginParentDir, isPluginOutsideAssetsDir);
-                AddLabelsToAssetsIfNeeded(pluginParentDir, isPluginOutsideAssetsDir);
-                AssetDatabase.Refresh();
+        private void OnAssetDatabaseOnimportPackageFailed(string packageName, string errorMessage)
+        {
+            if (!IsImportingSdk(packageName)) return;
 
-                InvokeImportPackageCompletedCallback(Settings.IronSourceSettings.editorImportingSdk);
-                Settings.IronSourceSettings.editorImportingSdk = null;
-            };
+            Debug.LogError(errorMessage);
+            Settings.IronSourceSettings.editorImportingSdk = null;
+        }
 
-            AssetDatabase.importPackageCancelled += packageName =>
-            {
-                if (!IsImportingSdk(packageName)) return;
+        private void OnAssetDatabaseOnimportPackageCancelled(string packageName)
+        {
+            if (!IsImportingSdk(packageName)) return;
 
-                Settings.IronSourceSettings.editorImportingSdk = null;
-            };
+            Settings.IronSourceSettings.editorImportingSdk = null;
+        }
 
-            AssetDatabase.importPackageFailed += (packageName, errorMessage) =>
-            {
-                if (!IsImportingSdk(packageName)) return;
+        private void OnAssetDatabaseOnimportPackageCompleted(string packageName)
+        {
+            if (!IsImportingSdk(packageName)) return;
 
-                Debug.LogError(errorMessage);
-                Settings.IronSourceSettings.editorImportingSdk = null;
-            };
+            var pluginParentDir = PluginParentDirectory;
+            var isPluginOutsideAssetsDir = IsPluginOutsideAssetsDirectory;
+            MovePluginFilesIfNeeded(pluginParentDir, isPluginOutsideAssetsDir);
+            AddLabelsToAssetsIfNeeded(pluginParentDir, isPluginOutsideAssetsDir);
+            AssetDatabase.Refresh();
+
+            InvokeImportPackageCompletedCallback(Settings.IronSourceSettings.editorImportingSdk);
+            Settings.IronSourceSettings.editorImportingSdk = null;
         }
 
         private bool IsImportingMedationNetwork(string packageName)
@@ -127,8 +131,6 @@ namespace Pancake.Editor
         {
             return Settings.IronSourceSettings.editorImportingSdk != null && packageName.Contains("IronSource_IntegrationManager_v");
         }
-
-        private string GetPluginFileName(Network network) { return $"IronSource_IntegrationManager_v{network.lastVersion.unity}.unitypackage"; }
 
         private static void UpdateAssetLabelsIfNeeded(string assetPath, string pluginParentDir)
         {
@@ -353,7 +355,7 @@ namespace Pancake.Editor
                 network.CurrentToLatestVersionComparisonResult = EVersionComparisonResult.Lesser;
             }
         }
-        
+
         public IEnumerator DownloadPlugin(Network network)
         {
             string pathFile = Path.Combine(Application.temporaryCachePath, $"IronSource_IntegrationManager_v{network.lastVersion.unity}.unitypackage");
@@ -387,14 +389,14 @@ namespace Pancake.Editor
 
             webRequest = null;
         }
-        
+
         public void DownloadAllPlugin(List<AdapterMediationIronSource> networks)
         {
             branWidthRequest = new UnityWebRequest[networks.Count];
 
             for (var i = 0; i < networks.Count; i++)
             {
-                EditorCoroutine.StartCoroutine(DownloadFileDependency(networks[i].downloadUrl, i, false));
+                EditorCoroutine.StartCoroutine(DownloadFileDependency(networks[i].downloadUrl, i));
             }
         }
 
@@ -509,7 +511,7 @@ namespace Pancake.Editor
             AssetDatabase.Refresh();
         }
 
-        public IEnumerator DownloadFileDependency(string url, int index, bool interactive = true)
+        public IEnumerator DownloadFileDependency(string url, int index)
         {
             int fileNameIndex = url.LastIndexOf("/", StringComparison.Ordinal) + 1;
             string downloadFileName = url.Substring(fileNameIndex);
@@ -555,7 +557,7 @@ namespace Pancake.Editor
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }
-        
+
         public static void RefreshAllCurrentVersionAdapter()
         {
             foreach (var source in Settings.IronSourceSettings.editorListNetwork)

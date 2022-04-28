@@ -265,12 +265,12 @@ namespace Pancake.Editor
                         if (IsAdmobSdkAvaiable)
                         {
                             EditorGUILayout.HelpBox("Admob plugin was imported", MessageType.Info);
-                            if (Settings.AdmobSettings.importingSdk != null && !string.IsNullOrEmpty(Settings.AdmobSettings.importingSdk.lastVersion.unity) &&
-                                Settings.AdmobSettings.importingSdk.CurrentToLatestVersionComparisonResult == EVersionComparisonResult.Lesser)
+                            if (Settings.AdmobSettings.editorImportingSdk != null && !string.IsNullOrEmpty(Settings.AdmobSettings.editorImportingSdk.lastVersion.unity) &&
+                                Settings.AdmobSettings.editorImportingSdk.CurrentToLatestVersionComparisonResult == EVersionComparisonResult.Lesser)
                             {
                                 if (GUILayout.Button("Update Admob Plugin", GUILayout.Height(EditorGUIUtility.singleLineHeight * 1.3f)))
                                 {
-                                    EditorCoroutine.StartCoroutine(SettingManager.Instance.DownloadGma(Settings.AdmobSettings.importingSdk));
+                                    EditorCoroutine.StartCoroutine(SettingManager.Instance.DownloadGma(Settings.AdmobSettings.editorImportingSdk));
                                 }
                             }
 
@@ -300,12 +300,12 @@ namespace Pancake.Editor
                                 () =>
                                 {
                                     DrawHeaderMediation();
-                                    foreach (var network in Settings.AdmobSettings.MediationNetworks)
+                                    foreach (var network in Settings.AdmobSettings.editorListNetwork)
                                     {
                                         DrawAdmobNetworkDetailRow(network);
                                     }
                                     
-                                    //DrawAdmobInstallAllNetwork();
+                                    DrawAdmobInstallAllNetwork();
                                 });
 
                             EditorGUILayout.Space();
@@ -322,9 +322,9 @@ namespace Pancake.Editor
                             EditorGUILayout.HelpBox("Admob plugin not found. Please import it to show ads from Admob", MessageType.Warning);
                             if (GUILayout.Button("Import Admob Plugin", GUILayout.Height(EditorGUIUtility.singleLineHeight * 1.3f)))
                             {
-                                if (Settings.AdmobSettings.importingSdk != null)
+                                if (Settings.AdmobSettings.editorImportingSdk != null)
                                 {
-                                    EditorCoroutine.StartCoroutine(SettingManager.Instance.DownloadGma(Settings.AdmobSettings.importingSdk));
+                                    EditorCoroutine.StartCoroutine(SettingManager.Instance.DownloadGma(Settings.AdmobSettings.editorImportingSdk));
                                 }
                                 else
                                 {
@@ -524,6 +524,7 @@ namespace Pancake.Editor
                         }
                     }
 
+                    network.currentVersion = new NetworkVersion();
                     SettingManager.RemoveAllEmptyFolder(new DirectoryInfo(pluginRoot));
                     SettingManager.Instance.UpdateCurrentVersion(network);
 
@@ -694,9 +695,9 @@ namespace Pancake.Editor
         {
             var showInstallAll = false;
             var showUninstallAll = false;
-            for (int i = 0; i < Settings.AdmobSettings.MediationNetworks.Count; i++)
+            for (int i = 0; i < Settings.AdmobSettings.editorListNetwork.Count; i++)
             {
-                var network = Settings.AdmobSettings.MediationNetworks[i];
+                var network = Settings.AdmobSettings.editorListNetwork[i];
                 string currentVersion = network.currentVersion != null ? network.currentVersion.unity : "";
                 var status = "";
                 var isActionEnabled = false;
@@ -725,7 +726,7 @@ namespace Pancake.Editor
                 GUI.enabled = showInstallAll && !EditorApplication.isCompiling;
                 if (GUILayout.Button(new GUIContent("Install All"), FieldWidth))
                 {
-                    SettingManager.Instance.DownloadAllPlugin(Settings.AdmobSettings.MediationNetworks);
+                    EditorCoroutine.StartCoroutine(SettingManager.Instance.DownloadAllPlugin(Settings.AdmobSettings.editorListNetwork));
                 }
 
                 GUI.enabled = !EditorApplication.isCompiling;
@@ -737,7 +738,7 @@ namespace Pancake.Editor
                     EditorUtility.DisplayProgressBar("Ads", "Deleting All Network...", 0.5f);
                     var pluginRoot = SettingManager.MediationSpecificPluginParentDirectory;
 
-                    foreach (var network in Settings.AdmobSettings.MediationNetworks)
+                    foreach (var network in Settings.AdmobSettings.editorListNetwork)
                     {
                         foreach (var pluginFilePath in network.pluginFilePath)
                         {
@@ -753,6 +754,8 @@ namespace Pancake.Editor
                             }
                         }
 
+                        network.currentVersion = new NetworkVersion();
+                        network.CurrentToLatestVersionComparisonResult = EVersionComparisonResult.Lesser;
                         SettingManager.RemoveAllEmptyFolder(new DirectoryInfo(pluginRoot));
                         SettingManager.Instance.UpdateCurrentVersion(network);
                     }

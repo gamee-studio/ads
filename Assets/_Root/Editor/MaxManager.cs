@@ -595,12 +595,12 @@ namespace Pancake.Editor
         private bool IsImportingNetwork(string packageName)
         {
             // Note: The pluginName doesn't have the '.unitypacakge' extension included in its name but the pluginFileName does. So using Contains instead of Equals.
-            return Settings.MaxSettings.editorImportingNetwork != null && GetPluginFileName(Settings.MaxSettings.editorImportingNetwork).Contains(packageName);
+            return Settings.MaxSettings.editorImportingNetwork != null && GetPluginFileName(Settings.MaxSettings.editorImportingNetwork).Contains(packageName) && !Settings.MaxSettings.editorInstallAllFlag;
         }
 
         private (bool, int) IsIncludeImportAllNetwork(string packageName)
         {
-            if (packageName.Contains('\\')) packageName = packageName.Split('\\')[1];
+            if (packageName.Contains('\\')) packageName = packageName.Split('\\').Last();
           
             var flag = false;
             var index = 0;

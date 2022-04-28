@@ -79,79 +79,118 @@ namespace Pancake.Editor
 
         public SettingManager()
         {
-            AssetDatabase.importPackageCompleted += packageName =>
-            {
-                if (!IsImportingNetwork(packageName)) return;
+            AssetDatabase.importPackageCompleted += OnAssetDatabaseOnimportPackageCompleted;
+            AssetDatabase.importPackageCancelled += OnAssetDatabaseOnimportPackageCancelled;
+            AssetDatabase.importPackageFailed += OnAssetDatabaseOnimportPackageFailed;
 
-                var pluginParentDir = PluginParentDirectory;
-                var isPluginOutsideAssetsDir = IsPluginOutsideAssetsDirectory;
-                MovePluginFilesIfNeeded(pluginParentDir, isPluginOutsideAssetsDir);
-                AddLabelsToAssetsIfNeeded(pluginParentDir, isPluginOutsideAssetsDir);
-                AssetDatabase.Refresh();
-
-                CallImportPackageCompletedCallback(Settings.AdmobSettings.importingMediationNetwork);
-                Settings.AdmobSettings.importingMediationNetwork = null;
-            };
-
-            AssetDatabase.importPackageCancelled += packageName =>
-            {
-                if (!IsImportingNetwork(packageName)) return;
-
-                Settings.AdmobSettings.importingMediationNetwork = null;
-            };
-
-            AssetDatabase.importPackageFailed += (packageName, errorMessage) =>
-            {
-                if (!IsImportingNetwork(packageName)) return;
-
-                Debug.LogError(errorMessage);
-                Settings.AdmobSettings.importingMediationNetwork = null;
-            };
+            AssetDatabase.importPackageCompleted += OnAssetDatabaseOnimportAllPackageCompleted;
+            AssetDatabase.importPackageCancelled += OnAssetDatabaseOnimportAllPackageCancelled;
+            AssetDatabase.importPackageFailed += OnAssetDatabaseOnimportAllPackageFailed;
 
 
             #region gma
 
-            AssetDatabase.importPackageCompleted += packageName =>
-            {
-                if (!IsImportingGMA(packageName)) return;
-
-                //var pluginParentDir = PluginParentDirectory;
-                //var isPluginOutsideAssetsDir = IsPluginOutsideAssetsDirectory;
-                //MovePluginFilesIfNeeded(pluginParentDir, isPluginOutsideAssetsDir);
-                //AddLabelsToAssetsIfNeeded(pluginParentDir, isPluginOutsideAssetsDir);
-                AssetDatabase.Refresh();
-
-                CallImportGmaCompletedCallback(Settings.AdmobSettings.importingSdk);
-                Settings.AdmobSettings.importingSdk = null;
-            };
-
-            AssetDatabase.importPackageCancelled += packageName =>
-            {
-                if (!IsImportingGMA(packageName)) return;
-
-                Settings.AdmobSettings.importingSdk = null;
-            };
-
-            AssetDatabase.importPackageFailed += (packageName, errorMessage) =>
-            {
-                if (!IsImportingGMA(packageName)) return;
-
-                Debug.LogError(errorMessage);
-                Settings.AdmobSettings.importingSdk = null;
-            };
+            AssetDatabase.importPackageCompleted += OnImportSdkCompletedCallback;
+            AssetDatabase.importPackageCancelled += OnImportSdkCancelledCallback;
+            AssetDatabase.importPackageFailed += OnImportSdkFailedCallback;
 
             #endregion
         }
 
-        private static void CallImportPackageCompletedCallback(Network network)
+        private void OnAssetDatabaseOnimportAllPackageFailed(string packageName, string errorMessage)
         {
-            importPackageCompletedCallback?.Invoke(network);
+            var result = IsIncludeImportAllNetwork(packageName);
+            if (!result.Item1) return;
+
+            Debug.LogError(errorMessage);
+            Settings.AdmobSettings.editorImportingListNetwork[result.Item2] = null;
         }
 
-        private static void CallImportGmaCompletedCallback(Network network)
+        private void OnAssetDatabaseOnimportAllPackageCancelled(string packageName)
         {
-            importGmaCompletedCallback?.Invoke(network);
+            var result = IsIncludeImportAllNetwork(packageName);
+            if (!result.Item1) return;
+
+            Settings.AdmobSettings.editorImportingListNetwork[result.Item2] = null;
         }
+
+        private void OnAssetDatabaseOnimportAllPackageCompleted(string packageName)
+        {
+            var result = IsIncludeImportAllNetwork(packageName);
+            if (!result.Item1) return;
+
+            var pluginParentDir = PluginParentDirectory;
+            var isPluginOutsideAssetsDir = IsPluginOutsideAssetsDirectory;
+            MovePluginFilesIfNeeded(pluginParentDir, isPluginOutsideAssetsDir);
+            AddLabelsToAssetsIfNeeded(pluginParentDir, isPluginOutsideAssetsDir);
+            AssetDatabase.Refresh();
+
+            Debug.Log("Import completed : " + packageName);
+            CallImportPackageCompletedCallback(Settings.AdmobSettings.editorImportingListNetwork[result.Item2]);
+            Settings.AdmobSettings.editorImportingListNetwork[result.Item2] = null;
+        }
+
+        private void OnImportSdkFailedCallback(string packageName, string errorMessage)
+        {
+            if (!IsImportingGMA(packageName)) return;
+
+            Debug.LogError(errorMessage);
+            Settings.AdmobSettings.editorImportingSdk = null;
+        }
+
+        private void OnImportSdkCancelledCallback(string packageName)
+        {
+            if (!IsImportingGMA(packageName)) return;
+
+            Settings.AdmobSettings.editorImportingSdk = null;
+        }
+
+        private void OnImportSdkCompletedCallback(string packageName)
+        {
+            if (!IsImportingGMA(packageName)) return;
+
+            //var pluginParentDir = PluginParentDirectory;
+            //var isPluginOutsideAssetsDir = IsPluginOutsideAssetsDirectory;
+            //MovePluginFilesIfNeeded(pluginParentDir, isPluginOutsideAssetsDir);
+            //AddLabelsToAssetsIfNeeded(pluginParentDir, isPluginOutsideAssetsDir);
+            AssetDatabase.Refresh();
+
+            CallImportGmaCompletedCallback(Settings.AdmobSettings.editorImportingSdk);
+            Settings.AdmobSettings.editorImportingSdk = null;
+        }
+
+        private void OnAssetDatabaseOnimportPackageFailed(string packageName, string errorMessage)
+        {
+            if (!IsImportingNetwork(packageName)) return;
+
+            Debug.LogError(errorMessage);
+            Settings.AdmobSettings.editorImportingNetwork = null;
+        }
+
+        private void OnAssetDatabaseOnimportPackageCancelled(string packageName)
+        {
+            if (!IsImportingNetwork(packageName)) return;
+
+            Settings.AdmobSettings.editorImportingNetwork = null;
+        }
+
+        private void OnAssetDatabaseOnimportPackageCompleted(string packageName)
+        {
+            if (!IsImportingNetwork(packageName)) return;
+
+            var pluginParentDir = PluginParentDirectory;
+            var isPluginOutsideAssetsDir = IsPluginOutsideAssetsDirectory;
+            MovePluginFilesIfNeeded(pluginParentDir, isPluginOutsideAssetsDir);
+            AddLabelsToAssetsIfNeeded(pluginParentDir, isPluginOutsideAssetsDir);
+            AssetDatabase.Refresh();
+
+            CallImportPackageCompletedCallback(Settings.AdmobSettings.editorImportingNetwork);
+            Settings.AdmobSettings.editorImportingNetwork = null;
+        }
+
+        private static void CallImportPackageCompletedCallback(Network network) { importPackageCompletedCallback?.Invoke(network); }
+
+        private static void CallImportGmaCompletedCallback(Network network) { importGmaCompletedCallback?.Invoke(network); }
 
         /// <summary>
         /// Adds labels to assets so that they can be easily found.
@@ -337,10 +376,32 @@ namespace Pancake.Editor
         private bool IsImportingNetwork(string packageName)
         {
             // Note: The pluginName doesn't have the '.unitypacakge' extension included in its name but the pluginFileName does. So using Contains instead of Equals.
-            return Settings.AdmobSettings.importingMediationNetwork != null && GetPluginFileName(Settings.AdmobSettings.importingMediationNetwork).Contains(packageName);
+            return Settings.AdmobSettings.editorImportingNetwork != null && GetPluginFileName(Settings.AdmobSettings.editorImportingNetwork).Contains(packageName) &&
+                   !Settings.AdmobSettings.editorInstallAllFlag;
         }
 
-        private bool IsImportingGMA(string packageName) { return Settings.AdmobSettings.importingSdk != null && packageName.Contains("GoogleMobileAds-v"); }
+        private (bool, int) IsIncludeImportAllNetwork(string packageName)
+        {
+            Debug.Log("here : " + packageName);
+            if (packageName.Contains('\\')) packageName = packageName.Split('\\').Last();
+
+            var flag = false;
+            var index = 0;
+            for (var i = 0; i < Settings.AdmobSettings.editorImportingListNetwork.Count; i++)
+            {
+                var importing = Settings.AdmobSettings.editorImportingListNetwork[i];
+                if (importing != null && GetPluginFileName(importing).Contains(packageName))
+                {
+                    flag = true;
+                    index = i;
+                    break;
+                }
+            }
+
+            return (Settings.AdmobSettings.editorInstallAllFlag && flag, index);
+        }
+
+        private bool IsImportingGMA(string packageName) { return Settings.AdmobSettings.editorImportingSdk != null && packageName.Contains("GoogleMobileAds-v"); }
 
         private string GetPluginFileName(Network network) { return $"GoogleMobileAds{network.displayName}Mediation.unitypackage"; }
 
@@ -350,8 +411,8 @@ namespace Pancake.Editor
             curl.Headers.Add(HttpRequestHeader.UserAgent, "request");
             const string url = "https://gist.githubusercontent.com/yenmoc/d79936098344befbd8edfa882c17bf20/raw";
             string json = curl.DownloadString(url);
-            Settings.AdmobSettings.MediationNetworks = JsonConvert.DeserializeObject<List<Network>>(json);
-            foreach (var n in Settings.AdmobSettings.MediationNetworks)
+            Settings.AdmobSettings.editorListNetwork = JsonConvert.DeserializeObject<List<Network>>(json);
+            foreach (var n in Settings.AdmobSettings.editorListNetwork)
             {
                 UpdateCurrentVersion(n);
             }
@@ -359,12 +420,13 @@ namespace Pancake.Editor
 
         public IEnumerator DownloadPlugin(Network network)
         {
+            Settings.AdmobSettings.editorInstallAllFlag = false;
             string pathFile = Path.Combine(Application.temporaryCachePath, $"{network.name.ToLowerInvariant()}_{network.lastVersion.unity}.zip");
             string urlDownload = string.Format(network.path, network.lastVersion.unity);
             var downloadHandler = new DownloadHandlerFile(pathFile);
-            webRequest = new UnityWebRequest(urlDownload) { method = UnityWebRequest.kHttpVerbGET, downloadHandler = downloadHandler };
+            webRequest = new UnityWebRequest(urlDownload) {method = UnityWebRequest.kHttpVerbGET, downloadHandler = downloadHandler};
             var operation = webRequest.SendWebRequest();
-            
+
             while (!operation.isDone)
             {
                 yield return new WaitForSeconds(0.1f); // Just wait till webRequest is completed. Our coroutine is pretty rudimentary.
@@ -383,7 +445,7 @@ namespace Pancake.Editor
             }
             else
             {
-                Settings.AdmobSettings.importingMediationNetwork = network;
+                Settings.AdmobSettings.editorImportingNetwork = network;
 
                 string folderUnZip = Path.Combine(Application.temporaryCachePath, "UnZip");
                 UnZip(folderUnZip, File.ReadAllBytes(pathFile));
@@ -400,9 +462,9 @@ namespace Pancake.Editor
             string pathFile = Path.Combine(Application.temporaryCachePath, $"{network.name.ToLowerInvariant()}_{network.lastVersion.unity}.zip");
             string urlDownload = string.Format(network.path, network.lastVersion.unity);
             var downloadHandler = new DownloadHandlerFile(pathFile);
-            brandWidthWebRequest[index] = new UnityWebRequest(urlDownload) { method = UnityWebRequest.kHttpVerbGET, downloadHandler = downloadHandler };
+            brandWidthWebRequest[index] = new UnityWebRequest(urlDownload) {method = UnityWebRequest.kHttpVerbGET, downloadHandler = downloadHandler};
             var operation = brandWidthWebRequest[index].SendWebRequest();
-            
+
             while (!operation.isDone)
             {
                 yield return new WaitForSeconds(0.1f); // Just wait till webRequest is completed. Our coroutine is pretty rudimentary.
@@ -421,8 +483,8 @@ namespace Pancake.Editor
             }
             else
             {
-                Settings.AdmobSettings.importingMediationNetwork = network;
-
+                Debug.Log("Add : " + network.name);
+                Settings.AdmobSettings.editorImportingListNetwork.Add(network);
                 string folderUnZip = Path.Combine(Application.temporaryCachePath, "UnZip");
                 UnZip(folderUnZip, File.ReadAllBytes(pathFile));
 
@@ -433,22 +495,26 @@ namespace Pancake.Editor
             brandWidthWebRequest[index] = null;
         }
 
-        public void DownloadAllPlugin(List<Network> networks)
+        public IEnumerator DownloadAllPlugin(List<Network> networks)
         {
             brandWidthWebRequest = new UnityWebRequest[networks.Count];
+            Settings.AdmobSettings.editorImportingListNetwork.Clear();
+            Settings.AdmobSettings.editorImportingNetwork = null;
+            Settings.AdmobSettings.editorInstallAllFlag = true;
 
             for (var i = 0; i < networks.Count; i++)
             {
+                yield return new WaitForSeconds(1f);
                 EditorCoroutine.StartCoroutine(DownloadPlugin(networks[i], i));
             }
         }
-        
+
         public IEnumerator DownloadGma(Network network)
         {
             string pathFile = Path.Combine(Application.temporaryCachePath, $"GoogleMobileAds-v{network.lastVersion.unity}.unitypackage");
             string urlDownload = string.Format(network.path, network.lastVersion.unity);
             var downloadHandler = new DownloadHandlerFile(pathFile);
-            webRequest = new UnityWebRequest(urlDownload) { method = UnityWebRequest.kHttpVerbGET, downloadHandler = downloadHandler };
+            webRequest = new UnityWebRequest(urlDownload) {method = UnityWebRequest.kHttpVerbGET, downloadHandler = downloadHandler};
             var operation = webRequest.SendWebRequest();
 
             while (!operation.isDone)
@@ -469,7 +535,7 @@ namespace Pancake.Editor
             }
             else
             {
-                Settings.AdmobSettings.importingSdk = network;
+                Settings.AdmobSettings.editorImportingSdk = network;
                 AssetDatabase.ImportPackage(Path.Combine(Application.temporaryCachePath, $"GoogleMobileAds-v{network.lastVersion.unity}.unitypackage"), true);
             }
 
@@ -481,9 +547,9 @@ namespace Pancake.Editor
             using var curl = new WebClient();
             curl.Headers.Add(HttpRequestHeader.UserAgent, "request");
             string json = curl.DownloadString("https://gist.githubusercontent.com/yenmoc/df91d875eb78556b8644a2c5a7dc8a03/raw");
-            Settings.AdmobSettings.importingSdk = JsonConvert.DeserializeObject<Network>(json);
+            Settings.AdmobSettings.editorImportingSdk = JsonConvert.DeserializeObject<Network>(json);
 
-            UpdateCurrentVersionGMA(Settings.AdmobSettings.importingSdk);
+            UpdateCurrentVersionGMA(Settings.AdmobSettings.editorImportingSdk);
         }
 
         public void UpdateCurrentVersionGMA(Network network)

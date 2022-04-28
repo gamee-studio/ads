@@ -18,17 +18,27 @@ namespace Pancake.Monetization
         [SerializeField] private bool useAdaptiveBanner;
 
 #if UNITY_EDITOR
-        private List<Network> _mediationNetworks = new List<Network>();
+        public List<Network> editorListNetwork = new List<Network>();
 
         /// <summary>
         /// editor only
         /// </summary>
-        public Network importingMediationNetwork;
+        public Network editorImportingNetwork;
 
         /// <summary>
         /// editor only
         /// </summary>
-        public Network importingSdk;
+        public Network editorImportingSdk;
+
+        /// <summary>
+        /// editor only
+        /// </summary>
+        public List<Network> editorImportingListNetwork = new List<Network>();
+
+        /// <summary>
+        /// editor only
+        /// </summary>
+        public bool editorInstallAllFlag;
 #endif
 
         public bool Enable => enable;
@@ -40,12 +50,5 @@ namespace Pancake.Monetization
         public AdmobRewardedUnit RewardedAdUnit => rewardedAdUnit;
         public AdmobRewardedInterstitialUnit RewardedInterstitialAdUnit => rewardedInterstitialAdUnit;
         public AdmobAppOpenUnit AppOpenAdUnit => appOpenAdUnit;
-
-#if UNITY_EDITOR
-        /// <summary>
-        /// editor only
-        /// </summary>
-        public List<Network> MediationNetworks { get => _mediationNetworks; set => _mediationNetworks = value; }
-#endif
     }
 }

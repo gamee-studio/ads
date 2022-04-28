@@ -17,7 +17,7 @@ namespace Pancake.Monetization
                 if (instance == null)
                 {
 #if !UNITY_EDITOR
-                        Debug.LogError("Ads settings not found! Please go to menu Tools > Snorlax > Ads to setup the plugin.");
+                    Debug.LogError("Ads settings not found! Please go to menu Tools > Snorlax > Ads to setup the plugin.");
 #endif
                     instance = CreateInstance<Settings>(); // Create a dummy scriptable object for temporary use.
                 }

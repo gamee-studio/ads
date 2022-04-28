@@ -28,17 +28,7 @@ namespace Pancake.Monetization
         /// <summary>
         /// editor only
         /// </summary>
-        public List<AdapterMediationIronSource> editorImportingListNetwork;
-
-        /// <summary>
-        /// editor only
-        /// </summary>
         public List<AdapterMediationIronSource> editorListNetwork = new List<AdapterMediationIronSource>();
-
-        /// <summary>
-        /// editor only
-        /// </summary>
-        public bool editorInstallAllFlag;
 #endif
 
         public bool Enable => enable;
