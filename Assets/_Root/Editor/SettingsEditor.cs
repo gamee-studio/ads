@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using Pancake.Monetization;
 using UnityEditor;
@@ -309,7 +310,7 @@ namespace Pancake.Editor
                                     {
                                         DrawAdmobNetworkDetailRow(network);
                                     }
-                                    
+
                                     DrawAdmobInstallAllNetwork();
                                 });
 
@@ -378,7 +379,7 @@ namespace Pancake.Editor
                                     {
                                         DrawApplovinNetworkDetailRow(network);
                                     }
-                                    
+
                                     DrawApplovinInstallAllNetwork();
                                 });
                             EditorGUILayout.Space();
@@ -426,7 +427,7 @@ namespace Pancake.Editor
                                     {
                                         DrawIronSourceNetworkDetailRow(network);
                                     }
-                                    
+
                                     DrawIronsourceInstallAllNetwork();
                                 });
                             EditorGUILayout.Space();
@@ -584,6 +585,14 @@ namespace Pancake.Editor
                     if (network.Name.Equals("ALGORIX_NETWORK"))
                     {
                         AdsEditorUtil.CreateMainTemplateGradle();
+                        AdsEditorUtil.AddSettingProguardFile(new List<string>()
+                        {
+                            "-keep class com.alxad.* {;}",
+                            "-keep class admob.custom.adapter.* {;}",
+                            "-keep class anythink.custom.adapter.* {;}",
+                            "-keep class com.mopub.mobileads.* {;}",
+                            "-keep class com.applovin.mediation.adapters.* {;}"
+                        });
                         AdsEditorUtil.AddAlgorixSettingGradle(network);
                     }
                 }
@@ -601,8 +610,13 @@ namespace Pancake.Editor
                         FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, pluginFilePath));
                         FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, pluginFilePath + ".meta"));
                     }
-                    
-                    if (network.Name.Equals("ALGORIX_NETWORK")) AdsEditorUtil.RemoveAlgorixSettingGradle();
+
+                    if (network.Name.Equals("ALGORIX_NETWORK"))
+                    {
+                        AdsEditorUtil.RemoveAlgorixSettingGradle();
+                        AdsEditorUtil.DeleteProguardFile();
+                    }
+
                     SettingManager.RemoveAllEmptyFolder(new DirectoryInfo(pluginRoot));
                     MaxManager.UpdateCurrentVersions(network, pluginRoot);
 

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using Pancake.Monetization;
 using UnityEditor;
@@ -18,6 +19,7 @@ namespace Pancake.Editor
 
         private const string MAINTEMPALTE_GRADLE_PATH = "Assets/Plugins/Android/mainTemplate.gradle";
         private const string GRADLETEMPALTE_PROPERTIES_PATH = "Assets/Plugins/Android/gradleTemplate.properties";
+        private const string PROGUARD_PATH = "Assets/Plugins/Android/proguard-user.txt";
 
         public static void CreateMainTemplateGradle()
         {
@@ -100,5 +102,36 @@ namespace Pancake.Editor
         }
 
         public static bool StateDeleteGradle() => EditorPrefs.GetBool(KEY_FORCE_GRADLE, false);
+        
+        public static void CreateProguardFile()
+        {
+            if (File.Exists(PROGUARD_PATH)) return;
+            var writer = new StreamWriter(PROGUARD_PATH, false);
+            writer.Write("");
+            writer.Close();
+            AssetDatabase.ImportAsset(PROGUARD_PATH);
+        }
+
+        public static void AddSettingProguardFile(List<string> settings)
+        {
+            if (!File.Exists(PROGUARD_PATH)) CreateProguardFile();
+           
+            var writer = new StreamWriter(PROGUARD_PATH, true);
+            for (int i = 0; i < settings.Count; i++)
+            {
+                writer.Write(settings[i]);
+                writer.Write("\n");
+            }
+            writer.Close();
+            AssetDatabase.ImportAsset(PROGUARD_PATH);
+        }
+        
+        public static void DeleteProguardFile()
+        {
+            if (!File.Exists(PROGUARD_PATH)) return;
+            FileUtil.DeleteFileOrDirectory(PROGUARD_PATH);
+            FileUtil.DeleteFileOrDirectory(PROGUARD_PATH + ".meta");
+            AssetDatabase.Refresh();
+        }
     }
 }
