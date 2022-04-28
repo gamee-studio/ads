@@ -310,7 +310,16 @@ namespace Pancake.Editor
         {
 #if PANCAKE_MAX_ENABLE
             var dependencyFilePath = Path.Combine(mediationPluginParentDirectory, network.DependenciesFilePath);
-            var currentVersions = GetCurrentVersions(dependencyFilePath);
+            MaxVersions currentVersions;
+            if (network.Name.Equals("ALGORIX_NETWORK"))
+            {
+                currentVersions = !File.Exists(dependencyFilePath) ? new MaxVersions() : network.LatestVersions;
+            }
+            else
+            {
+                currentVersions = GetCurrentVersions(dependencyFilePath);
+            }
+            
 
             network.CurrentVersions = currentVersions;
 

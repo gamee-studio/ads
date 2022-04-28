@@ -382,7 +382,6 @@ namespace Pancake.Editor
 
         private (bool, int) IsIncludeImportAllNetwork(string packageName)
         {
-            Debug.Log("here : " + packageName);
             if (packageName.Contains('\\')) packageName = packageName.Split('\\').Last();
 
             var flag = false;

@@ -229,14 +229,19 @@ namespace Pancake.Editor
                         AdsEditorUtil.CreateGradleTemplateProperties();
 #endif
                         ScriptingDefinition.AddDefineSymbolOnAllPlatforms(AdsEditorUtil.SCRIPTING_DEFINITION_MULTIPLE_DEX);
+                        AdsEditorUtil.SetDeleteGradleState(true);
                     }
                     else
                     {
-                        AdsEditorUtil.DeleteMainTemplateGradle();
+                        if (AdsEditorUtil.StateDeleteGradle())
+                        {
+                            AdsEditorUtil.SetDeleteGradleState(false);
+                            AdsEditorUtil.DeleteMainTemplateGradle();
 #if UNITY_2020_3_OR_NEWER
-                        AdsEditorUtil.DeleteGradleTemplateProperties();
+                            AdsEditorUtil.DeleteGradleTemplateProperties();
 #endif
-                        ScriptingDefinition.RemoveDefineSymbolOnAllPlatforms(AdsEditorUtil.SCRIPTING_DEFINITION_MULTIPLE_DEX);
+                            ScriptingDefinition.RemoveDefineSymbolOnAllPlatforms(AdsEditorUtil.SCRIPTING_DEFINITION_MULTIPLE_DEX);
+                        }
                     }
                 });
 
@@ -576,6 +581,11 @@ namespace Pancake.Editor
                 {
                     // Download the plugin.
                     EditorCoroutine.StartCoroutine(MaxManager.Instance.DownloadPlugin(network));
+                    if (network.Name.Equals("ALGORIX_NETWORK"))
+                    {
+                        AdsEditorUtil.CreateMainTemplateGradle();
+                        AdsEditorUtil.AddAlgorixSettingGradle(network);
+                    }
                 }
 
                 GUI.enabled = !EditorApplication.isCompiling;
@@ -591,7 +601,9 @@ namespace Pancake.Editor
                         FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, pluginFilePath));
                         FileUtil.DeleteFileOrDirectory(Path.Combine(pluginRoot, pluginFilePath + ".meta"));
                     }
-
+                    
+                    if (network.Name.Equals("ALGORIX_NETWORK")) AdsEditorUtil.RemoveAlgorixSettingGradle();
+                    SettingManager.RemoveAllEmptyFolder(new DirectoryInfo(pluginRoot));
                     MaxManager.UpdateCurrentVersions(network, pluginRoot);
 
                     // Refresh UI
