@@ -23,7 +23,7 @@ Add the following lines
 - for excactly version
 
 ```csharp
-"com.gamee.ads": "https://github.com/gamee-studio/ads.git?path=Assets/_Root#1.0.8",
+"com.gamee.ads": "https://github.com/gamee-studio/ads.git?path=Assets/_Root#1.0.9",
 "com.snorlax.locale": "https://github.com/snorluxe/locale.git?path=Assets/_Root#1.0.2",
 "com.google.external-dependency-manager": "https://github.com/snorluxe/external-dependency-manager.git?path=Assets/_Root#1.2.169",
 ```

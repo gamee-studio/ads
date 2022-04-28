@@ -2,7 +2,7 @@
   "name": "com.gamee.ads",
   "displayName": "Monetization",
   "description": "Advertising for unity3d",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "unity": "2020.1",
   "category": "gamee",
   "author": {
@@ -19,7 +19,7 @@
     "mediation"
   ],
   "dependencies": {
-    "com.unity.nuget.newtonsoft-json": "2.0.2",
+    "com.unity.nuget.newtonsoft-json": "3.0.2",
     "com.unity.sharp-zip-lib": "1.2.2-preview.2",
     "com.unity.ads.ios-support": "1.2.0"
   },
