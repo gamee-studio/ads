@@ -14,10 +14,17 @@
     "overrideReferences": true,
     "precompiledReferences": [
         "GoogleMobileAds.dll",
-        "GoogleMobileAds.Core.dll"
+        "GoogleMobileAds.Core.dll",
+        "Firebase.Analytics.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.google.firebase.analytics",
+            "expression": "8.0.0",
+            "define": "ADS_FIREBASE_TRACKING"
+        }
+    ],
     "noEngineReferences": false
 }

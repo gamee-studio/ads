@@ -10,7 +10,7 @@
         },
         {
             "key": "ADMOB_MODULE",
-            "state": false
+            "state": true
         },
         {
             "key": "MAX_MODULE",
