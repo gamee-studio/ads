@@ -17,7 +17,7 @@ namespace Pancake.Monetization
         public event Action<AdmobAppOpenLoader, AdFailedToLoadEventArgs> OnFailToLoadEvent = delegate { };
         public event Action<AdmobAppOpenLoader, object, EventArgs> OnRecordImpressionEvent = delegate { };
         public event Action<AdmobAppOpenLoader, object, EventArgs> OnClosedEvent = delegate { };
-
+        
         internal override bool IsReady() { return _appOpenAd != null; }
 
         public AdmobAppOpenLoader() { unit = Settings.AdmobSettings.AppOpenAdUnit; }

@@ -1,4 +1,5 @@
 using System;
+using GoogleMobileAds.Api;
 
 #pragma warning disable CS0414
 // ReSharper disable AccessToStaticMemberViaDerivedType
@@ -12,6 +13,7 @@ namespace Pancake.Monetization
         private ApplovinInterstitialLoader _interstitial;
         private ApplovinRewardedLoader _rewarded;
         private ApplovinRewardedInterstitialLoader _rewardedInterstitial;
+        private ApplovinAppOpenLoader _appOpen;
         private static ApplovinAdClient client;
         private bool _isBannerDestroyed;
         private bool _isRewardedCompleted;
@@ -47,6 +49,16 @@ namespace Pancake.Monetization
         public event Action OnRewardedInterstitialAdHidden;
         public event Action<MaxSdkBase.AdInfo> OnRewardedInterstitialAdRevenuePaid;
         public event Action<MaxSdkBase.Reward> OnRewardedInterstitialAdReceivedReward;
+#if PANCAKE_ADMOB_ENABLE
+        public event Action<GoogleMobileAds.Api.AdValueEventArgs> OnAppOpenAdPaid;
+#endif
+
+        public event Action OnAppOpenAdOpening;
+        public event Action OnAppOpenAdLoaded;
+        public event Action OnAppOpenAdFailedToShow;
+        public event Action OnAppOpenAdFailedToLoad;
+        public event Action OnAppOpenAdClosed;
+        public event Action OnAppOpenAdDidRecordImpression;
 #endif
 
         public override EAdNetwork Network => EAdNetwork.Applovin;
@@ -54,7 +66,7 @@ namespace Pancake.Monetization
         public override bool IsInsterstitialAdSupport => true;
         public override bool IsRewardedAdSupport => true;
         public override bool IsRewardedInterstitialAdSupport => true;
-        public override bool IsAppOpenAdSupport => false;
+        public override bool IsAppOpenAdSupport => true;
 
         public override bool IsSdkAvaiable
         {
@@ -131,6 +143,16 @@ namespace Pancake.Monetization
         internal void InvokeRewardedInterstitialAdHidden() { OnRewardedInterstitialAdHidden?.Invoke(); }
         internal void InvokeRewardedInterstitialAdRevenuePaid(MaxSdkBase.AdInfo info) { OnRewardedInterstitialAdRevenuePaid?.Invoke(info); }
         internal void InvokeRewardedInterstitialAdReceivedReward(MaxSdkBase.Reward reward) { OnRewardedInterstitialAdReceivedReward?.Invoke(reward); }
+#if PANCAKE_ADMOB_ENABLE
+        internal void InvokeAppOpenAdRevenuePaid(AdValueEventArgs value) { OnAppOpenAdPaid?.Invoke(value); }
+        internal void InvokeAppOpenAdOpening() { OnAppOpenAdOpening?.Invoke(); }
+        internal void InvokeAppOpenAdLoaded() { OnAppOpenAdLoaded?.Invoke(); }
+        internal void InvokeAppOpenAdFailedToShow() { OnAppOpenAdFailedToShow?.Invoke(); }
+        internal void InvokeAppOpenAdFailedToLoad() { OnAppOpenAdFailedToLoad?.Invoke(); }
+        internal void InvokeAppOpenAdClosed() { OnAppOpenAdClosed?.Invoke(); }
+        internal void InvokeAppOpenAdDidRecordImpression() { OnAppOpenAdDidRecordImpression?.Invoke(); }
+        internal virtual void InternalAppOpenAdCompleted(ApplovinAppOpenLoader instance) { InvokeAppOpenAdCompleted(); }
+#endif
 #endif
 
         #endregion
@@ -149,6 +171,7 @@ namespace Pancake.Monetization
             _interstitial = new ApplovinInterstitialLoader(this);
             _rewarded = new ApplovinRewardedLoader(this);
             _rewardedInterstitial = new ApplovinRewardedInterstitialLoader(this);
+            _appOpen = new ApplovinAppOpenLoader(this);
 
             LoadInterstitialAd();
             LoadRewardedAd();
@@ -285,6 +308,12 @@ namespace Pancake.Monetization
             return false;
 #endif
         }
+
+#if PANCAKE_ADMOB_ENABLE
+        protected override void InternalLoadAppOpenAd() { _appOpen.Load();}
+        protected override void InternalShowAppOpenAd() { _appOpen.Show(); }
+        protected override bool InternalIsAppOpenAdReady() { return _appOpen.IsReady(); }
+#endif
 
         public override void ShowConsentForm()
         {

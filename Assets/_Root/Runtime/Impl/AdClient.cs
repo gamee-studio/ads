@@ -6,6 +6,7 @@ namespace Pancake.Monetization
     public abstract class AdClient : IAdClient
     {
         protected bool isInitialized;
+        protected bool isShowingAd;
         public event Action<IAdClient> OnInterstitialAdCompleted;
         public event Action<IAdClient> OnRewardedAdSkipped;
         public event Action<IAdClient> OnRewardedAdCompleted;
@@ -22,6 +23,7 @@ namespace Pancake.Monetization
         protected abstract string NoSdkMessage { get; }
         public virtual float GetAdaptiveBannerHeight { get; }
         public virtual bool IsInitialized => isInitialized;
+        public virtual bool IsShowingAd => isShowingAd;
 
         public virtual void Initialize()
         {
@@ -110,6 +112,7 @@ namespace Pancake.Monetization
                     return;
                 }
 
+                isShowingAd = true;
                 InternalShowInterstitialAd();
             }
             else
@@ -229,6 +232,9 @@ namespace Pancake.Monetization
         }
 
         public bool IsAppOpenAdReady() { return CheckInitialize(false) && InternalIsAppOpenAdReady(); }
+
+        protected virtual void 
+
 
         public virtual void ShowConsentForm() { }
     }

@@ -42,6 +42,7 @@ namespace Pancake.Monetization
     public enum EAppOpenAdNetwork
     {
         None = EAdNetwork.None,
-        Admob = EAdNetwork.Admob
+        Admob = EAdNetwork.Admob,
+        Applovin = EAdNetwork.Applovin
     }
 }

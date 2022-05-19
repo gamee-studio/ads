@@ -14,6 +14,7 @@ namespace Pancake.Monetization
         [SerializeField] private bool enableGDPR;
         [SerializeField] private bool enableMultipleDex;
         [SerializeField] private EAdNetwork currentNetwork = EAdNetwork.Admob;
+        [SerializeField] private bool useAppOpenAdOfAdmob;
 
         public bool AutoInit { get => autoInit; set => autoInit = value; }
 
@@ -30,5 +31,7 @@ namespace Pancake.Monetization
         public bool EnableMultipleDex => enableMultipleDex;
 
         public EAdNetwork CurrentNetwork { get => currentNetwork; set => currentNetwork = value; }
+
+        public bool UseAppOpenAdOfAdmob { get => useAppOpenAdOfAdmob; set => useAppOpenAdOfAdmob = value; }
     }
 }

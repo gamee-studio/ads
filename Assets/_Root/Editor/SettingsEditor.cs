@@ -44,6 +44,7 @@ namespace Pancake.Editor
 
             public static Property enableMultipleDex = new Property(null, new GUIContent("Multiple Dex"));
             public static Property currentNetwork = new Property(null, new GUIContent("Current Network", "Current network use show ad"));
+            public static Property useAppOpenAdOfAdmob = new Property(null, new GUIContent("App Open Ad", "Enable app open ad use admob while use another network"));
         }
 
         private static class AdmobProperties
@@ -51,11 +52,11 @@ namespace Pancake.Editor
             public static SerializedProperty main;
             public static Property enable = new Property(null, new GUIContent("Enable", "Enable using admob ad"));
             public static Property devicesTest = new Property(null, new GUIContent("Devices Test", "List devices show real ad but mark test user"));
-            public static Property bannerAdUnit = new Property(null, new GUIContent("Banner ad"));
-            public static Property interstitialAdUnit = new Property(null, new GUIContent("Interstitial ad"));
+            public static Property bannerAdUnit = new Property(null, new GUIContent("Banner Ad"));
+            public static Property interstitialAdUnit = new Property(null, new GUIContent("Interstitial Ad"));
             public static Property rewardedAdUnit = new Property(null, new GUIContent("Rewarded Ad"));
-            public static Property rewardedInterstitialAdUnit = new Property(null, new GUIContent("Rewarded interstitial ad"));
-            public static Property appOpenAdUnit = new Property(null, new GUIContent("App open ad"));
+            public static Property rewardedInterstitialAdUnit = new Property(null, new GUIContent("Rewarded interstitial Ad"));
+            public static Property appOpenAdUnit = new Property(null, new GUIContent("App Open Ad"));
             public static Property enableTestMode = new Property(null, new GUIContent("Enable Test Mode", "Enable true when want show test ad"));
             public static Property useAdaptiveBanner = new Property(null, new GUIContent("Use Adaptive Banner", "Use adaptive banner ad when use smart banner"));
         }
@@ -65,10 +66,11 @@ namespace Pancake.Editor
             public static SerializedProperty main;
             public static Property enable = new Property(null, new GUIContent("Enable", "Enable using applovin ad"));
             public static Property sdkKey = new Property(null, new GUIContent("Sdk Key", "Sdk of applovin"));
-            public static Property bannerAdUnit = new Property(null, new GUIContent("Banner ad"));
-            public static Property interstitialAdUnit = new Property(null, new GUIContent("Interstitial ad"));
+            public static Property bannerAdUnit = new Property(null, new GUIContent("Banner Ad"));
+            public static Property interstitialAdUnit = new Property(null, new GUIContent("Interstitial Ad"));
             public static Property rewardedAdUnit = new Property(null, new GUIContent("Rewarded Ad"));
             public static Property rewardedInterstitialAdUnit = new Property(null, new GUIContent("Rewarded Interstitial Ad"));
+            public static Property appOpenAdUnit = new Property(null, new GUIContent("App Open Ad (Admob)"));
             public static Property enableAgeRestrictedUser = new Property(null, new GUIContent("Age Restrictd User"));
 
             public static Property enableRequestAdAfterHidden = new Property(null,
@@ -163,6 +165,7 @@ namespace Pancake.Editor
             AdProperties.privacyPolicyUrl.property = AdProperties.main.FindPropertyRelative("privacyPolicyUrl");
             AdProperties.enableMultipleDex.property = AdProperties.main.FindPropertyRelative("enableMultipleDex");
             AdProperties.currentNetwork.property = AdProperties.main.FindPropertyRelative("currentNetwork");
+            AdProperties.useAppOpenAdOfAdmob.property = AdProperties.main.FindPropertyRelative("useAppOpenAdOfAdmob");
 
             AdmobProperties.main = serializedObject.FindProperty("admobSettings");
             AdmobProperties.enable.property = AdmobProperties.main.FindPropertyRelative("enable");
@@ -182,6 +185,10 @@ namespace Pancake.Editor
             ApplovinProperties.interstitialAdUnit.property = ApplovinProperties.main.FindPropertyRelative("interstitialAdUnit");
             ApplovinProperties.rewardedAdUnit.property = ApplovinProperties.main.FindPropertyRelative("rewardedAdUnit");
             ApplovinProperties.rewardedInterstitialAdUnit.property = ApplovinProperties.main.FindPropertyRelative("rewardedInterstitialAdUnit");
+#if PANCAKE_MAX_ENABLE
+             ApplovinProperties.appOpenAdUnit.property = ApplovinProperties.main.FindPropertyRelative("appOpenAdUnit");           
+#endif
+
             ApplovinProperties.enableAgeRestrictedUser.property = ApplovinProperties.main.FindPropertyRelative("enableAgeRestrictedUser");
             ApplovinProperties.enableRequestAdAfterHidden.property = ApplovinProperties.main.FindPropertyRelative("enableRequestAdAfterHidden");
             ApplovinProperties.enableMaxAdReview.property = ApplovinProperties.main.FindPropertyRelative("enableMaxAdReview");
@@ -219,6 +226,14 @@ namespace Pancake.Editor
                     EditorGUILayout.PropertyField(AdProperties.autoInit.property, AdProperties.autoInit.content);
                     EditorGUILayout.PropertyField(AdProperties.enableGDPR.property, AdProperties.enableGDPR.content);
                     EditorGUILayout.PropertyField(AdProperties.enableMultipleDex.property, AdProperties.enableMultipleDex.content);
+                    if (Settings.AdSettings.CurrentNetwork != EAdNetwork.Admob && Settings.AdSettings.CurrentNetwork != EAdNetwork.None)
+                    {
+                        EditorGUILayout.PropertyField(AdProperties.useAppOpenAdOfAdmob.property, AdProperties.useAppOpenAdOfAdmob.content);
+                    }
+                    else
+                    {
+                        Settings.AdSettings.UseAppOpenAdOfAdmob = false;
+                    }
                     EditorGUILayout.PropertyField(AdProperties.currentNetwork.property, AdProperties.currentNetwork.content);
 
                     if (Settings.AdSettings.EnableGDPR) EditorGUILayout.PropertyField(AdProperties.privacyPolicyUrl.property, AdProperties.privacyPolicyUrl.content);
@@ -368,6 +383,9 @@ namespace Pancake.Editor
                             EditorGUILayout.PropertyField(ApplovinProperties.interstitialAdUnit.property, ApplovinProperties.interstitialAdUnit.content);
                             EditorGUILayout.PropertyField(ApplovinProperties.rewardedAdUnit.property, ApplovinProperties.rewardedAdUnit.content);
                             EditorGUILayout.PropertyField(ApplovinProperties.rewardedInterstitialAdUnit.property, ApplovinProperties.rewardedInterstitialAdUnit.content);
+#if PANCAKE_MAX_ENABLE
+                            if (Settings.AdSettings.UseAppOpenAdOfAdmob) EditorGUILayout.PropertyField(ApplovinProperties.appOpenAdUnit.property, ApplovinProperties.appOpenAdUnit.content);
+#endif
                             EditorGUILayout.Space();
 
                             Uniform.DrawUppercaseSection("APPLOVIN_MODULE_MEDIATION",
