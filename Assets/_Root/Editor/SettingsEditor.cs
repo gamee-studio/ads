@@ -915,10 +915,10 @@ namespace Pancake.Editor
                 GUILayout.FlexibleSpace();
 
                 const string ironsourceKeyInstallAll = "IronSource_InstallAll";
-                GUI.enabled = showInstallAll && !EditorApplication.isCompiling && UtilEditor.IsCompleteDelay(ironsourceKeyInstallAll);
+                GUI.enabled = showInstallAll && !EditorApplication.isCompiling && InEditor.IsCompleteDelay(ironsourceKeyInstallAll);
                 if (GUILayout.Button(new GUIContent("Install All"), FieldWidth))
                 {
-                    UtilEditor.Delay(ironsourceKeyInstallAll, 2f);
+                    InEditor.Delay(ironsourceKeyInstallAll, 2f);
                     IronSourceManager.Instance.DownloadAllPlugin(Settings.IronSourceSettings.editorListNetwork);
                 }
 

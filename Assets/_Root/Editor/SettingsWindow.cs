@@ -35,7 +35,7 @@ namespace Pancake.Editor
 
         private static SettingsWindow GetWindow()
         {
-            var window = GetWindow<SettingsWindow>(UtilEditor.InspectorWindow);
+            var window = GetWindow<SettingsWindow>(InEditor.InspectorWindow);
             window.titleContent = new GUIContent("Ads");
 
             return window;
