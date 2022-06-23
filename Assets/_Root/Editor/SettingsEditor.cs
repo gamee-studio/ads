@@ -290,7 +290,7 @@ namespace Pancake.Editor
                             {
 #if PANCAKE_ADMOB_ENABLE
                                 GoogleMobileAds.Editor.GoogleMobileAdsSettingsEditor.OpenInspector();
-                                EditorWindow.GetWindow(UtilEditor.InspectorWindow).Focus();
+                                EditorWindow.GetWindow(InEditor.InspectorWindow).Focus();
 #endif
                             }
 
