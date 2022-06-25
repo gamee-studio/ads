@@ -11,6 +11,7 @@ namespace Pancake.Monetization
         [SerializeField] private AppUnit appKey;
         [SerializeField] private bool useAdaptiveBanner;
         [SerializeField] private IronSourceBannerUnit bannerAdUnit;
+        [SerializeField] private IronSourceAppOpenUnit appOpenAdUnit;
 
 
 #if UNITY_EDITOR
@@ -38,5 +39,8 @@ namespace Pancake.Monetization
         public AppUnit AppKey => appKey;
 
         public bool UseAdaptiveBanner => useAdaptiveBanner;
+#if PANCAKE_IRONSOURCE_ENABLE && PANCAKE_ADMOB_ENABLE
+        public IronSourceAppOpenUnit AppOpenAdUnit => appOpenAdUnit;
+#endif
     }
 }

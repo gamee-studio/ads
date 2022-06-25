@@ -1,6 +1,6 @@
 namespace Pancake.Monetization
 {
-    /*/// <summary>
+    /// <summary>
     /// store internal static value
     /// </summary>
     internal static class R
@@ -9,5 +9,5 @@ namespace Pancake.Monetization
         /// prevent show app open ad, it will become true when interstitial or rewarded was showed
         /// </summary>
         internal static bool isPreventAppOpenAd;
-    }*/
+    }
 }

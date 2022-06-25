@@ -8,6 +8,7 @@ namespace Pancake.Monetization
         private IronSourceBannerLoader _banner;
         private IronSourceInterstitialLoader _interstitial;
         private IronSourceRewardedLoader _rewarded;
+        private ApplovinAppOpenLoader _appOpen;
         private static IronSourceAdClient client;
         private bool _isBannerLoaded;
         private bool _isRewardedCompleted;
@@ -59,6 +60,18 @@ namespace Pancake.Monetization
         public event Action<IronSourceError> OnRewardedVideoAdShowFailedEvent;
 
         public event Action<string> OnSegmentReceivedEvent;
+        
+#if PANCAKE_ADMOB_ENABLE
+        public event Action<GoogleMobileAds.Api.AdValueEventArgs> OnAppOpenAdPaid;
+#endif
+
+        public event Action OnAppOpenAdOpening;
+        public event Action OnAppOpenAdLoaded;
+        public event Action OnAppOpenAdFailedToShow;
+        public event Action OnAppOpenAdFailedToLoad;
+        public event Action OnAppOpenAdClosed;
+        public event Action OnAppOpenAdDidRecordImpression;
+        
 #endif
 
 #if PANCAKE_IRONSOURCE_ENABLE
@@ -135,6 +148,16 @@ namespace Pancake.Monetization
         }
 
         internal void InvokeSegmentReceived(string segment) { OnSegmentReceivedEvent?.Invoke(segment); }
+#if PANCAKE_ADMOB_ENABLE
+        internal void InvokeAppOpenAdRevenuePaid(GoogleMobileAds.Api.AdValueEventArgs value) { OnAppOpenAdPaid?.Invoke(value); }
+        internal void InvokeAppOpenAdOpening() { OnAppOpenAdOpening?.Invoke(); }
+        internal void InvokeAppOpenAdLoaded() { OnAppOpenAdLoaded?.Invoke(); }
+        internal void InvokeAppOpenAdFailedToShow() { OnAppOpenAdFailedToShow?.Invoke(); }
+        internal void InvokeAppOpenAdFailedToLoad() { OnAppOpenAdFailedToLoad?.Invoke(); }
+        internal void InvokeAppOpenAdClosed() { OnAppOpenAdClosed?.Invoke(); }
+        internal void InvokeAppOpenAdDidRecordImpression() { OnAppOpenAdDidRecordImpression?.Invoke(); }
+        internal virtual void InternalAppOpenAdCompleted(IronSourceAppOpenLoader instance) { InvokeAppOpenAdCompleted(); }
+#endif
 #endif
 
         protected override string NoSdkMessage => NO_SDK_MESSAGE;
@@ -235,5 +258,11 @@ namespace Pancake.Monetization
             return false;
 #endif
         }
+        
+#if PANCAKE_ADMOB_ENABLE
+        protected override void InternalLoadAppOpenAd() { _appOpen.Load();}
+        protected override void InternalShowAppOpenAd() { _appOpen.Show(); }
+        protected override bool InternalIsAppOpenAdReady() { return _appOpen.IsReady(); }
+#endif
     }
 }

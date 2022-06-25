@@ -1,7 +1,4 @@
 using System;
-#if PANCAKE_ADMOB_ENABLE
-using GoogleMobileAds.Api;
-#endif
 
 #pragma warning disable CS0414
 // ReSharper disable AccessToStaticMemberViaDerivedType
@@ -146,7 +143,7 @@ namespace Pancake.Monetization
         internal void InvokeRewardedInterstitialAdRevenuePaid(MaxSdkBase.AdInfo info) { OnRewardedInterstitialAdRevenuePaid?.Invoke(info); }
         internal void InvokeRewardedInterstitialAdReceivedReward(MaxSdkBase.Reward reward) { OnRewardedInterstitialAdReceivedReward?.Invoke(reward); }
 #if PANCAKE_ADMOB_ENABLE
-        internal void InvokeAppOpenAdRevenuePaid(AdValueEventArgs value) { OnAppOpenAdPaid?.Invoke(value); }
+        internal void InvokeAppOpenAdRevenuePaid(GoogleMobileAds.Api.AdValueEventArgs value) { OnAppOpenAdPaid?.Invoke(value); }
         internal void InvokeAppOpenAdOpening() { OnAppOpenAdOpening?.Invoke(); }
         internal void InvokeAppOpenAdLoaded() { OnAppOpenAdLoaded?.Invoke(); }
         internal void InvokeAppOpenAdFailedToShow() { OnAppOpenAdFailedToShow?.Invoke(); }

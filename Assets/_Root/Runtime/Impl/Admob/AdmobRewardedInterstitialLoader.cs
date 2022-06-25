@@ -25,10 +25,7 @@ namespace Pancake.Monetization
 
         internal override bool IsReady() { return _rewardedInterstitialAd != null; }
 
-        internal override void Load()
-        {
-            RewardedInterstitialAd.LoadAd(unit.Id, Admob.CreateRequest(), OnAdLoadCallback);
-        }
+        internal override void Load() { RewardedInterstitialAd.LoadAd(unit.Id, Admob.CreateRequest(), OnAdLoadCallback); }
 
         private void OnAdLoadCallback(RewardedInterstitialAd rewardedInterstitialAd, AdFailedToLoadEventArgs error)
         {
@@ -58,7 +55,11 @@ namespace Pancake.Monetization
 
         private void OnAdDidRecordImpression(object sender, EventArgs e) { OnRecordImpressionEvent.Invoke(this, sender, e); }
 
-        private void OnAdOpening(object sender, EventArgs e) { OnOpeningEvent.Invoke(this, sender, e); }
+        private void OnAdOpening(object sender, EventArgs e)
+        {
+            R.isPreventAppOpenAd = true;
+            OnOpeningEvent.Invoke(this, sender, e);
+        }
 
         private void OnAdLoaded() { OnLoadedEvent.Invoke(this); }
 
@@ -72,6 +73,7 @@ namespace Pancake.Monetization
 
         private void OnAdClosed(object sender, EventArgs e)
         {
+            R.isPreventAppOpenAd = false;
             OnClosedEvent.Invoke(this, sender, e);
             if (IsEarnRewardedInterstitial)
             {
@@ -85,10 +87,7 @@ namespace Pancake.Monetization
             Destroy();
         }
 
-        internal override void Show()
-        {
-            _rewardedInterstitialAd?.Show(OnRewardHandleEvent);
-        }
+        internal override void Show() { _rewardedInterstitialAd?.Show(OnRewardHandleEvent); }
 
         internal override void Destroy()
         {

@@ -37,7 +37,11 @@ namespace Pancake.Monetization
 
         private void OnAdDidRecordImpression(object sender, EventArgs e) { OnRecordImpressionEvent.Invoke(this, sender, e); }
 
-        private void OnAdOpening(object sender, EventArgs e) { OnOpeningEvent.Invoke(this, sender, e); }
+        private void OnAdOpening(object sender, EventArgs e)
+        {
+            R.isPreventAppOpenAd = true;
+            OnOpeningEvent.Invoke(this, sender, e);
+        }
 
         private void OnAdLoaded(object sender, EventArgs e) { OnLoadedEvent.Invoke(this, sender, e); }
 
@@ -47,6 +51,7 @@ namespace Pancake.Monetization
 
         private void OnAdClosed(object sender, EventArgs e)
         {
+            R.isPreventAppOpenAd = false;
             OnClosedEvent.Invoke(this, sender, e);
             OnCompleted.Invoke(this);
             Destroy();

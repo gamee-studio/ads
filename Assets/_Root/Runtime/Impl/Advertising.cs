@@ -29,8 +29,8 @@ namespace Pancake.Monetization
         private static float lastTimeLoadAppOpenTimestamp = DEFAULT_TIMESTAMP;
         private const string REMOVE_ADS_KEY = "remove_ads";
         private const float DEFAULT_TIMESTAMP = -1000;
-        
-        
+
+
         public static EAutoLoadingAd AutoLoadingAdMode
         {
             get => autoLoadingAdMode;
@@ -123,6 +123,9 @@ namespace Pancake.Monetization
         {
             isInitialized = true;
             AutoLoadingAdMode = Settings.AdSettings.AutoLoadingAd;
+#if PANCAKE_ADMOB_ENABLE
+            if (Settings.AdSettings.UseAppOpenAdOfAdmob || Settings.AdSettings.CurrentNetwork == EAdNetwork.Admob) RegisterAppStateChange();
+#endif
         }
 
         private static bool InitializeCheck()
@@ -425,12 +428,9 @@ namespace Pancake.Monetization
         private static void ShowAppOpenAd() { ShowAppOpenAd(GetClientAlreadySetup(Settings.CurrentNetwork)); }
 
 #if PANCAKE_ADMOB_ENABLE
-        private void RegisterAppStateChange()
-        {
-            GoogleMobileAds.Api.AppStateEventNotifier.AppStateChanged += OnAppStateChanged;
-        }
-        
-        private void OnAppStateChanged(GoogleMobileAds.Common.AppState state)
+        private static void RegisterAppStateChange() { GoogleMobileAds.Api.AppStateEventNotifier.AppStateChanged += OnAppStateChanged; }
+
+        private static void OnAppStateChanged(GoogleMobileAds.Common.AppState state)
         {
             if (state == GoogleMobileAds.Common.AppState.Foreground)
             {

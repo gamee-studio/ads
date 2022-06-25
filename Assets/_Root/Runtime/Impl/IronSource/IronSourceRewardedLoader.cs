@@ -25,11 +25,14 @@ namespace Pancake.Monetization
         }
 
 #if PANCAKE_IRONSOURCE_ENABLE
-        private void OnAdOpened() { }
+        private void OnAdOpened() { R.isPreventAppOpenAd = true;}
 
         private void OnAdClicked(IronSourcePlacement placement) { }
 
-        private void OnAdClosed() { }
+        private void OnAdClosed()
+        {
+            R.isPreventAppOpenAd = false;
+        }
 
         private void OnAvailabilityChanged(bool status) { }
 

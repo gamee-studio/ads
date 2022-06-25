@@ -86,6 +86,7 @@ namespace Pancake.Editor
             public static Property enable = new Property(null, new GUIContent("Enable", "Enable using ironSource ad"));
             public static Property appKey = new Property(null, new GUIContent("Sdk Key", "Sdk of ironSource"));
             public static Property bannerAdUnit = new Property(null, new GUIContent("Banner Ad"));
+            public static Property appOpenAdUnit = new Property(null, new GUIContent("App Open Ad (Admob)"));
 
             public static Property useAdaptiveBanner = new Property(null,
                 new GUIContent("Use Adaptive Banner", "Use adaptive banner ad when use smart banner affect for admob ad of ironsouce mediation"));
@@ -185,9 +186,7 @@ namespace Pancake.Editor
             ApplovinProperties.interstitialAdUnit.property = ApplovinProperties.main.FindPropertyRelative("interstitialAdUnit");
             ApplovinProperties.rewardedAdUnit.property = ApplovinProperties.main.FindPropertyRelative("rewardedAdUnit");
             ApplovinProperties.rewardedInterstitialAdUnit.property = ApplovinProperties.main.FindPropertyRelative("rewardedInterstitialAdUnit");
-#if PANCAKE_MAX_ENABLE
-             ApplovinProperties.appOpenAdUnit.property = ApplovinProperties.main.FindPropertyRelative("appOpenAdUnit");           
-#endif
+            ApplovinProperties.appOpenAdUnit.property = ApplovinProperties.main.FindPropertyRelative("appOpenAdUnit");
 
             ApplovinProperties.enableAgeRestrictedUser.property = ApplovinProperties.main.FindPropertyRelative("enableAgeRestrictedUser");
             ApplovinProperties.enableRequestAdAfterHidden.property = ApplovinProperties.main.FindPropertyRelative("enableRequestAdAfterHidden");
@@ -198,6 +197,7 @@ namespace Pancake.Editor
             IronSourceProperties.appKey.property = IronSourceProperties.main.FindPropertyRelative("appKey");
             IronSourceProperties.bannerAdUnit.property = IronSourceProperties.main.FindPropertyRelative("bannerAdUnit");
             IronSourceProperties.useAdaptiveBanner.property = IronSourceProperties.main.FindPropertyRelative("useAdaptiveBanner");
+            IronSourceProperties.appOpenAdUnit.property = IronSourceProperties.main.FindPropertyRelative("appOpenAdUnit");
         }
 
         public override void OnInspectorGUI()
@@ -234,6 +234,7 @@ namespace Pancake.Editor
                     {
                         Settings.AdSettings.UseAppOpenAdOfAdmob = false;
                     }
+
                     EditorGUILayout.PropertyField(AdProperties.currentNetwork.property, AdProperties.currentNetwork.content);
 
                     if (Settings.AdSettings.EnableGDPR) EditorGUILayout.PropertyField(AdProperties.privacyPolicyUrl.property, AdProperties.privacyPolicyUrl.content);
@@ -383,9 +384,7 @@ namespace Pancake.Editor
                             EditorGUILayout.PropertyField(ApplovinProperties.interstitialAdUnit.property, ApplovinProperties.interstitialAdUnit.content);
                             EditorGUILayout.PropertyField(ApplovinProperties.rewardedAdUnit.property, ApplovinProperties.rewardedAdUnit.content);
                             EditorGUILayout.PropertyField(ApplovinProperties.rewardedInterstitialAdUnit.property, ApplovinProperties.rewardedInterstitialAdUnit.content);
-#if PANCAKE_MAX_ENABLE
                             if (Settings.AdSettings.UseAppOpenAdOfAdmob) EditorGUILayout.PropertyField(ApplovinProperties.appOpenAdUnit.property, ApplovinProperties.appOpenAdUnit.content);
-#endif
                             EditorGUILayout.Space();
 
                             Uniform.DrawUppercaseSection("APPLOVIN_MODULE_MEDIATION",
@@ -434,6 +433,8 @@ namespace Pancake.Editor
                             EditorGUILayout.PropertyField(IronSourceProperties.appKey.property, IronSourceProperties.appKey.content);
                             EditorGUILayout.PropertyField(IronSourceProperties.bannerAdUnit.property, IronSourceProperties.bannerAdUnit.content);
                             EditorGUILayout.PropertyField(IronSourceProperties.useAdaptiveBanner.property, IronSourceProperties.useAdaptiveBanner.content);
+
+                            if (Settings.AdSettings.UseAppOpenAdOfAdmob) EditorGUILayout.PropertyField(IronSourceProperties.appOpenAdUnit.property, IronSourceProperties.appOpenAdUnit.content);
                             EditorGUILayout.Space();
 
                             Uniform.DrawUppercaseSection("IRONSOURCE_MODULE_MEDIATION",
