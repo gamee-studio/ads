@@ -1,5 +1,7 @@
 using System;
+#if PANCAKE_ADMOB_ENABLE
 using GoogleMobileAds.Api;
+#endif
 
 #pragma warning disable CS0414
 // ReSharper disable AccessToStaticMemberViaDerivedType

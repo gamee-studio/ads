@@ -12,13 +12,15 @@ namespace Pancake.Monetization
         private AppOpenAd _appOpenAd;
 
         internal override bool IsReady() { return _appOpenAd != null; }
-
+#endif
         public ApplovinAppOpenLoader(ApplovinAdClient client)
         {
             _client = client;
+#if PANCAKE_MAX_ENABLE && PANCAKE_ADMOB_ENABLE
             unit = Settings.MaxSettings.AppOpenAdUnit;
+#endif
         }
-
+#if PANCAKE_MAX_ENABLE && PANCAKE_ADMOB_ENABLE
         internal override void Load() { AppOpenAd.LoadAd(unit.Id, ((ApplovinAppOpenUnit) unit).orientation, Admob.CreateRequest(), OnAdLoadCallback); }
 
         private void OnAdLoadCallback(AppOpenAd appOpenAd, AdFailedToLoadEventArgs error)
