@@ -13,6 +13,7 @@ namespace Pancake.Monetization
         bool IsSdkAvaiable { get; }
         bool IsInitialized { get; }
         void Initialize();
+        void RegisterAppStateChange();
 
         #region banner ad
 

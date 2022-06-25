@@ -29,7 +29,8 @@ namespace Pancake.Monetization
         private static float lastTimeLoadAppOpenTimestamp = DEFAULT_TIMESTAMP;
         private const string REMOVE_ADS_KEY = "remove_ads";
         private const float DEFAULT_TIMESTAMP = -1000;
-
+        
+        
         public static EAutoLoadingAd AutoLoadingAdMode
         {
             get => autoLoadingAdMode;
@@ -417,11 +418,27 @@ namespace Pancake.Monetization
 
         public static void ShowRewardedInterstitialAd() { ShowRewardedInterstitialAd(GetClientAlreadySetup(Settings.CurrentNetwork)); }
 
-        public static void LoadAppOpenAd() { LoadAppOpenAd(GetClientAlreadySetup(Settings.CurrentNetwork)); }
+        private static void LoadAppOpenAd() { LoadAppOpenAd(GetClientAlreadySetup(Settings.CurrentNetwork)); }
 
-        public static bool IsAppOpenAdReady() { return IsAppOpenAdReady(GetClientAlreadySetup(Settings.CurrentNetwork)); }
+        private static bool IsAppOpenAdReady() { return IsAppOpenAdReady(GetClientAlreadySetup(Settings.CurrentNetwork)); }
 
-        public static void ShowAppOpenAd() { ShowAppOpenAd(GetClientAlreadySetup(Settings.CurrentNetwork)); }
+        private static void ShowAppOpenAd() { ShowAppOpenAd(GetClientAlreadySetup(Settings.CurrentNetwork)); }
+
+#if PANCAKE_ADMOB_ENABLE
+        private void RegisterAppStateChange()
+        {
+            GoogleMobileAds.Api.AppStateEventNotifier.AppStateChanged += OnAppStateChanged;
+        }
+        
+        private void OnAppStateChanged(GoogleMobileAds.Common.AppState state)
+        {
+            if (state == GoogleMobileAds.Common.AppState.Foreground)
+            {
+                ShowAppOpenAd();
+            }
+        }
+#endif
+
 
         public static void ShowConsentFrom() { ShowConsentForm(GetClientAlreadySetup(Settings.CurrentNetwork)); }
     }

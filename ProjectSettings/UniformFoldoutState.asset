@@ -6,11 +6,11 @@
         },
         {
             "key": "AUTO_AD_LOADING_CONFIG_FOLDOUT_KEY",
-            "state": false
+            "state": true
         },
         {
             "key": "ADMOB_MODULE",
-            "state": false
+            "state": true
         },
         {
             "key": "MAX_MODULE",
@@ -18,11 +18,11 @@
         },
         {
             "key": "IRONSOURCE_MODULE",
-            "state": false
+            "state": true
         },
         {
             "key": "APPLOVIN_MODULE_MEDIATION",
-            "state": false
+            "state": true
         },
         {
             "key": "ADMOB_MODULE_MEDIATION",

@@ -11,7 +11,14 @@ namespace Pancake.Monetization
 #if PANCAKE_MAX_ENABLE && PANCAKE_ADMOB_ENABLE
         private AppOpenAd _appOpenAd;
 
-        internal override bool IsReady() { return _appOpenAd != null; }
+        /// <summary>
+        /// Ad references in the app open beta will time out after four hours.
+        /// Ads rendered more than four hours after request time will no longer be valid and may not earn revenue.
+        /// This time limit is being carefully considered and may change in future beta versions of the app open format.
+        /// </summary>
+        private DateTime _loadTime;
+
+        internal override bool IsReady() { return _appOpenAd != null && (DateTime.UtcNow - _loadTime).TotalHours < 4; }
 #endif
         public ApplovinAppOpenLoader(ApplovinAdClient client)
         {
@@ -32,6 +39,7 @@ namespace Pancake.Monetization
             }
 
             _appOpenAd = appOpenAd;
+            _loadTime = DateTime.UtcNow;
             OnAdLoaded();
             _appOpenAd.OnAdDidDismissFullScreenContent += OnAdClosed;
             _appOpenAd.OnAdDidRecordImpression += OnAdDidRecordImpression;

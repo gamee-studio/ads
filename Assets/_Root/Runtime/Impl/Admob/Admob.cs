@@ -1,6 +1,5 @@
 #if PANCAKE_ADMOB_ENABLE
 using GoogleMobileAds.Api;
-using UnityEngine;
 
 namespace Pancake.Monetization
 {

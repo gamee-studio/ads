@@ -9,6 +9,12 @@ namespace Pancake.Monetization
     {
 #if PANCAKE_ADMOB_ENABLE
         private AppOpenAd _appOpenAd;
+        /// <summary>
+        /// Ad references in the app open beta will time out after four hours.
+        /// Ads rendered more than four hours after request time will no longer be valid and may not earn revenue.
+        /// This time limit is being carefully considered and may change in future beta versions of the app open format.
+        /// </summary>
+        private DateTime _loadTime;
         public event Action<AdmobAppOpenLoader> OnCompleted = delegate { };
         public event Action<AdmobAppOpenLoader, object, AdValueEventArgs> OnPaidEvent = delegate { };
         public event Action<AdmobAppOpenLoader, object, EventArgs> OnOpeningEvent = delegate { };
@@ -18,7 +24,7 @@ namespace Pancake.Monetization
         public event Action<AdmobAppOpenLoader, object, EventArgs> OnRecordImpressionEvent = delegate { };
         public event Action<AdmobAppOpenLoader, object, EventArgs> OnClosedEvent = delegate { };
         
-        internal override bool IsReady() { return _appOpenAd != null; }
+        internal override bool IsReady() { return _appOpenAd != null && (DateTime.UtcNow - _loadTime).TotalHours < 4;; }
 
         public AdmobAppOpenLoader() { unit = Settings.AdmobSettings.AppOpenAdUnit; }
         
@@ -33,6 +39,7 @@ namespace Pancake.Monetization
             }
 
             _appOpenAd = appOpenAd;
+            _loadTime = DateTime.UtcNow;
             OnAdLoaded();
             _appOpenAd.OnAdDidDismissFullScreenContent += OnAdClosed;
             _appOpenAd.OnAdDidRecordImpression += OnAdDidRecordImpression;

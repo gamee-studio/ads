@@ -38,6 +38,8 @@ namespace Pancake.Monetization
             }
         }
 
+        public virtual void RegisterAppStateChange() { }
+
         protected virtual bool CheckInitialize(bool logMessage = true)
         {
             if (Network == EAdNetwork.None) return false;
@@ -232,8 +234,6 @@ namespace Pancake.Monetization
         }
 
         public bool IsAppOpenAdReady() { return CheckInitialize(false) && InternalIsAppOpenAdReady(); }
-
-
 
 
         public virtual void ShowConsentForm() { }
