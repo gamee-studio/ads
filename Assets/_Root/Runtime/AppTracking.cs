@@ -12,7 +12,7 @@ namespace Pancake.Monetization
             Parameter[] LTVParameters =
             {
                 // Log ad value in micros.
-                new Parameter("valuemicros", adInfo.Revenue),
+                new Parameter("valuemicros", adInfo.Revenue * 1000000),
                 // These values below won’t be used in ROASrecipe.
                 // But log for purposes of debugging and futurereference.
                 new Parameter("currency", "USD"), new Parameter("precision", 1), new Parameter("adunitid", adInfo.AdUnitIdentifier),

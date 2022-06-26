@@ -31,7 +31,13 @@ namespace Pancake.Monetization
         }
 
 #if PANCAKE_MAX_ENABLE
-        private void OnAdRevenuePaid(string unit, MaxSdkBase.AdInfo info) { _client.InvokeBannerAdRevenuePaid(info); }
+        private void OnAdRevenuePaid(string unit, MaxSdkBase.AdInfo info)
+        {
+            _client.InvokeBannerAdRevenuePaid(info);
+#if ADS_FIREBASE_TRACKING
+            AppTracking.TrackingRevenue(info);  
+#endif
+        }
 
         private void OnAdCollapsed(string unit, MaxSdkBase.AdInfo info) { _client.InvokeBannerAdCollapsed(); }
 

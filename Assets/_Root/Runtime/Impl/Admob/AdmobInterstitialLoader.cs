@@ -35,7 +35,13 @@ namespace Pancake.Monetization
             _interstitialAd.LoadAd(Admob.CreateRequest());
         }
 
-        private void OnPaidHandleEvent(object sender, AdValueEventArgs e) { OnPaidEvent.Invoke(this, sender, e); }
+        private void OnPaidHandleEvent(object sender, AdValueEventArgs e)
+        {
+            OnPaidEvent.Invoke(this, sender, e); 
+#if ADS_FIREBASE_TRACKING
+            AppTracking.TrackingRevenue(e, unit.Id);  
+#endif
+        }
 
         private void OnAdDidRecordImpression(object sender, EventArgs e) { OnRecordImpressionEvent.Invoke(this, sender, e); }
 

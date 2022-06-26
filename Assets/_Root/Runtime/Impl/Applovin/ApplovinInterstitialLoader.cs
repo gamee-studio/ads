@@ -37,7 +37,13 @@ namespace Pancake.Monetization
 
         private void OnAdDisplayed(string unit, MaxSdkBase.AdInfo info) { _client.InvokeInterstitialAdDisplay(); }
 
-        private void OnAdRevenuePaid(string unit, MaxSdkBase.AdInfo info) { _client.InvokeInterstitialAdRevenuePaid(info); }
+        private void OnAdRevenuePaid(string unit, MaxSdkBase.AdInfo info)
+        {
+            _client.InvokeInterstitialAdRevenuePaid(info);
+#if ADS_FIREBASE_TRACKING
+            AppTracking.TrackingRevenue(info);  
+#endif
+        }
 
         private void OnAdLoadFailed(string unit, MaxSdkBase.ErrorInfo error) { _client.InvokeInterstitialAdFaildToLoad(); }
 

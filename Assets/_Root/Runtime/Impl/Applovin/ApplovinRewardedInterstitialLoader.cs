@@ -25,7 +25,13 @@ namespace Pancake.Monetization
         }
 
 #if PANCAKE_MAX_ENABLE
-        private void OnAdRevenuePaid(string unit, MaxSdkBase.AdInfo info) { _client.InvokeRewardedInterstitialAdRevenuePaid(info); }
+        private void OnAdRevenuePaid(string unit, MaxSdkBase.AdInfo info)
+        {
+            _client.InvokeRewardedInterstitialAdRevenuePaid(info);
+#if ADS_FIREBASE_TRACKING
+            AppTracking.TrackingRevenue(info);  
+#endif
+        }
 
         private void OnAdReceivedReward(string unit, MaxSdkBase.Reward reward, MaxSdkBase.AdInfo info) { _client.InvokeRewardedInterstitialAdReceivedReward(reward); }
 

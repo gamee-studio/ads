@@ -54,7 +54,13 @@ namespace Pancake.Monetization
             _appOpenAd.OnPaidEvent += OnPaidHandleEvent;
         }
 
-        private void OnPaidHandleEvent(object sender, AdValueEventArgs e) { OnPaidEvent.Invoke(this, sender, e); }
+        private void OnPaidHandleEvent(object sender, AdValueEventArgs e)
+        {
+            OnPaidEvent.Invoke(this, sender, e);
+#if ADS_FIREBASE_TRACKING
+            AppTracking.TrackingRevenue(e, unit.Id);  
+#endif
+        }
 
         private void OnAdFailedToShow(object sender, AdErrorEventArgs e) { OnFailToShowEvent.Invoke(this, sender, e); }
 

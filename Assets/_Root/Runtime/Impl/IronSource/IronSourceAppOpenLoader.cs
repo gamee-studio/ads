@@ -50,7 +50,13 @@ namespace Pancake.Monetization
 
         private void OnAdDidRecordImpression(object sender, EventArgs e) { _client.InvokeAppOpenAdDidRecordImpression(); }
 
-        private void OnPaidHandleEvent(object sender, AdValueEventArgs e) { _client.InvokeAppOpenAdRevenuePaid(e); }
+        private void OnPaidHandleEvent(object sender, AdValueEventArgs e)
+        {
+            _client.InvokeAppOpenAdRevenuePaid(e);
+#if ADS_FIREBASE_TRACKING
+            AppTracking.TrackingRevenue(e, unit.Id);  
+#endif
+        }
 
         private void OnAdFailedToShow(object sender, AdErrorEventArgs e) { _client.InvokeAppOpenAdFailedToShow(); }
 
