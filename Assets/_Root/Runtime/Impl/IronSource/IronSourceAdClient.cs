@@ -223,6 +223,7 @@ namespace Pancake.Monetization
         protected override void InternalShowInterstitialAd()
         {
 #if PANCAKE_IRONSOURCE_ENABLE
+            R.isShowingAd = true;
             IronSource.Agent.showInterstitial();
 #endif
         }
@@ -246,6 +247,7 @@ namespace Pancake.Monetization
         protected override void InternalShowRewardedAd()
         {
 #if PANCAKE_IRONSOURCE_ENABLE
+             R.isShowingAd = true;
             IronSource.Agent.showRewardedVideo();
 #endif
         }

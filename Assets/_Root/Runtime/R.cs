@@ -8,6 +8,6 @@ namespace Pancake.Monetization
         /// <summary>
         /// prevent show app open ad, it will become true when interstitial or rewarded was showed
         /// </summary>
-        internal static bool isPreventAppOpenAd;
+        internal static bool isShowingAd;
     }
 }

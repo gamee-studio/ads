@@ -54,10 +54,15 @@ namespace Pancake.Monetization
 
         private void OnAdFailedToShow(object sender, AdErrorEventArgs e) { _client.InvokeAppOpenAdFailedToShow(); }
 
-        private void OnAdOpening(object sender, EventArgs e) { _client.InvokeAppOpenAdOpening(); }
+        private void OnAdOpening(object sender, EventArgs e)
+        {
+            R.isShowingAd = true;
+            _client.InvokeAppOpenAdOpening();
+        }
 
         private void OnAdClosed(object sender, EventArgs e)
         {
+            R.isShowingAd = false;
             _client.InvokeAppOpenAdClosed();
             _client.InternalAppOpenAdCompleted(this);
             Destroy();

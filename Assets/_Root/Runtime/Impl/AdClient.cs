@@ -6,7 +6,7 @@ namespace Pancake.Monetization
     public abstract class AdClient : IAdClient
     {
         protected bool isInitialized;
-        protected bool isShowingAd;
+
         public event Action<IAdClient> OnInterstitialAdCompleted;
         public event Action<IAdClient> OnRewardedAdSkipped;
         public event Action<IAdClient> OnRewardedAdCompleted;
@@ -23,7 +23,6 @@ namespace Pancake.Monetization
         protected abstract string NoSdkMessage { get; }
         public virtual float GetAdaptiveBannerHeight { get; }
         public virtual bool IsInitialized => isInitialized;
-        public virtual bool IsShowingAd => isShowingAd;
 
         public virtual void Initialize()
         {
@@ -113,8 +112,7 @@ namespace Pancake.Monetization
                     Debug.Log($"Cannot show {Network} interstitial ad. Ad is not loaded.");
                     return;
                 }
-
-                isShowingAd = true;
+                
                 InternalShowInterstitialAd();
             }
             else
@@ -151,7 +149,7 @@ namespace Pancake.Monetization
                     Debug.LogFormat($"Cannot show {Network} rewarded ad : ad is not loaded.");
                     return;
                 }
-
+                
                 InternalShowRewardedAd();
             }
             else
@@ -188,7 +186,7 @@ namespace Pancake.Monetization
                     Debug.LogFormat($"Cannot show {Network} rewarded interstitial ad : ad is not loaded.");
                     return;
                 }
-
+                
                 InternalShowRewardedInterstitialAd();
             }
             else
@@ -224,8 +222,8 @@ namespace Pancake.Monetization
                     Debug.LogFormat($"Cannot show {Network} app open ad : ad is not loaded.");
                     return;
                 }
-
-                if (R.isPreventAppOpenAd) return; // dose not show app open ad when interstitial or rewarded still displayed
+                
+                if (R.isShowingAd) return; // dose not show app open ad when interstitial or rewarded still displayed
                 
                 InternalShowAppOpenAd();
             }

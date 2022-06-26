@@ -124,7 +124,7 @@ namespace Pancake.Monetization
             isInitialized = true;
             AutoLoadingAdMode = Settings.AdSettings.AutoLoadingAd;
 #if PANCAKE_ADMOB_ENABLE
-            if (Settings.AdSettings.UseAppOpenAdOfAdmob || Settings.AdSettings.CurrentNetwork == EAdNetwork.Admob) RegisterAppStateChange();
+            if ((Settings.AdSettings.UseAppOpenAdOfAdmob && Settings.AdSettings.CurrentNetwork != EAdNetwork.Admob) || Settings.AdSettings.CurrentNetwork == EAdNetwork.Admob) RegisterAppStateChange();
 #endif
         }
 
@@ -373,7 +373,7 @@ namespace Pancake.Monetization
 
         private static void LoadAppOpenAd(IAdClient client)
         {
-            if (IsAdRemoved() || !Application.isMobilePlatform) return;
+            if (IsAdRemoved() || !Application.isMobilePlatform || (!Settings.AdSettings.UseAppOpenAdOfAdmob && Settings.AdSettings.CurrentNetwork != EAdNetwork.Admob)) return;
             client.LoadAppOpenAd();
         }
 

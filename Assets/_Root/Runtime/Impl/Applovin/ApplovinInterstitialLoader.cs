@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace Pancake.Monetization
 {
     public class ApplovinInterstitialLoader
@@ -28,16 +30,12 @@ namespace Pancake.Monetization
 
         private void OnAdHidden(string unit, MaxSdkBase.AdInfo info)
         {
-            R.isPreventAppOpenAd = false;
+            R.isShowingAd = false;
             _client.InvokeInterstitialAdHidden();
             if (Settings.MaxSettings.EnableRequestAdAfterHidden) _client.LoadInterstitialAd();
         }
 
-        private void OnAdDisplayed(string unit, MaxSdkBase.AdInfo info)
-        {
-            R.isPreventAppOpenAd = true;
-            _client.InvokeInterstitialAdDisplay();
-        }
+        private void OnAdDisplayed(string unit, MaxSdkBase.AdInfo info) { _client.InvokeInterstitialAdDisplay(); }
 
         private void OnAdRevenuePaid(string unit, MaxSdkBase.AdInfo info) { _client.InvokeInterstitialAdRevenuePaid(info); }
 

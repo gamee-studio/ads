@@ -241,6 +241,7 @@ namespace Pancake.Monetization
         {
 #if PANCAKE_MAX_ENABLE
             if (string.IsNullOrEmpty(Settings.MaxSettings.InterstitialAdUnit.Id)) return;
+            R.isShowingAd = true;
             MaxSdk.ShowInterstitial(Settings.MaxSettings.InterstitialAdUnit.Id);
 #endif
         }
@@ -268,6 +269,7 @@ namespace Pancake.Monetization
 #if PANCAKE_MAX_ENABLE
             if (string.IsNullOrEmpty(Settings.MaxSettings.RewardedAdUnit.Id)) return;
             _isRewardedCompleted = false;
+            R.isShowingAd = true;
             MaxSdk.ShowRewardedAd(Settings.MaxSettings.RewardedAdUnit.Id);
 #endif
         }
@@ -294,6 +296,7 @@ namespace Pancake.Monetization
         {
 #if PANCAKE_MAX_ENABLE
             if (string.IsNullOrEmpty(Settings.MaxSettings.RewardedInterstitialAdUnit.Id)) return;
+            R.isShowingAd = true;
             MaxSdk.ShowRewardedInterstitialAd(Settings.MaxSettings.RewardedInterstitialAdUnit.Id);
 #endif
         }

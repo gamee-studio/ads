@@ -57,7 +57,7 @@ namespace Pancake.Monetization
 
         private void OnAdOpening(object sender, EventArgs e)
         {
-            R.isPreventAppOpenAd = true;
+            R.isShowingAd = true;
             OnOpeningEvent.Invoke(this, sender, e);
         }
 
@@ -73,7 +73,7 @@ namespace Pancake.Monetization
 
         private void OnAdClosed(object sender, EventArgs e)
         {
-            R.isPreventAppOpenAd = false;
+            R.isShowingAd = false;
             OnClosedEvent.Invoke(this, sender, e);
             if (IsEarnRewardedInterstitial)
             {

@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace Pancake.Monetization
 {
     public class ApplovinRewardedLoader
@@ -37,16 +39,12 @@ namespace Pancake.Monetization
 
         private void OnAdHidden(string unit, MaxSdkBase.AdInfo info)
         {
-            R.isPreventAppOpenAd = false;
+            R.isShowingAd = false;
             _client.InvokeRewardedAdHidden();
             if (Settings.MaxSettings.EnableRequestAdAfterHidden) _client.LoadRewardedAd();
         }
 
-        private void OnAdDisplayed(string unit, MaxSdkBase.AdInfo info)
-        {
-            R.isPreventAppOpenAd = true;
-            _client.InvokeRewardedAdDisplay();
-        }
+        private void OnAdDisplayed(string unit, MaxSdkBase.AdInfo info) { _client.InvokeRewardedAdDisplay(); }
 
         private void OnAdClicked(string unit, MaxSdkBase.AdInfo info) { _client.InvokeRewardedAdClicked(); }
 #endif

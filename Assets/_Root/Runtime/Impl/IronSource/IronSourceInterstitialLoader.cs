@@ -28,24 +28,17 @@ namespace Pancake.Monetization
 
         private void OnAdClosed()
         {
-            R.isPreventAppOpenAd = false;
+            R.isShowingAd = false;
             _client.InvokeInterstitialAdClosed();
         }
 
         private void OnAdLoadFailed(IronSourceError error) { _client.InvokeInterstitialAdLoadFailed(error); }
 
-        private void OnAdOpened()
-        {
-            R.isPreventAppOpenAd = true;
-            _client.InvokeInterstitialAdOpened();
-        }
+        private void OnAdOpened() { _client.InvokeInterstitialAdOpened(); }
 
         private void OnAdReady() { _client.InvokeInterstitialAdReady(); }
 
-        private void OnAdShowSucceeded()
-        {
-            _client.InvokeInterstitialAdShowSucceeded();
-        }
+        private void OnAdShowSucceeded() { _client.InvokeInterstitialAdShowSucceeded(); }
 
         private void OnAdShowFailed(IronSourceError error) { _client.InvokeInterstitialAdShowFailed(error); }
 #endif
