@@ -13,6 +13,7 @@ namespace Pancake.Monetization
         [SerializeField] private ApplovinBannerUnit bannerAdUnit;
         [SerializeField] private ApplovinInterstitialUnit interstitialAdUnit;
         [SerializeField] private ApplovinRewardedUnit rewardedAdUnit;
+        [SerializeField] private ApplovinAppOpenUnit appOpenAdUnit;
         [SerializeField] private ApplovinRewardedInterstitialUnit rewardedInterstitialAdUnit;
         [SerializeField] private bool enableAgeRestrictedUser;
         [SerializeField] private bool enableRequestAdAfterHidden = true;
@@ -45,6 +46,9 @@ namespace Pancake.Monetization
         public ApplovinBannerUnit BannerAdUnit => bannerAdUnit;
         public ApplovinInterstitialUnit InterstitialAdUnit => interstitialAdUnit;
         public ApplovinRewardedUnit RewardedAdUnit => rewardedAdUnit;
+#if PANCAKE_MAX_ENABLE && PANCAKE_ADMOB_ENABLE
+        public ApplovinAppOpenUnit AppOpenAdUnit => appOpenAdUnit;
+#endif
 
         public ApplovinRewardedInterstitialUnit RewardedInterstitialAdUnit => rewardedInterstitialAdUnit;
 

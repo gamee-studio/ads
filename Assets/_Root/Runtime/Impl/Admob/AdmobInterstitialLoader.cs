@@ -1,3 +1,5 @@
+
+using UnityEngine;
 #if PANCAKE_ADMOB_ENABLE
 using System;
 using GoogleMobileAds.Api;
@@ -37,7 +39,11 @@ namespace Pancake.Monetization
 
         private void OnAdDidRecordImpression(object sender, EventArgs e) { OnRecordImpressionEvent.Invoke(this, sender, e); }
 
-        private void OnAdOpening(object sender, EventArgs e) { OnOpeningEvent.Invoke(this, sender, e); }
+        private void OnAdOpening(object sender, EventArgs e)
+        {
+            R.isShowingAd = true;
+            OnOpeningEvent.Invoke(this, sender, e);
+        }
 
         private void OnAdLoaded(object sender, EventArgs e) { OnLoadedEvent.Invoke(this, sender, e); }
 
@@ -47,6 +53,7 @@ namespace Pancake.Monetization
 
         private void OnAdClosed(object sender, EventArgs e)
         {
+            R.isShowingAd = false;
             OnClosedEvent.Invoke(this, sender, e);
             OnCompleted.Invoke(this);
             Destroy();

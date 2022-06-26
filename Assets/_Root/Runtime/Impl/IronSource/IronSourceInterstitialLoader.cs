@@ -26,7 +26,11 @@ namespace Pancake.Monetization
 #if PANCAKE_IRONSOURCE_ENABLE
         private void OnAdClicked() { _client.InvokeInterstitialAdClicked(); }
 
-        private void OnAdClosed() { _client.InvokeInterstitialAdClosed(); }
+        private void OnAdClosed()
+        {
+            R.isShowingAd = false;
+            _client.InvokeInterstitialAdClosed();
+        }
 
         private void OnAdLoadFailed(IronSourceError error) { _client.InvokeInterstitialAdLoadFailed(error); }
 

@@ -15,7 +15,8 @@
     "precompiledReferences": [
         "GoogleMobileAds.dll",
         "GoogleMobileAds.Core.dll",
-        "Firebase.Analytics.dll"
+        "Firebase.Analytics.dll",
+        "GoogleMobileAds.Common.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],

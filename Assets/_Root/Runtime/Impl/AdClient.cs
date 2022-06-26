@@ -6,6 +6,7 @@ namespace Pancake.Monetization
     public abstract class AdClient : IAdClient
     {
         protected bool isInitialized;
+
         public event Action<IAdClient> OnInterstitialAdCompleted;
         public event Action<IAdClient> OnRewardedAdSkipped;
         public event Action<IAdClient> OnRewardedAdCompleted;
@@ -35,6 +36,8 @@ namespace Pancake.Monetization
                 Debug.Log(NoSdkMessage);
             }
         }
+
+        public virtual void RegisterAppStateChange() { }
 
         protected virtual bool CheckInitialize(bool logMessage = true)
         {
@@ -109,7 +112,7 @@ namespace Pancake.Monetization
                     Debug.Log($"Cannot show {Network} interstitial ad. Ad is not loaded.");
                     return;
                 }
-
+                
                 InternalShowInterstitialAd();
             }
             else
@@ -146,7 +149,7 @@ namespace Pancake.Monetization
                     Debug.LogFormat($"Cannot show {Network} rewarded ad : ad is not loaded.");
                     return;
                 }
-
+                
                 InternalShowRewardedAd();
             }
             else
@@ -183,7 +186,7 @@ namespace Pancake.Monetization
                     Debug.LogFormat($"Cannot show {Network} rewarded interstitial ad : ad is not loaded.");
                     return;
                 }
-
+                
                 InternalShowRewardedInterstitialAd();
             }
             else
@@ -219,7 +222,9 @@ namespace Pancake.Monetization
                     Debug.LogFormat($"Cannot show {Network} app open ad : ad is not loaded.");
                     return;
                 }
-
+                
+                if (R.isShowingAd) return; // dose not show app open ad when interstitial or rewarded still displayed
+                
                 InternalShowAppOpenAd();
             }
             else
@@ -229,6 +234,7 @@ namespace Pancake.Monetization
         }
 
         public bool IsAppOpenAdReady() { return CheckInitialize(false) && InternalIsAppOpenAdReady(); }
+
 
         public virtual void ShowConsentForm() { }
     }
