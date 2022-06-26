@@ -846,7 +846,8 @@ namespace Pancake.Editor
                         mediationNetwork.Name.Equals("OGURY_PRESAGE_NETWORK") || mediationNetwork.Name.Equals("SMAATO_NETWORK") ||
                         mediationNetwork.Name.Equals("SNAP_NETWORK") || mediationNetwork.Name.Equals("TAPJOY_NETWORK") ||
                         mediationNetwork.Name.Equals("TENCENT_NETWORK") || mediationNetwork.Name.Equals("VERIZON_NETWORK") ||
-                        mediationNetwork.Name.Equals("VERVE_NETWORK") || mediationNetwork.Name.Equals("YANDEX_NETWORK"))
+                        mediationNetwork.Name.Equals("VERVE_NETWORK") || mediationNetwork.Name.Equals("YANDEX_NETWORK") ||
+                        mediationNetwork.Name.Equals("BIDMACHINE_NETWORK"))
                     {
                         Settings.MaxSettings.editorListNetwork.Remove(mediationNetwork);
                     }

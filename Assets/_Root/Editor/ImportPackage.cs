@@ -5,8 +5,8 @@ namespace Pancake.Editor
 {
     public class ImportPackage
     {
-        private const string MAX_PACKAGE_PATH = "Assets/_Root/Packages/applovin-max-v5.4.0.unitypackage";
-        private const string MAX_PACKAGE_UPM_PATH = "Packages/com.gamee.ads/Packages/applovin-max-v5.4.0.unitypackage";
+        private const string MAX_PACKAGE_PATH = "Assets/_Root/Packages/applovin-max-v5.4.3.unitypackage";
+        private const string MAX_PACKAGE_UPM_PATH = "Packages/com.gamee.ads/Packages/applovin-max-v5.4.3.unitypackage";
 
         public static void ImportMax()
         {
