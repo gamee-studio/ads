@@ -28,6 +28,7 @@ namespace Pancake.Monetization
         private static float lastTimeLoadRewardedInterstitialTimestamp = DEFAULT_TIMESTAMP;
         private static float lastTimeLoadAppOpenTimestamp = DEFAULT_TIMESTAMP;
         private const string REMOVE_ADS_KEY = "remove_ads";
+        private const string APP_OPEN_ADS_KEY = "flag_app_open_ads";
         private const float DEFAULT_TIMESTAMP = -1000;
 
 
@@ -190,7 +191,7 @@ namespace Pancake.Monetization
 
         private static void AutoLoadInterstitialAd()
         {
-            if (IsAdRemoved()) return;
+            if (IsAdRemoved) return;
             if (IsInterstitialAdReady()) return;
 
             if (Time.realtimeSinceStartup - lastTimeLoadInterstitialAdTimestamp < Settings.AdSettings.AdLoadingInterval) return;
@@ -221,6 +222,7 @@ namespace Pancake.Monetization
 
         private static void AutoLoadAppOpenAd()
         {
+            if (IsAdRemoved || IsAppOpenRemoved) return;
             if (IsAppOpenAdReady()) return;
 
             if (Time.realtimeSinceStartup - lastTimeLoadAppOpenTimestamp < Settings.AdSettings.AdLoadingInterval) return;
@@ -296,7 +298,7 @@ namespace Pancake.Monetization
             return client;
         }
 
-        private static bool IsAdRemoved() { return StorageUtil.GetBool(REMOVE_ADS_KEY, false); }
+        public static bool IsAdRemoved => StorageUtil.GetBool(REMOVE_ADS_KEY, false);
 
         public static void RemoveAds()
         {
@@ -306,9 +308,23 @@ namespace Pancake.Monetization
             RemoveAdsEvent?.Invoke();
         }
 
+        public static void TurnOffAppOpenAds()
+        {
+            StorageUtil.SetBool(APP_OPEN_ADS_KEY, false);
+            StorageUtil.Save();
+        }
+
+        public static void TurnOnAppOpenAds()
+        {
+            StorageUtil.SetBool(APP_OPEN_ADS_KEY, true);
+            StorageUtil.Save();
+        }
+        
+        public static bool IsAppOpenRemoved => !StorageUtil.GetBool(APP_OPEN_ADS_KEY, false) || IsAdRemoved;
+
         private static void ShowBannerAd(IAdClient client)
         {
-            if (IsAdRemoved() || !Application.isMobilePlatform) return;
+            if (IsAdRemoved || !Application.isMobilePlatform) return;
 
             client.ShowBannerAd();
         }
@@ -327,19 +343,19 @@ namespace Pancake.Monetization
 
         private static void LoadInterstitialAd(IAdClient client)
         {
-            if (IsAdRemoved() || !Application.isMobilePlatform) return;
+            if (IsAdRemoved || !Application.isMobilePlatform) return;
             client.LoadInterstitialAd();
         }
 
         private static bool IsInterstitialAdReady(IAdClient client)
         {
-            if (!IsInitialized || IsAdRemoved() || !Application.isMobilePlatform) return false;
+            if (!IsInitialized || IsAdRemoved || !Application.isMobilePlatform) return false;
             return client.IsInterstitialAdReady();
         }
 
         private static void ShowInterstitialAd(IAdClient client)
         {
-            if (IsAdRemoved() || !Application.isMobilePlatform) return;
+            if (IsAdRemoved || !Application.isMobilePlatform) return;
             client.ShowInterstitialAd();
         }
 
@@ -373,19 +389,19 @@ namespace Pancake.Monetization
 
         private static void LoadAppOpenAd(IAdClient client)
         {
-            if (IsAdRemoved() || !Application.isMobilePlatform || (!Settings.AdSettings.UseAppOpenAdOfAdmob && Settings.AdSettings.CurrentNetwork != EAdNetwork.Admob)) return;
+            if (IsAdRemoved || IsAppOpenRemoved || !Application.isMobilePlatform || (!Settings.AdSettings.UseAppOpenAdOfAdmob && Settings.AdSettings.CurrentNetwork != EAdNetwork.Admob)) return;
             client.LoadAppOpenAd();
         }
 
         private static bool IsAppOpenAdReady(IAdClient client)
         {
-            if (!IsInitialized || IsAdRemoved() || !Application.isMobilePlatform) return false;
+            if (!IsInitialized || IsAppOpenRemoved || IsAdRemoved || !Application.isMobilePlatform) return false;
             return client.IsAppOpenAdReady();
         }
 
         private static void ShowAppOpenAd(IAdClient client)
         {
-            if (IsAdRemoved() || !Application.isMobilePlatform) return;
+            if (IsAdRemoved || IsAppOpenRemoved || !Application.isMobilePlatform) return;
             client.ShowAppOpenAd();
         }
 
