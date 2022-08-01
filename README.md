@@ -12,10 +12,10 @@ Integration module for implementing in-game advertising for Unity 3d
 
 Add the following lines below to `Packages/manifest.json`
 
-- for excactly version `1.0.11`
+- for excactly version `1.0.13`
 
 ```csharp
-"com.gamee.ads": "https://github.com/gamee-studio/ads.git?path=Assets/_Root#1.0.11",
+"com.gamee.ads": "https://github.com/gamee-studio/ads.git?path=Assets/_Root#1.0.13",
 "com.pancake.common": "https://github.com/pancake-llc/common.git?path=Assets/_Root#1.2.5",
 "com.snorlax.locale": "https://github.com/snorluxe/locale.git?path=Assets/_Root#1.0.2",
 "com.google.external-dependency-manager": "https://github.com/snorluxe/external-dependency-manager.git?path=Assets/_Root#1.2.171",
