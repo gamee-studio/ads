@@ -320,7 +320,7 @@ namespace Pancake.Monetization
             StorageUtil.Save();
         }
         
-        public static bool IsAppOpenRemoved => !StorageUtil.GetBool(APP_OPEN_ADS_KEY, false) || IsAdRemoved;
+        public static bool IsAppOpenRemoved => !StorageUtil.GetBool(APP_OPEN_ADS_KEY, true) || IsAdRemoved;
 
         private static void ShowBannerAd(IAdClient client)
         {
